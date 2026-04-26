@@ -1,7 +1,5 @@
 # UBB-SE-2026-832-1
 
-Team repository for the merge phase (ClassLibrary + WebAPI + WinUI) in Software Engineering.
-
 ## Solution Structure
 
 - `ClassLibrary`
@@ -20,7 +18,7 @@ Team repository for the merge phase (ClassLibrary + WebAPI + WinUI) in Software 
 
 ## Architecture Rules
 
-- Keep business logic out of GUI code (`Views` / code-behind).
+- Keep business logic just in services.
 - Keep model definitions in `ClassLibrary/Models`; do not redefine models in `WinUI`.
 - Keep repository interfaces in `ClassLibrary/IRepositories`.
 - Keep repository implementations in `WebAPI/Repositories`.
@@ -28,7 +26,7 @@ Team repository for the merge phase (ClassLibrary + WebAPI + WinUI) in Software 
 
 ## Prerequisites
 
-- Windows + Visual Studio 2022 (for WinUI project)
+- Windows + Visual Studio 2022
 - .NET 8 SDK
 
 ## Getting Started
