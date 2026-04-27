@@ -3,13 +3,17 @@
 ## Solution Structure
 
 - `ClassLibrary`
-  - `Models` - shared domain/data models
+  - `Models` - shared domain models
   - `DTOs` - transport contracts
-  - `IRepositories` - repository interfaces (contracts only)
+  - `IRepositories` - repository interfaces
+  - `Repositories` - repository implementations
+  - `Data` - EF Core `AppDbContext`
+  - `Extensions` - registration and initialization helpers:
+    - `ServiceCollectionExtensions` for DI registrations
+    - `DatabaseInitializer` for seed data
 - `WebAPI`
   - `Controllers` - HTTP endpoints
-  - `Services` - business/service layer
-  - `Repositories` - data access implementations
+  - `Services` - business logic layer
   - `Properties/launchSettings.json` - run profiles (Development + Swagger)
 - `WinUI`
   - `Views` - XAML pages/windows
@@ -18,11 +22,20 @@
 
 ## Architecture Rules
 
-- Keep business logic just in services.
-- Keep model definitions in `ClassLibrary/Models`; do not redefine models in `WinUI`.
+- Keep business logic in services.
+- Keep model definitions in `ClassLibrary/Models`; do not redefine them in `WinUI`.
 - Keep repository interfaces in `ClassLibrary/IRepositories`.
-- Keep repository implementations in `WebAPI/Repositories`.
-- `WinUI` communicates with backend through services/proxies, not direct DB access.
+- Keep repository implementations in `ClassLibrary/Repositories`.
+- Keep EF context definitions in `ClassLibrary/Data`.
+- `WebAPI` should call extension methods for data-layer wiring, not reference data-layer internals directly.
+- `WinUI` communicates with backend through services/proxies, not direct database access.
+
+## Data Access
+
+- EF Core is configured with an in-memory database (`AppDb`) for now.
+- `AppDbContext` lives in `ClassLibrary/Data/AppDbContext.cs`.
+- DI registration is done via `AddClassLibraryDataAccess()` in `ClassLibrary/Extensions/ServiceCollectionExtensions.cs`.
+- Seed data is applied via `SeedClassLibraryData()` in `ClassLibrary/Extensions/DatabaseInitializer.cs`.
 
 ## Prerequisites
 
@@ -44,9 +57,3 @@ When running `WebAPI`, test:
 
 - Swagger UI: `http://localhost:5066/swagger`
 - Users endpoint: `http://localhost:5066/api/users`
-
-Notes:
-
-- `404` on `/` is normal unless a root endpoint is mapped.
-- `404` on `/favicon.ico` is normal if no icon file is provided.
-

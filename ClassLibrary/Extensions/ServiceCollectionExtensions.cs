@@ -8,12 +8,12 @@ namespace ClassLibrary.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    private const string InMemoryDatabaseName = "AppDb";
+    private const string inMemoryDatabaseName = "AppDb";
 
     public static IServiceCollection AddClassLibraryDataAccess(this IServiceCollection services)
     {
         services.AddDbContext<AppDbContext>(options =>
-            options.UseInMemoryDatabase(InMemoryDatabaseName));
+            options.UseInMemoryDatabase(inMemoryDatabaseName));
         services.AddScoped<IUserRepository, UserRepository>();
 
         return services;

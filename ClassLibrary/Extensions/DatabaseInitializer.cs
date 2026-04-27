@@ -6,8 +6,8 @@ namespace ClassLibrary.Extensions;
 
 public static class DatabaseInitializer
 {
-    private const string SeedUserEmail = "test@example.com";
-    private const string SeedUserFullName = "test user";
+    private const string seedUserEmail = "test@example.com";
+    private const string seedUserFullName = "test user";
 
     public static void SeedClassLibraryData(this IServiceProvider serviceProvider)
     {
@@ -23,8 +23,8 @@ public static class DatabaseInitializer
             new User
             {
                 Id = Guid.NewGuid(),
-                Email = SeedUserEmail,
-                FullName = SeedUserFullName
+                Email = seedUserEmail,
+                FullName = seedUserFullName
             });
         dbContext.SaveChanges();
     }
