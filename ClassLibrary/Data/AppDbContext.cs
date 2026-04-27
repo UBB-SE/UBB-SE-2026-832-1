@@ -13,6 +13,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<WorkoutLog> WorkoutLogs { get; set; } = default!;
 
+    public DbSet<Notification> Notifications { get; set; } = default!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ClientAchievement>()

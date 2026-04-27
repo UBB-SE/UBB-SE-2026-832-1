@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
             options.UseInMemoryDatabase(IN_MEMORY_DATABASE_NAME));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRepositoryAchievements, RepositoryAchievements>();
+        services.AddScoped<IRepositoryNotification, RepositoryNotification>();
 
         return services;
     }
