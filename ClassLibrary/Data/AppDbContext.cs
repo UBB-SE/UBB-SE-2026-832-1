@@ -29,10 +29,25 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<Message> Messages { get; set; } = default!;
 
+    public DbSet<Favorite> Favorites { get; set; } = default!;
+
+    public DbSet<MealsIngredient> MealsIngredients { get; set; } = default!;
+
+    public DbSet<MealPlanMeal> MealPlanMeals { get; set; } = default!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Ingredient>()
             .HasKey(i => i.FoodId);
+
+        modelBuilder.Entity<Favorite>()
+            .HasKey(f => new { f.UserId, f.MealId });
+
+        modelBuilder.Entity<MealsIngredient>()
+            .HasKey(mi => new { mi.MealId, mi.FoodId });
+
+        modelBuilder.Entity<MealPlanMeal>()
+            .HasKey(mpm => new { mpm.MealPlanId, mpm.MealId });
     }
 }
 
