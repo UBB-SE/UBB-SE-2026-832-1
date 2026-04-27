@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<AppDbContext>(options =>
             options.UseInMemoryDatabase(IN_MEMORY_DATABASE_NAME));
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRepositoryAchievements, RepositoryAchievements>();
 
         return services;
     }

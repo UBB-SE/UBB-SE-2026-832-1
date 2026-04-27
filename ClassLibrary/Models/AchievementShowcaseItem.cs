@@ -1,4 +1,4 @@
-namespace VibeCoders.Models;
+namespace ClassLibrary.Models;
 
 public sealed class AchievementShowcaseItem
 {

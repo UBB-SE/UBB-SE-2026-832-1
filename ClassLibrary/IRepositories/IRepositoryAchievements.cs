@@ -1,25 +1,22 @@
-﻿namespace VibeCoders.Repositories.Interfaces
+using ClassLibrary.Models;
+
+namespace ClassLibrary.IRepositories;
+
+public interface IRepositoryAchievements
 {
-    using VibeCoders.Models;
+    Task<int> GetConsecutiveWorkoutDayStreakAsync(int clientId, CancellationToken cancellationToken = default);
 
-    public interface IRepositoryAchievements
-    {
-        int GetConsecutiveWorkoutDayStreak(int clientId);
+    Task<IReadOnlyList<Achievement>> GetAllAchievementsAsync(CancellationToken cancellationToken = default);
 
-        List<Achievement> GetAllAchievements();
+    Task<int> GetWorkoutsInLastSevenDaysAsync(int clientId, CancellationToken cancellationToken = default);
 
-        void EvaluateAndUnlockWorkoutMilestones(int clientId);
+    Task<IReadOnlyList<AchievementShowcaseItem>> GetAchievementShowcaseForClientAsync(int clientId, CancellationToken cancellationToken = default);
 
-        int GetWorkoutsInLastSevenDays(int clientId);
+    Task<int> GetWorkoutCountAsync(int clientId, CancellationToken cancellationToken = default);
 
-        List<AchievementShowcaseItem> GetAchievementShowcaseForClient(int clientId);
+    Task<int> GetDistinctWorkoutDayCountAsync(int clientId, CancellationToken cancellationToken = default);
 
-        int GetWorkoutCount(int clientId);
+    Task<AchievementShowcaseItem?> GetAchievementForClientAsync(int achievementId, int clientId, CancellationToken cancellationToken = default);
 
-        int GetDistinctWorkoutDayCount(int clientId);
-
-        AchievementShowcaseItem? GetAchievementForClient(int achievementId, int clientId);
-
-        bool AwardAchievement(int clientId, int achievementId);
-    }
+    Task<bool> AwardAchievementAsync(int clientId, int achievementId, CancellationToken cancellationToken = default);
 }

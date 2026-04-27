@@ -1,39 +1,58 @@
-namespace VibeCoders.Repositories;
-using Microsoft.Data.Sqlite;
-using VibeCoders.Models;
-using VibeCoders.Repositories.Interfaces;
+using ClassLibrary.Data;
+using ClassLibrary.IRepositories;
+using ClassLibrary.Models;
+using Microsoft.EntityFrameworkCore;
 
-public class RepositoryAchievements : IRepositoryAchievements
+namespace ClassLibrary.Repositories;
+
+
+public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepositoryAchievements
 {
-    private readonly string connectionString;
-    public RepositoryAchievements(string connectionString)
+    public async Task<IReadOnlyList<Achievement>> GetAllAchievementsAsync(CancellationToken cancellationToken = default)
     {
-        this.connectionString = connectionString;
+        return await dbContext.Achievements
+            .AsNoTracking()
+            .OrderBy(a => a.AchievementId)
+            .ToListAsync(cancellationToken);
     }
-    public int GetConsecutiveWorkoutDayStreak(int clientId)
+
+    public async Task<int> GetWorkoutCountAsync(int clientId, CancellationToken cancellationToken = default)
     {
-        using var connection = new SqliteConnection(this.connectionString);
-        connection.Open();
+        return await dbContext.WorkoutLogs
+            .CountAsync(w => w.ClientId == clientId, cancellationToken);
+    }
 
-        const string sql = @"
-            SELECT DISTINCT date(date)
-            FROM   WORKOUT_LOG
-            WHERE  client_id = @ClientId
-            ORDER BY date(date) DESC;";
+    public async Task<int> GetDistinctWorkoutDayCountAsync(int clientId, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.WorkoutLogs
+            .Where(w => w.ClientId == clientId)
+            .Select(w => w.Date.Date)
+            .Distinct()
+            .CountAsync(cancellationToken);
+    }
 
-        using var command = new SqliteCommand(sql, connection);
-        command.Parameters.AddWithValue("@ClientId", clientId);
+    public async Task<int> GetWorkoutsInLastSevenDaysAsync(int clientId, CancellationToken cancellationToken = default)
+    {
+        var today = DateTime.Today;
+        var cutoff = today.AddDays(-6);
+        var tomorrow = today.AddDays(1);
 
-        var dates = new List<DateTime>();
-        using var reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            if (DateTime.TryParse(reader.GetString(0), out var parsedDate))
-            {
-                dates.Add(parsedDate.Date);
-            }
-        }
+        return await dbContext.WorkoutLogs
+            .CountAsync(
+                w => w.ClientId == clientId && w.Date >= cutoff && w.Date < tomorrow,
+                cancellationToken);
+    }
 
+    public async Task<int> GetConsecutiveWorkoutDayStreakAsync(int clientId, CancellationToken cancellationToken = default)
+    {
+        var dates = await dbContext.WorkoutLogs
+            .Where(w => w.ClientId == clientId)
+            .Select(w => w.Date.Date)
+            .Distinct()
+            .OrderByDescending(d => d)
+            .ToListAsync(cancellationToken);
+
+        
         if (dates.Count == 0)
         {
             return 0;
@@ -61,221 +80,72 @@ public class RepositoryAchievements : IRepositoryAchievements
         return maxStreak;
     }
 
-    public List<Achievement> GetAllAchievements()
+    public async Task<IReadOnlyList<AchievementShowcaseItem>> GetAchievementShowcaseForClientAsync(int clientId, CancellationToken cancellationToken = default)
     {
-        var list = new List<Achievement>();
-
-        using var connection = new SqliteConnection(this.connectionString);
-        connection.Open();
-
-        const string sql = @"
-            SELECT
-                achievement_id,
-                title,
-                description,
-                COALESCE(criteria, '') AS criteria,
-                threshold_workouts
-            FROM ACHIEVEMENT
-            ORDER BY achievement_id;";
-
-        using var command = new SqliteCommand(sql, connection);
-        using var reader = command.ExecuteReader();
-
-        while (reader.Read())
-        {
-            list.Add(new Achievement
+        var items = await dbContext.Achievements
+            .AsNoTracking()
+            .Select(a => new AchievementShowcaseItem
             {
-                AchievementId = reader.GetInt32(0),
-                Name = reader.GetString(1),
-                Description = reader.GetString(2),
-                Criteria = reader.GetString(3),
-                ThresholdWorkouts = reader.IsDBNull(4) ? null : reader.GetInt32(4),
-                IsUnlocked = false,
-            });
-        }
+                AchievementId = a.AchievementId,
+                Title = a.Name,
+                Description = a.Description,
+                Criteria = a.Criteria,
+                IsUnlocked = a.ClientAchievements.Any(ca => ca.ClientId == clientId && ca.Unlocked),
+            })
+            .ToListAsync(cancellationToken);
 
-        return list;
+        
+        return items
+            .GroupBy(x => x.Title, StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.First())
+            .OrderByDescending(x => x.IsUnlocked)
+            .ThenBy(x => x.AchievementId)
+            .ToList();
     }
 
-    public void EvaluateAndUnlockWorkoutMilestones(int clientId)
+    public async Task<AchievementShowcaseItem?> GetAchievementForClientAsync(int achievementId, int clientId, CancellationToken cancellationToken = default)
     {
-        var achievements = this.GetAllAchievements();
-        int totalWorkouts = this.GetWorkoutCount(clientId);
-
-        foreach (var achievement in achievements)
-        {
-            if (achievement.ThresholdWorkouts.HasValue && totalWorkouts >= achievement.ThresholdWorkouts.Value)
+        return await dbContext.Achievements
+            .AsNoTracking()
+            .Where(a => a.AchievementId == achievementId)
+            .Select(a => new AchievementShowcaseItem
             {
-                this.AwardAchievement(clientId, achievement.AchievementId);
-            }
-        }
+                AchievementId = a.AchievementId,
+                Title = a.Name,
+                Description = a.Description,
+                Criteria = a.Criteria,
+                IsUnlocked = a.ClientAchievements.Any(ca => ca.ClientId == clientId && ca.Unlocked),
+            })
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public int GetWorkoutsInLastSevenDays(int clientId)
+    public async Task<bool> AwardAchievementAsync(int clientId, int achievementId, CancellationToken cancellationToken = default)
     {
-        using var connection = new SqliteConnection(this.connectionString);
-        connection.Open();
+        var existing = await dbContext.ClientAchievements
+            .FirstOrDefaultAsync(
+                ca => ca.ClientId == clientId && ca.AchievementId == achievementId,
+                cancellationToken);
 
-        const string sql = @"
-            SELECT COUNT(*)
-            FROM   WORKOUT_LOG
-            WHERE  client_id = @ClientId
-              AND  date(date) >= date('now', '-6 days')
-              AND  date(date) <= date('now');";
-
-        using var command = new SqliteCommand(sql, connection);
-        command.Parameters.AddWithValue("@ClientId", clientId);
-        return Convert.ToInt32(command.ExecuteScalar());
-    }
-
-    public List<AchievementShowcaseItem> GetAchievementShowcaseForClient(int clientId)
-    {
-        var list = new List<AchievementShowcaseItem>();
-
-        using var connection = new SqliteConnection(this.connectionString);
-        connection.Open();
-
-        const string sql = @"
-            SELECT a.achievement_id, a.title, a.description, a.criteria,
-                   CASE WHEN COALESCE(ca.unlocked, 0) = 1 THEN 1 ELSE 0 END
-            FROM ACHIEVEMENT a
-            LEFT JOIN CLIENT_ACHIEVEMENT ca
-                ON ca.achievement_id = a.achievement_id AND ca.client_id = @ClientId
-            ORDER BY COALESCE(ca.unlocked, 0) DESC, a.achievement_id;";
-
-        using var command = new SqliteCommand(sql, connection);
-        command.Parameters.AddWithValue("@ClientId", clientId);
-
-        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        using var reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            var title = reader.GetString(1);
-            if (!seen.Add(title))
-            {
-                continue;
-            }
-
-            list.Add(new AchievementShowcaseItem
-            {
-                AchievementId = reader.GetInt32(0),
-                Title = title,
-                Description = reader.GetString(2),
-                Criteria = reader.GetString(3),
-                IsUnlocked = reader.GetInt32(4) != 0,
-            });
-        }
-
-        return list;
-    }
-
-    public int GetWorkoutCount(int clientId)
-    {
-        using var connection = new SqliteConnection(this.connectionString);
-        connection.Open();
-        using var command = new SqliteCommand(
-            "SELECT COUNT(1) FROM WORKOUT_LOG WHERE client_id = @ClientId;", connection);
-        command.Parameters.AddWithValue("@ClientId", clientId);
-        return Convert.ToInt32(command.ExecuteScalar());
-    }
-
-    public int GetDistinctWorkoutDayCount(int clientId)
-    {
-        using var connection = new SqliteConnection(this.connectionString);
-        connection.Open();
-        using var command = new SqliteCommand(
-            "SELECT COUNT(DISTINCT date(date)) FROM WORKOUT_LOG WHERE client_id = @ClientId;", connection);
-        command.Parameters.AddWithValue("@ClientId", clientId);
-        return Convert.ToInt32(command.ExecuteScalar());
-    }
-
-    public AchievementShowcaseItem? GetAchievementForClient(int achievementId, int clientId)
-    {
-        using var connection = new SqliteConnection(this.connectionString);
-        connection.Open();
-
-        const string sql = @"
-            SELECT a.achievement_id, a.title, a.description, a.criteria,
-                   CASE WHEN COALESCE(ca.unlocked, 0) = 1 THEN 1 ELSE 0 END
-            FROM ACHIEVEMENT a
-            LEFT JOIN CLIENT_ACHIEVEMENT ca
-                ON ca.achievement_id = a.achievement_id AND ca.client_id = @ClientId
-            WHERE a.achievement_id = @AchievementId;";
-
-        using var command = new SqliteCommand(sql, connection);
-        command.Parameters.AddWithValue("@AchievementId", achievementId);
-        command.Parameters.AddWithValue("@ClientId", clientId);
-
-        using var reader = command.ExecuteReader();
-        if (!reader.Read())
-        {
-            return null;
-        }
-
-        return new AchievementShowcaseItem
-        {
-            AchievementId = reader.GetInt32(0),
-            Title = reader.GetString(1),
-            Description = reader.GetString(2),
-            Criteria = reader.GetString(3),
-            IsUnlocked = reader.GetInt32(4) != 0,
-        };
-    }
-
-    public bool AwardAchievement(int clientId, int achievementId)
-    {
-        using var connection = new SqliteConnection(this.connectionString);
-        connection.Open();
-
-        const string checkSql = @"
-            SELECT COUNT(1)
-            FROM CLIENT_ACHIEVEMENT
-            WHERE client_id      = @ClientId
-              AND achievement_id = @AchievementId
-              AND unlocked       = 1;";
-
-        using (var checkCmd = new SqliteCommand(checkSql, connection))
-        {
-            checkCmd.Parameters.AddWithValue("@ClientId", clientId);
-            checkCmd.Parameters.AddWithValue("@AchievementId", achievementId);
-
-            if (Convert.ToInt32(checkCmd.ExecuteScalar()) > 0)
-            {
-                return false;
-            }
-        }
-
-        const string insertSql = @"
-            INSERT OR IGNORE INTO CLIENT_ACHIEVEMENT (client_id, achievement_id, unlocked)
-            VALUES (@ClientId, @AchievementId, 1);";
-
-        const string updateSql = @"
-            UPDATE CLIENT_ACHIEVEMENT
-               SET unlocked = 1
-             WHERE client_id      = @ClientId
-               AND achievement_id = @AchievementId;";
-
-        try
-        {
-            using (var insertCmd = new SqliteCommand(insertSql, connection))
-            {
-                insertCmd.Parameters.AddWithValue("@ClientId", clientId);
-                insertCmd.Parameters.AddWithValue("@AchievementId", achievementId);
-                insertCmd.ExecuteNonQuery();
-            }
-
-            using (var updateCmd = new SqliteCommand(updateSql, connection))
-            {
-                updateCmd.Parameters.AddWithValue("@ClientId", clientId);
-                updateCmd.Parameters.AddWithValue("@AchievementId", achievementId);
-                updateCmd.ExecuteNonQuery();
-            }
-
-            return true;
-        }
-        catch (SqliteException exception) when (exception.SqliteErrorCode == 19)
+        if (existing is { Unlocked: true })
         {
             return false;
         }
+
+        if (existing is null)
+        {
+            dbContext.ClientAchievements.Add(new ClientAchievement
+            {
+                ClientId = clientId,
+                AchievementId = achievementId,
+                Unlocked = true,
+            });
+        }
+        else
+        {
+            existing.Unlocked = true;
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return true;
     }
 }
