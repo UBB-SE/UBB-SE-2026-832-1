@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,12 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<Notification> Notifications { get; set; } = default!;
 
+    public DbSet<NutritionPlan> NutritionPlans { get; set; } = default!;
+
+    public DbSet<Meal> Meals { get; set; } = default!;
+
+    public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ClientAchievement>()
@@ -24,5 +31,22 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             .HasOne(ca => ca.Achievement)
             .WithMany(a => a.ClientAchievements)
             .HasForeignKey(ca => ca.AchievementId);
+
+        modelBuilder.Entity<NutritionPlan>()
+            .HasKey(np => np.PlanId);
+
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasKey(cnp => new { cnp.ClientId, cnp.NutritionPlanId });
+
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasOne(cnp => cnp.NutritionPlan)
+            .WithMany()
+            .HasForeignKey(cnp => cnp.NutritionPlanId);
+
+        modelBuilder.Entity<Meal>()
+            .Property(m => m.Ingredients)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
     }
 }
