@@ -1,4 +1,4 @@
-using ClassLibrary.DependencyInjection;
+using ClassLibrary.Extensions;
 using WebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
