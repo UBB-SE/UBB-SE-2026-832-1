@@ -16,6 +16,7 @@
   - local variables, parameters must use `camelCase` naming convention
 5. Constants
   - whenever possible to use `const` keyword before a variable, it must be used
+  - constants must use `UPPER_CASE_WITH_UNDERSCORES` naming convention
 
 ### Files
 
