@@ -1,4 +1,6 @@
-namespace VibeCoders.Models;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ClassLibrary.Models;
 
 public class Achievement
 {
@@ -14,5 +16,9 @@ public class Achievement
 
     public int? ThresholdWorkouts { get; set; }
 
+    // Per-client display state — not a database column.
+    [NotMapped]
     public bool IsUnlocked { get; set; }
+
+    public ICollection<ClientAchievement> ClientAchievements { get; set; } = [];
 }

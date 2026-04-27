@@ -1,4 +1,4 @@
-namespace VibeCoders.Models;
+namespace ClassLibrary.Models;
 
 public sealed class LoggedSet
 {
@@ -11,6 +11,5 @@ public sealed class LoggedSet
     public double? TargetWeight { get; set; }
     public double? ActualWeight { get; set; }
     public int SetNumber { get; set; }
-
     public LoggedExercise? Exercise { get; set; }
 }
