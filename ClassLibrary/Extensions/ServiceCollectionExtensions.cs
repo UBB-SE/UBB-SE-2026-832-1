@@ -16,6 +16,16 @@ public static class ServiceCollectionExtensions
             options.UseInMemoryDatabase(IN_MEMORY_DATABASE_NAME));
         services.AddScoped<IUserRepository, UserRepository>();
 
+        services.AddScoped<INutUserRepository, NutUserRepository>();
+        services.AddScoped<IMealRepository, MealRepository>();
+        services.AddScoped<IMealPlanRepository, MealPlanRepository>();
+        services.AddScoped<IIngredientRepository, IngredientRepository>();
+        services.AddScoped<IInventoryRepository, InventoryRepository>();
+        services.AddScoped<IShoppingListRepository, ShoppingListRepository>();
+        services.AddScoped<IReminderRepository, ReminderRepository>();
+        services.AddScoped<IDailyLogRepository, DailyLogRepository>();
+        services.AddScoped<IChatRepository, ChatRepository>();
+
         return services;
     }
 }
