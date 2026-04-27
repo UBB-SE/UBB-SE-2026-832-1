@@ -5,11 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
 
-// NON-REPOSITORY LOGIC REMOVED:
-// The original implementation contained SaveNutritionPlanForClient(NutritionPlan plan, int clientId)
-// which orchestrated three sequential operations: InsertNutritionPlan, InsertMeal (for each meal),
-// and AssignNutritionPlanToClient. This is pure orchestration and does not belong in a data-access
-// layer. It must be reimplemented in a NutritionService that depends on IRepositoryNutrition.
+
 public sealed class RepositoryNutrition(AppDbContext dbContext) : IRepositoryNutrition
 {
     public async Task<int> InsertNutritionPlanAsync(NutritionPlan plan, CancellationToken cancellationToken = default)
