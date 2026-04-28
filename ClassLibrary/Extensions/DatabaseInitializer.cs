@@ -25,9 +25,9 @@ public static class DatabaseInitializer
             new Ingredient { FoodId = 2, Name = "Brown Rice", CaloriesPer100g = 216, ProteinPer100g = 5, CarbsPer100g = 45, FatPer100g = 1.8 },
             new Ingredient { FoodId = 3, Name = "Broccoli", CaloriesPer100g = 55, ProteinPer100g = 3.7, CarbsPer100g = 11, FatPer100g = 0.6 });
 
-        dbContext.Meals.AddRange(
-            new Meal { Name = "Grilled Chicken Bowl", Calories = 450, Protein = 40, Carbs = 35, Fat = 12 },
-            new Meal { Name = "Veggie Stir Fry", Calories = 280, Protein = 12, Carbs = 30, Fat = 8 });
+        dbContext.FoodItems.AddRange(
+            new FoodItem { Name = "Grilled Chicken Bowl", Calories = 450, Protein = 40, Carbs = 35, Fat = 12 },
+            new FoodItem { Name = "Veggie Stir Fry", Calories = 280, Protein = 12, Carbs = 30, Fat = 8 });
 
         dbContext.SaveChanges();
     }

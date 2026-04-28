@@ -1,6 +1,6 @@
 namespace ClassLibrary.Models;
 
-public sealed class MealFilter
+public sealed class FoodItemFilter
 {
     public bool IsKeto { get; set; }
 
