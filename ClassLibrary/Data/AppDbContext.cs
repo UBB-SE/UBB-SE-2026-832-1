@@ -56,19 +56,19 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
         modelBuilder.Entity<Conversation>()
             .HasOne(c => c.User)
             .WithMany()
-            .HasForeignKey(c => c.UserId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Conversation>()
             .HasMany(c => c.Messages)
             .WithOne(m => m.Conversation)
-            .HasForeignKey(m => m.ConversationId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Message>()
             .HasOne(m => m.Sender)
             .WithMany()
-            .HasForeignKey(m => m.SenderId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

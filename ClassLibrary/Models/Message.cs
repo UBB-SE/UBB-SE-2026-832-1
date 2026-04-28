@@ -12,18 +12,12 @@ public class Message
     public DateTime SentAt { get; set; }
 
     [Required]
-    [ForeignKey(nameof(Conversation))]
-    public int ConversationId { get; set; }
+    public virtual Conversation Conversation { get; set; } = default!;
 
     [Required]
-    [ForeignKey(nameof(Sender))]
-    public Guid SenderId { get; set; }
+    public virtual User Sender { get; set; } = default!;
 
     [Required]
     [MaxLength(5000)]
     public string TextContent { get; set; } = string.Empty;
-
-    public virtual Conversation? Conversation { get; set; }
-
-    public virtual User? Sender { get; set; }
 }

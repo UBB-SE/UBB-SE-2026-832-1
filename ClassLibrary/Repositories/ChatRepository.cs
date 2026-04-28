@@ -25,11 +25,12 @@ public class ChatRepository : IChatRepository
 
     public async Task<IEnumerable<Conversation>> GetConversationsWithUserMessagesAsync()
     {
+        // Note: Since User model doesn't have a Role property, this method returns all conversations with messages.
+        // To distinguish between user and nutritionist messages, consider adding an IsFromNutritionist
+        // property to the Message model or adding Role property to User model.
         return await context.Conversations
             .Include(c => c.User)
-            .Where(c => context.Messages
-                .Include(m => m.Sender)
-                .Any(m => m.ConversationId == c.Id && m.Sender!.Email != null))
+            .Where(c => c.Messages.Any())
             .OrderByDescending(c => c.HasUnanswered)
             .ThenByDescending(c => c.Id)
             .Distinct()
@@ -40,7 +41,7 @@ public class ChatRepository : IChatRepository
     {
         return await context.Conversations
             .Include(c => c.User)
-            .Where(c => context.Messages.Any(m => m.ConversationId == c.Id))
+            .Where(c => c.Messages.Any())
             .OrderByDescending(c => c.HasUnanswered)
             .ThenByDescending(c => c.Id)
             .Distinct()
@@ -51,8 +52,7 @@ public class ChatRepository : IChatRepository
     {
         return await context.Conversations
             .Include(c => c.User)
-            .Where(c => context.Messages
-                .Any(m => m.ConversationId == c.Id && m.SenderId == nutritionistId))
+            .Where(c => c.Messages.Any(m => EF.Property<Guid>(m.Sender, "Id") == nutritionistId))
             .OrderByDescending(c => c.HasUnanswered)
             .ThenByDescending(c => c.Id)
             .Distinct()
@@ -62,16 +62,23 @@ public class ChatRepository : IChatRepository
     public async Task<Conversation> GetOrCreateConversationForUserAsync(Guid userId)
     {
         var conversation = await context.Conversations
-            .FirstOrDefaultAsync(c => c.UserId == userId);
+            .Include(c => c.User)
+            .FirstOrDefaultAsync(c => EF.Property<Guid>(c.User, "Id") == userId);
 
         if (conversation != null)
         {
             return conversation;
         }
 
+        var user = await context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            throw new InvalidOperationException($"User with ID {userId} not found.");
+        }
+
         conversation = new Conversation
         {
-            UserId = userId,
+            User = user,
             HasUnanswered = false
         };
 
@@ -85,28 +92,36 @@ public class ChatRepository : IChatRepository
     {
         return await context.Messages
             .Include(m => m.Sender)
-            .Where(m => m.ConversationId == conversationId)
+            .Include(m => m.Conversation)
+            .Where(m => EF.Property<int>(m.Conversation, "Id") == conversationId)
             .OrderBy(m => m.SentAt)
             .ToListAsync();
     }
 
     public async Task AddMessageAsync(int conversationId, Guid senderId, string text, bool isNutritionist)
     {
+        var conversation = await context.Conversations.FindAsync(conversationId);
+        if (conversation == null)
+        {
+            throw new InvalidOperationException($"Conversation with ID {conversationId} not found.");
+        }
+
+        var sender = await context.Users.FindAsync(senderId);
+        if (sender == null)
+        {
+            throw new InvalidOperationException($"User with ID {senderId} not found.");
+        }
+
         var message = new Message
         {
-            ConversationId = conversationId,
-            SenderId = senderId,
+            Conversation = conversation,
+            Sender = sender,
             TextContent = text,
             SentAt = DateTime.UtcNow
         };
 
         context.Messages.Add(message);
-
-        var conversation = await context.Conversations.FindAsync(conversationId);
-        if (conversation != null)
-        {
-            conversation.HasUnanswered = !isNutritionist;
-        }
+        conversation.HasUnanswered = !isNutritionist;
 
         await context.SaveChangesAsync();
     }
