@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRepositoryNotification, RepositoryNotification>();
         services.AddScoped<IRepositoryNutrition, RepositoryNutrition>();
         services.AddScoped<IDailyLogRepository, DailyLogRepository>();
+        services.AddScoped<IChatRepository, ChatRepository>();
 
         return services;
     }
