@@ -6,9 +6,6 @@ namespace ClassLibrary.Extensions;
 
 public static class DatabaseInitializer
 {
-    private const string SEED_USER_EMAIL = "test@example.com";
-    private const string SEED_USER_FULL_NAME = "test user";
-
     public static void SeedClassLibraryData(this IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
@@ -19,28 +16,19 @@ public static class DatabaseInitializer
             return;
         }
 
-        dbContext.Users.Add(
-            new User
-            {
-                Id = Guid.NewGuid(),
-                Email = SEED_USER_EMAIL,
-                FullName = SEED_USER_FULL_NAME
-            });
-
-        dbContext.NutUsers.AddRange(
-            new NutUser { Username = "nutritionist", Password = "admin123", Role = "nutritionist" },
-            new NutUser { Username = "testuser", Password = "pass", Role = "regular" });
+        dbContext.Users.AddRange(
+            new User { Username = "nutritionist", Password = "admin123", Role = "Nutritionist" },
+            new User { Username = "testuser", Password = "testpass1", Role = "User" });
 
         dbContext.Ingredients.AddRange(
-            new Ingredient { FoodId = 1, Name = "Chicken Breast", Calories = 165, Protein = 31, Carbs = 0, Fat = 3.6 },
-            new Ingredient { FoodId = 2, Name = "Brown Rice", Calories = 216, Protein = 5, Carbs = 45, Fat = 1.8 },
-            new Ingredient { FoodId = 3, Name = "Broccoli", Calories = 55, Protein = 3.7, Carbs = 11, Fat = 0.6 });
+            new Ingredient { FoodId = 1, Name = "Chicken Breast", CaloriesPer100g = 165, ProteinPer100g = 31, CarbsPer100g = 0, FatPer100g = 3.6 },
+            new Ingredient { FoodId = 2, Name = "Brown Rice", CaloriesPer100g = 216, ProteinPer100g = 5, CarbsPer100g = 45, FatPer100g = 1.8 },
+            new Ingredient { FoodId = 3, Name = "Broccoli", CaloriesPer100g = 55, ProteinPer100g = 3.7, CarbsPer100g = 11, FatPer100g = 0.6 });
 
         dbContext.Meals.AddRange(
-            new Meal { Name = "Grilled Chicken Bowl", CookingTime = 25, Servings = 2, CookingLevel = "Easy" },
-            new Meal { Name = "Veggie Stir Fry", CookingTime = 15, Servings = 1, CookingLevel = "Easy" });
+            new Meal { Name = "Grilled Chicken Bowl", Calories = 450, Protein = 40, Carbs = 35, Fat = 12 },
+            new Meal { Name = "Veggie Stir Fry", Calories = 280, Protein = 12, Carbs = 30, Fat = 8 });
 
         dbContext.SaveChanges();
     }
 }
-
