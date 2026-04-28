@@ -26,6 +26,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<Ingredient> Ingredients { get; set; } = default!;
 
+    public DbSet<Conversation> Conversations { get; set; } = default!;
+
+    public DbSet<Message> Messages { get; set; } = default!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ClientAchievement>()
@@ -79,5 +83,23 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.HasKey(i => i.FoodId);
             entity.Property(i => i.Name).IsRequired().HasMaxLength(200);
         });
+
+        modelBuilder.Entity<Conversation>()
+            .HasOne(c => c.User)
+            .WithMany()
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Conversation>()
+            .HasMany(c => c.Messages)
+            .WithOne(m => m.Conversation)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Sender)
+            .WithMany()
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
