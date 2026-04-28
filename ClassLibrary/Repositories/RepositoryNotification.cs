@@ -11,7 +11,7 @@ public sealed class RepositoryNotification(AppDbContext dbContext) : IRepository
     {
         return await dbContext.Notifications
             .AsNoTracking()
-            .Where(n => n.ClientId == clientId)
+            .Where(n => n.Client.Id == clientId)
             .OrderByDescending(n => n.DateCreated)
             .ToListAsync(cancellationToken);
     }

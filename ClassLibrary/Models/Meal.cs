@@ -8,8 +8,6 @@ public class Meal
     public int MealId { get; set; }
 
     [Required]
-    public int NutritionPlanId { get; set; }
-
     public NutritionPlan NutritionPlan { get; set; } = null!;
 
     [Required]

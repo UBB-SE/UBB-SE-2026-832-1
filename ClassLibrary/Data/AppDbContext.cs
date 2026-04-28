@@ -26,24 +26,34 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<NutritionPlan>()
+            .HasKey(np => np.PlanId);
+
         modelBuilder.Entity<ClientAchievement>()
-            .HasKey(ca => new { ca.ClientId, ca.AchievementId });
+            .HasKey("ClientId", "AchievementId");
+
+        modelBuilder.Entity<ClientAchievement>()
+            .HasOne(ca => ca.Client)
+            .WithMany(c => c.ClientAchievements)
+            .HasForeignKey("ClientId");
 
         modelBuilder.Entity<ClientAchievement>()
             .HasOne(ca => ca.Achievement)
             .WithMany(a => a.ClientAchievements)
-            .HasForeignKey(ca => ca.AchievementId);
-
-        modelBuilder.Entity<NutritionPlan>()
-            .HasKey(np => np.PlanId);
+            .HasForeignKey("AchievementId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasKey(cnp => new { cnp.ClientId, cnp.NutritionPlanId });
+            .HasKey("ClientId", "NutritionPlanId");
+
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasOne(cnp => cnp.Client)
+            .WithMany(c => c.ClientNutritionPlans)
+            .HasForeignKey("ClientId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
             .HasOne(cnp => cnp.NutritionPlan)
             .WithMany()
-            .HasForeignKey(cnp => cnp.NutritionPlanId);
+            .HasForeignKey("NutritionPlanId");
 
         modelBuilder.Entity<Meal>()
             .Property(m => m.Ingredients)

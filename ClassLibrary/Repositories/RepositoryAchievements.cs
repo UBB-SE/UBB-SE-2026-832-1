@@ -19,13 +19,13 @@ public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepository
     public async Task<int> GetWorkoutCountAsync(int clientId, CancellationToken cancellationToken = default)
     {
         return await dbContext.WorkoutLogs
-            .CountAsync(w => w.ClientId == clientId, cancellationToken);
+            .CountAsync(w => w.Client.Id == clientId, cancellationToken);
     }
 
     public async Task<int> GetDistinctWorkoutDayCountAsync(int clientId, CancellationToken cancellationToken = default)
     {
         return await dbContext.WorkoutLogs
-            .Where(w => w.ClientId == clientId)
+            .Where(w => w.Client.Id == clientId)
             .Select(w => w.Date.Date)
             .Distinct()
             .CountAsync(cancellationToken);
@@ -39,20 +39,20 @@ public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepository
 
         return await dbContext.WorkoutLogs
             .CountAsync(
-                w => w.ClientId == clientId && w.Date >= cutoff && w.Date < tomorrow,
+                w => w.Client.Id == clientId && w.Date >= cutoff && w.Date < tomorrow,
                 cancellationToken);
     }
 
     public async Task<int> GetConsecutiveWorkoutDayStreakAsync(int clientId, CancellationToken cancellationToken = default)
     {
         var dates = await dbContext.WorkoutLogs
-            .Where(w => w.ClientId == clientId)
+            .Where(w => w.Client.Id == clientId)
             .Select(w => w.Date.Date)
             .Distinct()
             .OrderByDescending(d => d)
             .ToListAsync(cancellationToken);
 
-        
+
         if (dates.Count == 0)
         {
             return 0;
@@ -90,11 +90,11 @@ public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepository
                 Title = a.Name,
                 Description = a.Description,
                 Criteria = a.Criteria,
-                IsUnlocked = a.ClientAchievements.Any(ca => ca.ClientId == clientId && ca.Unlocked),
+                IsUnlocked = a.ClientAchievements.Any(ca => ca.Client.Id == clientId && ca.Unlocked),
             })
             .ToListAsync(cancellationToken);
 
-        
+
         return items
             .GroupBy(x => x.Title, StringComparer.OrdinalIgnoreCase)
             .Select(g => g.First())
@@ -114,7 +114,7 @@ public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepository
                 Title = a.Name,
                 Description = a.Description,
                 Criteria = a.Criteria,
-                IsUnlocked = a.ClientAchievements.Any(ca => ca.ClientId == clientId && ca.Unlocked),
+                IsUnlocked = a.ClientAchievements.Any(ca => ca.Client.Id == clientId && ca.Unlocked),
             })
             .FirstOrDefaultAsync(cancellationToken);
     }
@@ -123,7 +123,7 @@ public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepository
     {
         var existing = await dbContext.ClientAchievements
             .FirstOrDefaultAsync(
-                ca => ca.ClientId == clientId && ca.AchievementId == achievementId,
+                ca => ca.Client.Id == clientId && ca.Achievement.AchievementId == achievementId,
                 cancellationToken);
 
         if (existing is { Unlocked: true })
@@ -133,10 +133,18 @@ public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepository
 
         if (existing is null)
         {
+            var client = await dbContext.Clients
+                .FirstOrDefaultAsync(c => c.Id == clientId, cancellationToken)
+                ?? throw new InvalidOperationException($"Client {clientId} not found.");
+
+            var achievement = await dbContext.Achievements
+                .FirstOrDefaultAsync(a => a.AchievementId == achievementId, cancellationToken)
+                ?? throw new InvalidOperationException($"Achievement {achievementId} not found.");
+
             dbContext.ClientAchievements.Add(new ClientAchievement
             {
-                ClientId = clientId,
-                AchievementId = achievementId,
+                Client = client,
+                Achievement = achievement,
                 Unlocked = true,
             });
         }

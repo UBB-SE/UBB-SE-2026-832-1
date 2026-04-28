@@ -8,8 +8,6 @@ public sealed class WorkoutLog
     public int Id { get; set; }
 
     [Required]
-    public int ClientId { get; set; }
-
     public Client Client { get; set; } = null!;
 
     [Required]
