@@ -22,7 +22,7 @@ public static class DatabaseInitializer
         dbContext.Users.Add(
             new User
             {
-                Id = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
                 Email = SEED_USER_EMAIL,
                 FullName = SEED_USER_FULL_NAME
             });

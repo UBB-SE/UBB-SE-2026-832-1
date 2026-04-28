@@ -8,9 +8,9 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 {
     public DbSet<User> Users { get; set; } = default!;
 
-    public DbSet<Achievement> Achievements { get; set; } = default!;
+    public DbSet<Client> Clients { get; set; } = default!;
 
-    public DbSet<ClientAchievement> ClientAchievements { get; set; } = default!;
+    public DbSet<Achievement> Achievements { get; set; } = default!;
 
     public DbSet<WorkoutLog> WorkoutLogs { get; set; } = default!;
 
@@ -28,45 +28,39 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ClientAchievement>()
-            .HasKey(ca => new { ca.ClientId, ca.AchievementId });
-
-        modelBuilder.Entity<ClientAchievement>()
-            .HasOne(ca => ca.Achievement)
-            .WithMany(a => a.ClientAchievements)
-            .HasForeignKey(ca => ca.AchievementId);
-
-        modelBuilder.Entity<NutritionPlan>()
-            .HasKey(np => np.PlanId);
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasKey("ClientId", "NutritionPlanId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasKey(cnp => new { cnp.ClientId, cnp.NutritionPlanId });
+            .HasOne(clientNutritionPlan => clientNutritionPlan.Client)
+            .WithMany(client => client.ClientNutritionPlans)
+            .HasForeignKey("ClientId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasOne(cnp => cnp.NutritionPlan)
+            .HasOne(clientNutritionPlan => clientNutritionPlan.NutritionPlan)
             .WithMany()
-            .HasForeignKey(cnp => cnp.NutritionPlanId);
+            .HasForeignKey("NutritionPlanId");
 
         modelBuilder.Entity<Meal>()
-            .Property(m => m.Ingredients)
+            .Property(meal => meal.Ingredients)
             .HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+                value => JsonSerializer.Serialize(value, (JsonSerializerOptions?)null),
+                value => JsonSerializer.Deserialize<List<string>>(value, (JsonSerializerOptions?)null) ?? new List<string>());
 
         modelBuilder.Entity<Conversation>()
-            .HasOne(c => c.User)
+            .HasOne(conversation => conversation.User)
             .WithMany()
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Conversation>()
-            .HasMany(c => c.Messages)
-            .WithOne(m => m.Conversation)
+            .HasMany(conversation => conversation.Messages)
+            .WithOne(message => message.Conversation)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Message>()
-            .HasOne(m => m.Sender)
+            .HasOne(message => message.Sender)
             .WithMany()
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);

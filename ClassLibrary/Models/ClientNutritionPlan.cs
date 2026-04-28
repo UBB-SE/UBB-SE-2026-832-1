@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ClassLibrary.Models;
 
 public class ClientNutritionPlan
 {
-    public int ClientId { get; set; }
+    [Required]
+    public Client Client { get; set; } = null!;
 
-    public int NutritionPlanId { get; set; }
-
+    [Required]
     public NutritionPlan NutritionPlan { get; set; } = null!;
 }
