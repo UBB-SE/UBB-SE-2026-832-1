@@ -8,7 +8,7 @@ namespace ClassLibrary.Models;
 public class Ingredient
 {
     [Key]
-    public int FoodId { get; set; }
+    public int IngredientId { get; set; }
 
     [Required]
     [MaxLength(255)]

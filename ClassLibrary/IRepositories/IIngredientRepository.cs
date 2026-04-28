@@ -4,10 +4,8 @@ using ClassLibrary.Models;
 
 namespace ClassLibrary.IRepositories;
 
-
 public interface IIngredientRepository
 {
-    Task<int> GetOrCreateIngredientIdAsync(string name);
     Task<int> GetOrCreateIngredientIdByNameAsync(string name);
     Task<List<KeyValuePair<int, string>>> SearchIngredientsAsync(string search);
     Task<List<Ingredient>> GetAllAsync();
