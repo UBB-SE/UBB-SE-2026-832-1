@@ -44,57 +44,57 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             .HasKey("ClientId", "NutritionPlanId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasOne(cnp => cnp.Client)
-            .WithMany(c => c.ClientNutritionPlans)
+            .HasOne(clientNutritionPlan => clientNutritionPlan.Client)
+            .WithMany(client => client.ClientNutritionPlans)
             .HasForeignKey("ClientId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasOne(cnp => cnp.NutritionPlan)
+            .HasOne(clientNutritionPlan => clientNutritionPlan.NutritionPlan)
             .WithMany()
             .HasForeignKey("NutritionPlanId");
 
         modelBuilder.Entity<Meal>()
-            .Property(m => m.Ingredients)
+            .Property(meal => meal.Ingredients)
             .HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+                value => JsonSerializer.Serialize(value, (JsonSerializerOptions?)null),
+                value => JsonSerializer.Deserialize<List<string>>(value, (JsonSerializerOptions?)null) ?? new List<string>());
 
         modelBuilder.Entity<DailyLog>(entity =>
         {
-            entity.HasOne(dl => dl.User)
+            entity.HasOne(dailyLog => dailyLog.User)
                 .WithMany()
-                .HasForeignKey(dl => dl.UserId)
+                .HasForeignKey(dailyLog => dailyLog.UserId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(dl => dl.Meal)
+            entity.HasOne(dailyLog => dailyLog.Meal)
                 .WithMany()
-                .HasForeignKey(dl => dl.MealId)
+                .HasForeignKey(dailyLog => dailyLog.MealId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.Property(dl => dl.LoggedAt).IsRequired();
+            entity.Property(dailyLog => dailyLog.LoggedAt).IsRequired();
         });
 
         modelBuilder.Entity<Ingredient>(entity =>
         {
-            entity.Property(i => i.Name).IsRequired().HasMaxLength(200);
+            entity.Property(ingredient => ingredient.Name).IsRequired().HasMaxLength(200);
         });
 
         modelBuilder.Entity<Conversation>()
-            .HasOne(c => c.User)
+            .HasOne(conversation => conversation.User)
             .WithMany()
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Conversation>()
-            .HasMany(c => c.Messages)
-            .WithOne(m => m.Conversation)
+            .HasMany(conversation => conversation.Messages)
+            .WithOne(message => message.Conversation)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Message>()
-            .HasOne(m => m.Sender)
+            .HasOne(message => message.Sender)
             .WithMany()
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
