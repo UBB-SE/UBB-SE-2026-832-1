@@ -22,6 +22,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
 
+    public DbSet<DailyLog> DailyLogs { get; set; } = default!;
+
+    public DbSet<Ingredient> Ingredients { get; set; } = default!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ClientAchievement>()
