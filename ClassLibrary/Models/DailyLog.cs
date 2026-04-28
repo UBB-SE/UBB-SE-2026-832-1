@@ -8,12 +8,6 @@ public class DailyLog
     public int Id { get; set; }
 
     [Required]
-    public int UserId { get; set; }
-
-    [Required]
-    public int MealId { get; set; }
-
-    [Required]
     public DateTime LoggedAt { get; set; }
 
     [Required]
@@ -27,4 +21,11 @@ public class DailyLog
 
     [Required]
     public double Fats { get; set; }
+
+    // Navigation properties - no explicit IDs
+    [Required]
+    public virtual User User { get; set; } = null!;
+
+    [Required]
+    public virtual Meal Meal { get; set; } = null!;
 }

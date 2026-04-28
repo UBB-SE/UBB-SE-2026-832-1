@@ -52,5 +52,30 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+
+        // DailyLog configuration - relationships via navigation properties
+        modelBuilder.Entity<DailyLog>(entity =>
+        {
+            entity.HasKey(dl => dl.Id);
+
+            entity.HasOne(dl => dl.User)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(dl => dl.Meal)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(dl => dl.LoggedAt).IsRequired();
+        });
+
+        // Ingredient configuration
+        modelBuilder.Entity<Ingredient>(entity =>
+        {
+            entity.HasKey(i => i.FoodId);
+            entity.Property(i => i.Name).IsRequired().HasMaxLength(200);
+        });
     }
 }

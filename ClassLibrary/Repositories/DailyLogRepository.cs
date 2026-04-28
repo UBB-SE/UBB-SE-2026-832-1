@@ -13,18 +13,18 @@ public sealed class DailyLogRepository(AppDbContext dbContext) : IDailyLogReposi
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> HasAnyLogsAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<bool> HasAnyLogsAsync(User user, CancellationToken cancellationToken = default)
     {
         return await dbContext.DailyLogs
             .AsNoTracking()
-            .AnyAsync(dl => dl.UserId == userId, cancellationToken);
+            .AnyAsync(dl => dl.User == user, cancellationToken);
     }
 
-    public async Task<DailyLog?> GetNutritionTotalsForRangeAsync(int userId, DateTime startInclusive, DateTime endExclusive, CancellationToken cancellationToken = default)
+    public async Task<DailyLog?> GetNutritionTotalsForRangeAsync(User user, DateTime startInclusive, DateTime endExclusive, CancellationToken cancellationToken = default)
     {
         var logs = await dbContext.DailyLogs
             .AsNoTracking()
-            .Where(dl => dl.UserId == userId && dl.LoggedAt >= startInclusive && dl.LoggedAt < endExclusive)
+            .Where(dl => dl.User == user && dl.LoggedAt >= startInclusive && dl.LoggedAt < endExclusive)
             .ToListAsync(cancellationToken);
 
         if (logs.Count == 0)
@@ -34,7 +34,7 @@ public sealed class DailyLogRepository(AppDbContext dbContext) : IDailyLogReposi
 
         return new DailyLog
         {
-            UserId = userId,
+            User = user,
             LoggedAt = startInclusive,
             Calories = logs.Sum(l => l.Calories),
             Protein = logs.Sum(l => l.Protein),
