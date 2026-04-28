@@ -13,10 +13,9 @@ public sealed class UserService(IUserRepository userRepository) : IUserService
             .Select(user => new UserDto
             {
                 Id = user.UserId,
-                Email = user.Email,
-                FullName = user.FullName
+                Username = user.Username,
+                Role = user.Role
             })
             .ToList();
     }
 }
-

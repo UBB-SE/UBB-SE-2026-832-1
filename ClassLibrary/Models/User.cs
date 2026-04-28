@@ -4,13 +4,18 @@ namespace ClassLibrary.Models;
 
 public class User
 {
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
 
-    [Required]
-    [MaxLength(256)]
-    public string Email { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Username is mandatory")]
+    [StringLength(30, MinimumLength = 3)]
+    [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "Username must be alphanumeric")]
+    public string Username { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(200)]
-    public string FullName { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Password is mandatory")]
+    [StringLength(30, MinimumLength = 8)]
+    public string Password { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Role is mandatory")]
+    [RegularExpression(@"^(User|Nutritionist)$", ErrorMessage = "Role must be 'User' or 'Nutritionist'")]
+    public string Role { get; set; } = "User";
 }
