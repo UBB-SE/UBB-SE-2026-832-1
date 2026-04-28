@@ -24,6 +24,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<Ingredient> Ingredients { get; set; }
 
+    public DbSet<Reminder> Reminders { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ClientAchievement>()
@@ -50,5 +51,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+        
+        modelBuilder.Entity<Reminder>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.Reminders)
+            .IsRequired();
     }
 }
