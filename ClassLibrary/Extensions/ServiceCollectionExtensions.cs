@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRepositoryAchievements, RepositoryAchievements>();
         services.AddScoped<IRepositoryNotification, RepositoryNotification>();
         services.AddScoped<IRepositoryNutrition, RepositoryNutrition>();
+        services.AddScoped<IChatRepository, ChatRepository>();
 
         return services;
     }
