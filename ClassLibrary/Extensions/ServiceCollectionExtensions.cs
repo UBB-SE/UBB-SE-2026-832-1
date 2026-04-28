@@ -8,12 +8,13 @@ namespace ClassLibrary.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    private const string IN_MEMORY_DATABASE_NAME = "AppDb";
-
     public static IServiceCollection AddClassLibraryDataAccess(this IServiceCollection services)
     {
+        // 1. Swapped InMemory for SQLite using your new DatabasePaths utility
         services.AddDbContext<AppDbContext>(options =>
-            options.UseInMemoryDatabase(IN_MEMORY_DATABASE_NAME));
+            options.UseSqlite(DatabasePaths.GetConnectionString()));
+
+        // 2. Kept ALL of the existing repository registrations so nothing breaks!
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRepositoryAchievements, RepositoryAchievements>();
         services.AddScoped<IRepositoryNotification, RepositoryNotification>();
@@ -23,4 +24,3 @@ public static class ServiceCollectionExtensions
         return services;
     }
 }
-

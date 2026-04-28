@@ -50,5 +50,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+
+        modelBuilder.Entity<Ingredient>()
+            .Property(i => i.Name)
+            .IsRequired()
+            .HasMaxLength(255);
     }
 }
