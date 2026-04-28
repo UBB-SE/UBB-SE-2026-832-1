@@ -8,8 +8,7 @@ namespace ClassLibrary.Models;
 /// </summary>
 public sealed class FoodItem
 {
-    [Key]
-    public int Id { get; set; }
+    public int FoodItemId { get; set; }
 
     public string Name { get; set; } = string.Empty;
 

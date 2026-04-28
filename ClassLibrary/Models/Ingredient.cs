@@ -4,8 +4,7 @@ namespace ClassLibrary.Models;
 
 public sealed class Ingredient
 {
-    [Key]
-    public int FoodId { get; set; }
+    public int IngredientId { get; set; }
 
     public string Name { get; set; } = string.Empty;
 

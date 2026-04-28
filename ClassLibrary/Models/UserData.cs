@@ -42,7 +42,7 @@ public sealed class UserData
     private const int CALORIES_PER_GRAM_CARBS = 4;
     private const int CALORIES_PER_GRAM_FAT = 9;
 
-    public int Id { get; set; }
+    public int UserDataId { get; set; }
 
     public int UserId { get; set; }
 

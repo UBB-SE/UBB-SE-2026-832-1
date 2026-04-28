@@ -21,9 +21,9 @@ public static class DatabaseInitializer
             new User { Username = "testuser", Password = "testpass1", Role = "User" });
 
         dbContext.Ingredients.AddRange(
-            new Ingredient { FoodId = 1, Name = "Chicken Breast", CaloriesPer100g = 165, ProteinPer100g = 31, CarbsPer100g = 0, FatPer100g = 3.6 },
-            new Ingredient { FoodId = 2, Name = "Brown Rice", CaloriesPer100g = 216, ProteinPer100g = 5, CarbsPer100g = 45, FatPer100g = 1.8 },
-            new Ingredient { FoodId = 3, Name = "Broccoli", CaloriesPer100g = 55, ProteinPer100g = 3.7, CarbsPer100g = 11, FatPer100g = 0.6 });
+            new Ingredient { IngredientId = 1, Name = "Chicken Breast", CaloriesPer100g = 165, ProteinPer100g = 31, CarbsPer100g = 0, FatPer100g = 3.6 },
+            new Ingredient { IngredientId = 2, Name = "Brown Rice", CaloriesPer100g = 216, ProteinPer100g = 5, CarbsPer100g = 45, FatPer100g = 1.8 },
+            new Ingredient { IngredientId = 3, Name = "Broccoli", CaloriesPer100g = 55, ProteinPer100g = 3.7, CarbsPer100g = 11, FatPer100g = 0.6 });
 
         dbContext.FoodItems.AddRange(
             new FoodItem { Name = "Grilled Chicken Bowl", Calories = 450, Protein = 40, Carbs = 35, Fat = 12 },

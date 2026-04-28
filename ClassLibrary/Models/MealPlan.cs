@@ -4,7 +4,7 @@ namespace ClassLibrary.Models;
 
 public sealed class MealPlan
 {
-    public int Id { get; set; }
+    public int MealPlanId { get; set; }
 
     public int UserId { get; set; }
 

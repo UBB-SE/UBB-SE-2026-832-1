@@ -2,7 +2,7 @@ namespace ClassLibrary.Models;
 
 public sealed class Inventory
 {
-    public int Id { get; set; }
+    public int InventoryId { get; set; }
 
     public int UserId { get; set; }
 

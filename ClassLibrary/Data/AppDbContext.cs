@@ -38,9 +38,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Ingredient>()
-            .HasKey(i => i.FoodId);
-
         modelBuilder.Entity<ClientAchievement>()
             .HasKey(ca => new { ca.ClientId, ca.AchievementId });
 

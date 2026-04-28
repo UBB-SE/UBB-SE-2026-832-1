@@ -4,8 +4,7 @@ namespace ClassLibrary.Models;
 
 public sealed class User
 {
-    [Key]
-    public int Id { get; set; }
+    public int UserId { get; set; }
 
     [Required(ErrorMessage = "Username is mandatory")]
     [StringLength(30, MinimumLength = 3)]
