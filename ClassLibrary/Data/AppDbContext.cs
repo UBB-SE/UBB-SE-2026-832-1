@@ -22,6 +22,9 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
 
+    public DbSet<DailyLog> DailyLogs { get; set; } = default!;
+
+    public DbSet<Ingredient> Ingredients { get; set; } = default!;
     public DbSet<Conversation> Conversations { get; set; } = default!;
 
     public DbSet<Message> Messages { get; set; } = default!;
@@ -47,6 +50,33 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                 value => JsonSerializer.Serialize(value, (JsonSerializerOptions?)null),
                 value => JsonSerializer.Deserialize<List<string>>(value, (JsonSerializerOptions?)null) ?? new List<string>());
 
+        // DailyLog configuration - relationships with explicit ClassNameId foreign keys
+        modelBuilder.Entity<DailyLog>(entity =>
+        {
+            entity.HasKey(dl => dl.Id);
+
+            entity.HasOne(dl => dl.User)
+                .WithMany()
+                .HasForeignKey(dl => dl.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(dl => dl.Meal)
+                .WithMany()
+                .HasForeignKey(dl => dl.MealId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(dl => dl.LoggedAt).IsRequired();
+        });
+
+        // Ingredient configuration
+        modelBuilder.Entity<Ingredient>(entity =>
+        {
+            entity.HasKey(i => i.FoodId);
+            entity.Property(i => i.Name).IsRequired().HasMaxLength(200);
+        });
+=========
         modelBuilder.Entity<Conversation>()
             .HasOne(conversation => conversation.User)
             .WithMany()
