@@ -1,11 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace ClassLibrary.Models;
 
-/// <summary>
-/// A catalogued food item with nutritional data and dietary flags.
-/// Distinct from <see cref="Meal"/>, which represents a recipe inside a <see cref="NutritionPlan"/>.
-/// </summary>
 public sealed class FoodItem
 {
     public int FoodItemId { get; set; }
@@ -14,7 +8,7 @@ public sealed class FoodItem
 
     public int Calories { get; set; }
 
-    public int Carbs { get; set; }
+    public int Carbohydrates { get; set; }
 
     public int Fat { get; set; }
 

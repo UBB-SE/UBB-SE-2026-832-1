@@ -23,11 +23,11 @@ public sealed class UserData
     private const string GOAL_WELL_BEING = "well-being";
     private const string REGEX_GENDER = @"^(male|female)$";
     private const string REGEX_GOAL = @"^(bulk|cut|maintenance|well-being)$";
-    private const double BMR_WEIGHT_FACTOR = 10.0;
-    private const double BMR_HEIGHT_FACTOR = 6.25;
-    private const double BMR_AGE_FACTOR = 5.0;
-    private const double BMR_MALE_OFFSET = 5.0;
-    private const double BMR_FEMALE_OFFSET = 161.0;
+    private const double BASAL_METABOLIC_RATE_WEIGHT_FACTOR = 10.0;
+    private const double BASAL_METABOLIC_RATE_HEIGHT_FACTOR = 6.25;
+    private const double BASAL_METABOLIC_RATE_AGE_FACTOR = 5.0;
+    private const double BASAL_METABOLIC_RATE_MALE_OFFSET = 5.0;
+    private const double BASAL_METABOLIC_RATE_FEMALE_OFFSET = 161.0;
     private const double ACTIVITY_MULTIPLIER = 1.55;
     private const int BULK_CALORIE_DELTA = 300;
     private const int CUT_CALORIE_DELTA = -300;
@@ -39,7 +39,7 @@ public sealed class UserData
     private const double FAT_MAINTENANCE = 0.28;
     private const double FAT_WELL_BEING = 0.30;
     private const int CALORIES_PER_GRAM_PROTEIN = 4;
-    private const int CALORIES_PER_GRAM_CARBS = 4;
+    private const int CALORIES_PER_GRAM_CARBOHYDRATES = 4;
     private const int CALORIES_PER_GRAM_FAT = 9;
 
     public int UserDataId { get; set; }
@@ -64,13 +64,13 @@ public sealed class UserData
     [RegularExpression(REGEX_GOAL, ErrorMessage = ERROR_GOAL_INVALID)]
     public string Goal { get; set; } = string.Empty;
 
-    public double Bmi { get; set; }
+    public double BodyMassIndex { get; set; }
 
     public int CalorieNeeds { get; set; }
 
     public int ProteinNeeds { get; set; }
 
-    public int CarbNeeds { get; set; }
+    public int CarbohydrateNeeds { get; set; }
 
     public int FatNeeds { get; set; }
 
@@ -93,7 +93,7 @@ public sealed class UserData
         return age;
     }
 
-    public double CalculateBmi()
+    public double CalculateBodyMassIndex()
     {
         if (Height <= 0 || Weight <= 0)
         {
@@ -101,9 +101,9 @@ public sealed class UserData
         }
 
         double heightMeters = Height / 100.0;
-        double bmi = Weight / (heightMeters * heightMeters);
+        double bodyMassIndex = Weight / (heightMeters * heightMeters);
 
-        return (int)Math.Round(bmi);
+        return (int)Math.Round(bodyMassIndex);
     }
 
     public int CalculateCalorieNeeds()
@@ -113,33 +113,33 @@ public sealed class UserData
             return 0;
         }
 
-        double bmr =
+        double basalMetabolicRate =
             Gender.Equals(GENDER_MALE, StringComparison.OrdinalIgnoreCase)
-                ? (BMR_WEIGHT_FACTOR * Weight) +
-                  (BMR_HEIGHT_FACTOR * Height) -
-                  (BMR_AGE_FACTOR * Age) +
-                  BMR_MALE_OFFSET
+                ? (BASAL_METABOLIC_RATE_WEIGHT_FACTOR * Weight) +
+                  (BASAL_METABOLIC_RATE_HEIGHT_FACTOR * Height) -
+                  (BASAL_METABOLIC_RATE_AGE_FACTOR * Age) +
+                  BASAL_METABOLIC_RATE_MALE_OFFSET
                 : Gender.Equals(GENDER_FEMALE, StringComparison.OrdinalIgnoreCase)
-                    ? (BMR_WEIGHT_FACTOR * Weight) +
-                      (BMR_HEIGHT_FACTOR * Height) -
-                      (BMR_AGE_FACTOR * Age) -
-                      BMR_FEMALE_OFFSET
+                    ? (BASAL_METABOLIC_RATE_WEIGHT_FACTOR * Weight) +
+                      (BASAL_METABOLIC_RATE_HEIGHT_FACTOR * Height) -
+                      (BASAL_METABOLIC_RATE_AGE_FACTOR * Age) -
+                      BASAL_METABOLIC_RATE_FEMALE_OFFSET
                     : 0;
 
-        if (bmr <= 0)
+        if (basalMetabolicRate <= 0)
         {
             return 0;
         }
 
-        double tdee = bmr * ACTIVITY_MULTIPLIER;
+        double totalDailyEnergyExpenditure = basalMetabolicRate * ACTIVITY_MULTIPLIER;
 
         double adjustedCalories = Goal.ToLower() switch
         {
-            GOAL_BULK => tdee + BULK_CALORIE_DELTA,
-            GOAL_CUT => tdee + CUT_CALORIE_DELTA,
-            GOAL_MAINTENANCE => tdee,
-            GOAL_WELL_BEING => tdee,
-            _ => tdee
+            GOAL_BULK => totalDailyEnergyExpenditure + BULK_CALORIE_DELTA,
+            GOAL_CUT => totalDailyEnergyExpenditure + CUT_CALORIE_DELTA,
+            GOAL_MAINTENANCE => totalDailyEnergyExpenditure,
+            GOAL_WELL_BEING => totalDailyEnergyExpenditure,
+            _ => totalDailyEnergyExpenditure
         };
 
         return (int)Math.Round(adjustedCalories);
@@ -184,7 +184,7 @@ public sealed class UserData
         return (int)Math.Round(fatCalories / CALORIES_PER_GRAM_FAT);
     }
 
-    public int CalculateCarbNeeds()
+    public int CalculateCarbohydrateNeeds()
     {
         int calories = CalculateCalorieNeeds();
         int proteinCalories = CalculateProteinNeeds() * CALORIES_PER_GRAM_PROTEIN;
@@ -195,7 +195,7 @@ public sealed class UserData
             return 0;
         }
 
-        int carbCalories = Math.Max(0, calories - proteinCalories - fatCalories);
-        return (int)Math.Round(carbCalories / (double)CALORIES_PER_GRAM_CARBS);
+        int carbohydrateCalories = Math.Max(0, calories - proteinCalories - fatCalories);
+        return (int)Math.Round(carbohydrateCalories / (double)CALORIES_PER_GRAM_CARBOHYDRATES);
     }
 }
