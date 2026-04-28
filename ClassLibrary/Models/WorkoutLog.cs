@@ -4,8 +4,7 @@ namespace ClassLibrary.Models;
 
 public sealed class WorkoutLog
 {
-    [Key]
-    public int Id { get; set; }
+    public int WorkoutLogId { get; set; }
 
     [Required]
     public Client Client { get; set; } = null!;

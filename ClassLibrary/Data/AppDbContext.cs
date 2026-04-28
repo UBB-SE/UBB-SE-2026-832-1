@@ -12,8 +12,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<Achievement> Achievements { get; set; } = default!;
 
-    public DbSet<ClientAchievement> ClientAchievements { get; set; } = default!;
-
     public DbSet<WorkoutLog> WorkoutLogs { get; set; } = default!;
 
     public DbSet<Notification> Notifications { get; set; } = default!;
@@ -26,39 +24,23 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<NutritionPlan>()
-            .HasKey(np => np.PlanId);
-
-        modelBuilder.Entity<ClientAchievement>()
-            .HasKey("ClientId", "AchievementId");
-
-        modelBuilder.Entity<ClientAchievement>()
-            .HasOne(ca => ca.Client)
-            .WithMany(c => c.ClientAchievements)
-            .HasForeignKey("ClientId");
-
-        modelBuilder.Entity<ClientAchievement>()
-            .HasOne(ca => ca.Achievement)
-            .WithMany(a => a.ClientAchievements)
-            .HasForeignKey("AchievementId");
-
         modelBuilder.Entity<ClientNutritionPlan>()
             .HasKey("ClientId", "NutritionPlanId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasOne(cnp => cnp.Client)
-            .WithMany(c => c.ClientNutritionPlans)
+            .HasOne(clientNutritionPlan => clientNutritionPlan.Client)
+            .WithMany(client => client.ClientNutritionPlans)
             .HasForeignKey("ClientId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasOne(cnp => cnp.NutritionPlan)
+            .HasOne(clientNutritionPlan => clientNutritionPlan.NutritionPlan)
             .WithMany()
             .HasForeignKey("NutritionPlanId");
 
         modelBuilder.Entity<Meal>()
-            .Property(m => m.Ingredients)
+            .Property(meal => meal.Ingredients)
             .HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+                value => JsonSerializer.Serialize(value, (JsonSerializerOptions?)null),
+                value => JsonSerializer.Deserialize<List<string>>(value, (JsonSerializerOptions?)null) ?? new List<string>());
     }
 }

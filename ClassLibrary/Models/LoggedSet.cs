@@ -4,12 +4,9 @@ namespace ClassLibrary.Models;
 
 public sealed class LoggedSet
 {
-    [Key]
-    public int Id { get; set; }
+    public int LoggedSetId { get; set; }
 
     [Required]
-    public int WorkoutLogId { get; set; }
-
     public WorkoutLog WorkoutLog { get; set; } = null!;
 
     [Required]

@@ -4,8 +4,7 @@ namespace ClassLibrary.Models;
 
 public class NutritionPlan
 {
-    [Key]
-    public int PlanId { get; set; }
+    public int NutritionPlanId { get; set; }
 
     [Required]
     public DateTime StartDate { get; set; }

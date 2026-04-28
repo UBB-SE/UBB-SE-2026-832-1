@@ -4,8 +4,7 @@ namespace ClassLibrary.Models;
 
 public class Client
 {
-    [Key]
-    public int Id { get; set; }
+    public int ClientId { get; set; }
 
     [Required]
     [MaxLength(256)]
@@ -22,11 +21,11 @@ public class Client
     [MaxLength(500)]
     public string PrimaryGoal { get; set; } = string.Empty;
 
-    public List<WorkoutLog> WorkoutLogs { get; set; } = new();
+    public ICollection<WorkoutLog> WorkoutLogs { get; set; } = [];
 
-    public ICollection<ClientAchievement> ClientAchievements { get; set; } = new List<ClientAchievement>();
+    public ICollection<Achievement> UnlockedAchievements { get; set; } = [];
 
-    public ICollection<ClientNutritionPlan> ClientNutritionPlans { get; set; } = new List<ClientNutritionPlan>();
+    public ICollection<ClientNutritionPlan> ClientNutritionPlans { get; set; } = [];
 
-    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public ICollection<Notification> Notifications { get; set; } = [];
 }

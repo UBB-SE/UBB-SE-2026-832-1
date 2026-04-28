@@ -12,13 +12,13 @@ public sealed class RepositoryNutrition(AppDbContext dbContext) : IRepositoryNut
     {
         await dbContext.NutritionPlans.AddAsync(plan, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return plan.PlanId;
+        return plan.NutritionPlanId;
     }
 
     public async Task InsertMealAsync(Meal meal, int nutritionPlanId, CancellationToken cancellationToken = default)
     {
         var plan = await dbContext.NutritionPlans
-            .FirstOrDefaultAsync(np => np.PlanId == nutritionPlanId, cancellationToken)
+            .FirstOrDefaultAsync(nutritionPlan => nutritionPlan.NutritionPlanId == nutritionPlanId, cancellationToken)
             ?? throw new InvalidOperationException($"NutritionPlan {nutritionPlanId} not found.");
 
         meal.NutritionPlan = plan;
@@ -29,7 +29,7 @@ public sealed class RepositoryNutrition(AppDbContext dbContext) : IRepositoryNut
     public async Task AssignNutritionPlanToClientAsync(int clientId, int nutritionPlanId, CancellationToken cancellationToken = default)
     {
         bool exists = await dbContext.ClientNutritionPlans
-            .AnyAsync(cnp => cnp.Client.Id == clientId && cnp.NutritionPlan.PlanId == nutritionPlanId, cancellationToken);
+            .AnyAsync(clientNutritionPlan => clientNutritionPlan.Client.ClientId == clientId && clientNutritionPlan.NutritionPlan.NutritionPlanId == nutritionPlanId, cancellationToken);
 
         if (exists)
         {
@@ -37,11 +37,11 @@ public sealed class RepositoryNutrition(AppDbContext dbContext) : IRepositoryNut
         }
 
         var client = await dbContext.Clients
-            .FirstOrDefaultAsync(c => c.Id == clientId, cancellationToken)
+            .FirstOrDefaultAsync(client => client.ClientId == clientId, cancellationToken)
             ?? throw new InvalidOperationException($"Client {clientId} not found.");
 
         var plan = await dbContext.NutritionPlans
-            .FirstOrDefaultAsync(np => np.PlanId == nutritionPlanId, cancellationToken)
+            .FirstOrDefaultAsync(nutritionPlan => nutritionPlan.NutritionPlanId == nutritionPlanId, cancellationToken)
             ?? throw new InvalidOperationException($"NutritionPlan {nutritionPlanId} not found.");
 
         dbContext.ClientNutritionPlans.Add(new ClientNutritionPlan
@@ -57,10 +57,10 @@ public sealed class RepositoryNutrition(AppDbContext dbContext) : IRepositoryNut
     {
         return await dbContext.ClientNutritionPlans
             .AsNoTracking()
-            .Where(cnp => cnp.Client.Id == clientId)
-            .Select(cnp => cnp.NutritionPlan)
-            .Include(np => np.Meals)
-            .OrderBy(np => np.StartDate)
+            .Where(clientNutritionPlan => clientNutritionPlan.Client.ClientId == clientId)
+            .Select(clientNutritionPlan => clientNutritionPlan.NutritionPlan)
+            .Include(nutritionPlan => nutritionPlan.Meals)
+            .OrderBy(nutritionPlan => nutritionPlan.StartDate)
             .ToListAsync(cancellationToken);
     }
 
@@ -68,8 +68,8 @@ public sealed class RepositoryNutrition(AppDbContext dbContext) : IRepositoryNut
     {
         return await dbContext.Meals
             .AsNoTracking()
-            .Where(m => m.NutritionPlan.PlanId == nutritionPlanId)
-            .OrderBy(m => m.MealId)
+            .Where(meal => meal.NutritionPlan.NutritionPlanId == nutritionPlanId)
+            .OrderBy(meal => meal.MealId)
             .ToListAsync(cancellationToken);
     }
 }

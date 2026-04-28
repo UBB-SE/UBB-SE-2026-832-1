@@ -4,7 +4,6 @@ namespace ClassLibrary.Models;
 
 public sealed class AchievementShowcaseItem
 {
-    [Key]
     public int AchievementId { get; init; }
 
     [Required]

@@ -12,8 +12,7 @@ public enum NotificationType
 
 public class Notification
 {
-    [Key]
-    public int Id { get; set; }
+    public int NotificationId { get; set; }
 
     [Required]
     public Client Client { get; set; } = null!;

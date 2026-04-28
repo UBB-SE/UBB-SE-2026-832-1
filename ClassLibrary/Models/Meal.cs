@@ -4,7 +4,6 @@ namespace ClassLibrary.Models;
 
 public class Meal
 {
-    [Key]
     public int MealId { get; set; }
 
     [Required]

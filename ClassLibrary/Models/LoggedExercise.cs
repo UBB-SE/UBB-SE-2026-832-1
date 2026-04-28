@@ -4,16 +4,13 @@ namespace ClassLibrary.Models;
 
 public sealed class LoggedExercise
 {
-    [Key]
-    public int Id { get; set; }
+    public int LoggedExerciseId { get; set; }
 
     [Required]
     [MaxLength(200)]
     public string ExerciseName { get; set; } = string.Empty;
 
     [Required]
-    public int WorkoutLogId { get; set; }
-
     public WorkoutLog WorkoutLog { get; set; } = null!;
 
     public int ParentTemplateExerciseId { get; set; }

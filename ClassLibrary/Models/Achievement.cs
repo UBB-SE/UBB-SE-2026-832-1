@@ -1,11 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClassLibrary.Models;
 
 public class Achievement
 {
-    [Key]
     public int AchievementId { get; set; }
 
     [Required]
@@ -26,8 +24,5 @@ public class Achievement
 
     public int? ThresholdWorkouts { get; set; }
 
-    [NotMapped]
-    public bool IsUnlocked { get; set; }
-
-    public ICollection<ClientAchievement> ClientAchievements { get; set; } = [];
+    public ICollection<Client> Clients { get; set; } = [];
 }
