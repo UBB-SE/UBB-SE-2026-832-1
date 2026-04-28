@@ -18,6 +18,12 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<Inventory> Inventories { get; set; } = default!;
 
+    public DbSet<Favorite> Favorites { get; set; } = default!;
+
+    public DbSet<FoodItemIngredient> FoodItemIngredients { get; set; } = default!;
+
+    public DbSet<MealPlanFoodItem> MealPlanFoodItems { get; set; } = default!;
+
     public DbSet<Client> Clients { get; set; } = default!;
 
     public DbSet<Achievement> Achievements { get; set; } = default!;
@@ -40,6 +46,15 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Favorite>()
+            .HasKey(f => new { f.UserId, f.FoodItemId });
+
+        modelBuilder.Entity<FoodItemIngredient>()
+            .HasKey(fi => new { fi.FoodItemId, fi.IngredientId });
+
+        modelBuilder.Entity<MealPlanFoodItem>()
+            .HasKey(mpf => new { mpf.MealPlanId, mpf.FoodItemId });
+
         modelBuilder.Entity<ClientNutritionPlan>()
             .HasKey("ClientId", "NutritionPlanId");
 
