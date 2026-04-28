@@ -22,6 +22,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
 
+    public DbSet<Conversation> Conversations { get; set; } = default!;
+
+    public DbSet<Message> Messages { get; set; } = default!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ClientNutritionPlan>()
@@ -42,5 +46,23 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             .HasConversion(
                 value => JsonSerializer.Serialize(value, (JsonSerializerOptions?)null),
                 value => JsonSerializer.Deserialize<List<string>>(value, (JsonSerializerOptions?)null) ?? new List<string>());
+
+        modelBuilder.Entity<Conversation>()
+            .HasOne(conversation => conversation.User)
+            .WithMany()
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Conversation>()
+            .HasMany(conversation => conversation.Messages)
+            .WithOne(message => message.Conversation)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Message>()
+            .HasOne(message => message.Sender)
+            .WithMany()
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

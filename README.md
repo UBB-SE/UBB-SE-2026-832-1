@@ -27,6 +27,7 @@
 - Keep repository interfaces in `ClassLibrary/IRepositories`.
 - Keep repository implementations in `ClassLibrary/Repositories`.
 - Keep EF context definitions in `ClassLibrary/Data`.
+- Model object links via class references, not foreign-key id fields.
 - `WebAPI` should call extension methods for data-layer wiring, not reference data-layer internals directly.
 - `WinUI` communicates with backend through services/proxies, not direct database access.
 
