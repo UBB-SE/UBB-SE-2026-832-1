@@ -51,7 +51,16 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
-        
+
+        modelBuilder.Entity<Reminder>()
+            .Property(r => r.Name)
+            .IsRequired()
+            .HasMaxLength(255);
+        modelBuilder.Entity<Reminder>()
+            .Property(r => r.Frequency)
+            .HasMaxLength(50);
+        modelBuilder.Entity<Reminder>()
+            .Ignore(r => r.FullDateTimeDisplay);
         modelBuilder.Entity<Reminder>()
             .HasOne(r => r.User)
             .WithMany(u => u.Reminders)
