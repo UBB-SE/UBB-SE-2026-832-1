@@ -18,6 +18,8 @@ public class Notification
     [Required]
     public int ClientId { get; set; }
 
+    public Client Client { get; set; } = null!;
+
     [Required]
     [MaxLength(200)]
     public string Title { get; set; } = string.Empty;

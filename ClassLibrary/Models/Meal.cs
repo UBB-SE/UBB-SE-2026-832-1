@@ -10,6 +10,8 @@ public class Meal
     [Required]
     public int NutritionPlanId { get; set; }
 
+    public NutritionPlan NutritionPlan { get; set; } = null!;
+
     [Required]
     [MaxLength(200)]
     public string Name { get; set; } = string.Empty;

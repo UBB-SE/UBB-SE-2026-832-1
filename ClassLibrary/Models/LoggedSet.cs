@@ -10,6 +10,8 @@ public sealed class LoggedSet
     [Required]
     public int WorkoutLogId { get; set; }
 
+    public WorkoutLog WorkoutLog { get; set; } = null!;
+
     [Required]
     [MaxLength(200)]
     public string ExerciseName { get; set; } = string.Empty;

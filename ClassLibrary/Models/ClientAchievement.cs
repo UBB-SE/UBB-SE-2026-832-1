@@ -9,6 +9,8 @@ public class ClientAchievement
     [Required]
     public int ClientId { get; set; }
 
+    public Client Client { get; set; } = null!;
+
     [Required]
     public int AchievementId { get; set; }
 

@@ -14,6 +14,8 @@ public sealed class LoggedExercise
     [Required]
     public int WorkoutLogId { get; set; }
 
+    public WorkoutLog WorkoutLog { get; set; } = null!;
+
     public int ParentTemplateExerciseId { get; set; }
 
     public List<LoggedSet> Sets { get; set; } = new();

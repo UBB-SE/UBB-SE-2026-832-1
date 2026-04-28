@@ -9,6 +9,8 @@ public class ClientNutritionPlan
     [Required]
     public int ClientId { get; set; }
 
+    public Client Client { get; set; } = null!;
+
     [Required]
     public int NutritionPlanId { get; set; }
 

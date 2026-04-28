@@ -10,6 +10,8 @@ public sealed class WorkoutLog
     [Required]
     public int ClientId { get; set; }
 
+    public Client Client { get; set; } = null!;
+
     [Required]
     [MaxLength(200)]
     public string WorkoutName { get; set; } = string.Empty;

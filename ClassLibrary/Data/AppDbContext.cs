@@ -8,6 +8,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 {
     public DbSet<User> Users { get; set; } = default!;
 
+    public DbSet<Client> Clients { get; set; } = default!;
+
     public DbSet<Achievement> Achievements { get; set; } = default!;
 
     public DbSet<ClientAchievement> ClientAchievements { get; set; } = default!;
