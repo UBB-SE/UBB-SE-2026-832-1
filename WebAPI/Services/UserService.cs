@@ -12,7 +12,7 @@ public sealed class UserService(IUserRepository userRepository) : IUserService
         return users
             .Select(user => new UserDto
             {
-                Id = user.Id,
+                Id = user.UserId,
                 Username = user.Username,
                 Role = user.Role
             })

@@ -18,9 +18,9 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<Inventory> Inventories { get; set; } = default!;
 
-    public DbSet<Achievement> Achievements { get; set; } = default!;
+    public DbSet<Client> Clients { get; set; } = default!;
 
-    public DbSet<ClientAchievement> ClientAchievements { get; set; } = default!;
+    public DbSet<Achievement> Achievements { get; set; } = default!;
 
     public DbSet<WorkoutLog> WorkoutLogs { get; set; } = default!;
 
@@ -32,36 +32,54 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
 
+    public DbSet<DailyLog> DailyLogs { get; set; } = default!;
+
     public DbSet<Conversation> Conversations { get; set; } = default!;
 
     public DbSet<Message> Messages { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ClientAchievement>()
-            .HasKey(ca => new { ca.ClientId, ca.AchievementId });
-
-        modelBuilder.Entity<ClientAchievement>()
-            .HasOne(ca => ca.Achievement)
-            .WithMany(a => a.ClientAchievements)
-            .HasForeignKey(ca => ca.AchievementId);
-
-        modelBuilder.Entity<NutritionPlan>()
-            .HasKey(np => np.PlanId);
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasKey("ClientId", "NutritionPlanId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasKey(cnp => new { cnp.ClientId, cnp.NutritionPlanId });
+            .HasOne(cnp => cnp.Client)
+            .WithMany(c => c.ClientNutritionPlans)
+            .HasForeignKey("ClientId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
             .HasOne(cnp => cnp.NutritionPlan)
             .WithMany()
-            .HasForeignKey(cnp => cnp.NutritionPlanId);
+            .HasForeignKey("NutritionPlanId");
 
         modelBuilder.Entity<Meal>()
             .Property(m => m.Ingredients)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+
+        modelBuilder.Entity<DailyLog>(entity =>
+        {
+            entity.HasOne(dl => dl.User)
+                .WithMany()
+                .HasForeignKey(dl => dl.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(dl => dl.Meal)
+                .WithMany()
+                .HasForeignKey(dl => dl.MealId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(dl => dl.LoggedAt).IsRequired();
+        });
+
+        modelBuilder.Entity<Ingredient>(entity =>
+        {
+            entity.Property(i => i.Name).IsRequired().HasMaxLength(200);
+        });
 
         modelBuilder.Entity<Conversation>()
             .HasOne(c => c.User)

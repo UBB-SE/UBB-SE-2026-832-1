@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ClassLibrary.Models;
 
-public sealed class User
+public class User
 {
     public int UserId { get; set; }
 

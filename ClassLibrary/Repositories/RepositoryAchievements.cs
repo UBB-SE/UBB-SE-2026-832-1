@@ -12,21 +12,21 @@ public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepository
     {
         return await dbContext.Achievements
             .AsNoTracking()
-            .OrderBy(a => a.AchievementId)
+            .OrderBy(achievement => achievement.AchievementId)
             .ToListAsync(cancellationToken);
     }
 
     public async Task<int> GetWorkoutCountAsync(int clientId, CancellationToken cancellationToken = default)
     {
         return await dbContext.WorkoutLogs
-            .CountAsync(w => w.ClientId == clientId, cancellationToken);
+            .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId, cancellationToken);
     }
 
     public async Task<int> GetDistinctWorkoutDayCountAsync(int clientId, CancellationToken cancellationToken = default)
     {
         return await dbContext.WorkoutLogs
-            .Where(w => w.ClientId == clientId)
-            .Select(w => w.Date.Date)
+            .Where(workoutLog => workoutLog.Client.ClientId == clientId)
+            .Select(workoutLog => workoutLog.Date.Date)
             .Distinct()
             .CountAsync(cancellationToken);
     }
@@ -39,20 +39,19 @@ public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepository
 
         return await dbContext.WorkoutLogs
             .CountAsync(
-                w => w.ClientId == clientId && w.Date >= cutoff && w.Date < tomorrow,
+                workoutLog => workoutLog.Client.ClientId == clientId && workoutLog.Date >= cutoff && workoutLog.Date < tomorrow,
                 cancellationToken);
     }
 
     public async Task<int> GetConsecutiveWorkoutDayStreakAsync(int clientId, CancellationToken cancellationToken = default)
     {
         var dates = await dbContext.WorkoutLogs
-            .Where(w => w.ClientId == clientId)
-            .Select(w => w.Date.Date)
+            .Where(workoutLog => workoutLog.Client.ClientId == clientId)
+            .Select(workoutLog => workoutLog.Date.Date)
             .Distinct()
-            .OrderByDescending(d => d)
+            .OrderByDescending(date => date)
             .ToListAsync(cancellationToken);
 
-        
         if (dates.Count == 0)
         {
             return 0;
@@ -84,22 +83,21 @@ public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepository
     {
         var items = await dbContext.Achievements
             .AsNoTracking()
-            .Select(a => new AchievementShowcaseItem
+            .Select(achievement => new AchievementShowcaseItem
             {
-                AchievementId = a.AchievementId,
-                Title = a.Name,
-                Description = a.Description,
-                Criteria = a.Criteria,
-                IsUnlocked = a.ClientAchievements.Any(ca => ca.ClientId == clientId && ca.Unlocked),
+                AchievementId = achievement.AchievementId,
+                Title = achievement.Name,
+                Description = achievement.Description,
+                Criteria = achievement.Criteria,
+                IsUnlocked = achievement.Clients.Any(client => client.ClientId == clientId),
             })
             .ToListAsync(cancellationToken);
 
-        
         return items
-            .GroupBy(x => x.Title, StringComparer.OrdinalIgnoreCase)
-            .Select(g => g.First())
-            .OrderByDescending(x => x.IsUnlocked)
-            .ThenBy(x => x.AchievementId)
+            .GroupBy(item => item.Title, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .OrderByDescending(item => item.IsUnlocked)
+            .ThenBy(item => item.AchievementId)
             .ToList();
     }
 
@@ -107,44 +105,44 @@ public sealed class RepositoryAchievements(AppDbContext dbContext) : IRepository
     {
         return await dbContext.Achievements
             .AsNoTracking()
-            .Where(a => a.AchievementId == achievementId)
-            .Select(a => new AchievementShowcaseItem
+            .Where(achievement => achievement.AchievementId == achievementId)
+            .Select(achievement => new AchievementShowcaseItem
             {
-                AchievementId = a.AchievementId,
-                Title = a.Name,
-                Description = a.Description,
-                Criteria = a.Criteria,
-                IsUnlocked = a.ClientAchievements.Any(ca => ca.ClientId == clientId && ca.Unlocked),
+                AchievementId = achievement.AchievementId,
+                Title = achievement.Name,
+                Description = achievement.Description,
+                Criteria = achievement.Criteria,
+                IsUnlocked = achievement.Clients.Any(client => client.ClientId == clientId),
             })
             .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<bool> AwardAchievementAsync(int clientId, int achievementId, CancellationToken cancellationToken = default)
     {
-        var existing = await dbContext.ClientAchievements
-            .FirstOrDefaultAsync(
-                ca => ca.ClientId == clientId && ca.AchievementId == achievementId,
-                cancellationToken);
+        var client = await dbContext.Clients
+            .Include(client => client.UnlockedAchievements)
+            .FirstOrDefaultAsync(client => client.ClientId == clientId, cancellationToken);
 
-        if (existing is { Unlocked: true })
+        if (client is null)
         {
             return false;
         }
 
-        if (existing is null)
+        bool alreadyUnlocked = client.UnlockedAchievements.Any(achievement => achievement.AchievementId == achievementId);
+        if (alreadyUnlocked)
         {
-            dbContext.ClientAchievements.Add(new ClientAchievement
-            {
-                ClientId = clientId,
-                AchievementId = achievementId,
-                Unlocked = true,
-            });
-        }
-        else
-        {
-            existing.Unlocked = true;
+            return false;
         }
 
+        var achievement = await dbContext.Achievements
+            .FirstOrDefaultAsync(achievement => achievement.AchievementId == achievementId, cancellationToken);
+
+        if (achievement is null)
+        {
+            return false;
+        }
+
+        client.UnlockedAchievements.Add(achievement);
         await dbContext.SaveChangesAsync(cancellationToken);
         return true;
     }
