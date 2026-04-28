@@ -53,18 +53,20 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
 
-        // DailyLog configuration - relationships via navigation properties
+        // DailyLog configuration - relationships with explicit ClassNameId foreign keys
         modelBuilder.Entity<DailyLog>(entity =>
         {
             entity.HasKey(dl => dl.Id);
 
             entity.HasOne(dl => dl.User)
                 .WithMany()
+                .HasForeignKey(dl => dl.UserId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(dl => dl.Meal)
                 .WithMany()
+                .HasForeignKey(dl => dl.MealId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
