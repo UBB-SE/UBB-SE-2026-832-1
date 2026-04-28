@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IChatRepository, ChatRepository>();
         services.AddScoped<IDailyLogRepository, DailyLogRepository>();
         services.AddScoped<IShoppingListRepository, ShoppingListRepository>();
+        services.AddScoped<IWorkoutAnalyticsRepository, WorkoutAnalyticsRepository>();
 
         return services;
     }
