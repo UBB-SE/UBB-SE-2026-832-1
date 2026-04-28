@@ -4,7 +4,7 @@ namespace ClassLibrary.Models;
 
 public class DailyLog
 {
-    public int Id { get; set; }
+    public int DailyLogId { get; set; }
 
     public DateTime LoggedAt { get; set; }
 
