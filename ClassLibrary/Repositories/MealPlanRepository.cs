@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ClassLibrary.Data;
-using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
@@ -106,29 +105,4 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
         }
     }
 
-    public async Task<IReadOnlyList<IngredientViewModel>> GetIngredientsForFoodItemAsync(int foodItemId, CancellationToken cancellationToken = default)
-    {
-        var linkedIngredientIds = await dbContext.FoodItemIngredients
-            .AsNoTracking()
-            .Where(fi => fi.FoodItemId == foodItemId)
-            .Select(fi => fi.IngredientId)
-            .ToListAsync(cancellationToken);
-
-        var allIngredients = await dbContext.Ingredients
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-
-        return allIngredients
-            .Select(i => new IngredientViewModel
-            {
-                IngredientId = i.IngredientId,
-                Name = i.Name,
-                CaloriesPer100g = i.CaloriesPer100g,
-                ProteinPer100g = i.ProteinPer100g,
-                CarbsPer100g = i.CarbohydratesPer100g,
-                FatPer100g = i.FatPer100g,
-                IsInMeal = linkedIngredientIds.Contains(i.IngredientId)
-            })
-            .ToList();
-    }
 }

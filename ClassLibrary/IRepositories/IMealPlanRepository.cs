@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ClassLibrary.DTOs;
 using ClassLibrary.Models;
 
 namespace ClassLibrary.IRepositories;
@@ -27,6 +26,4 @@ public interface IMealPlanRepository
     Task AddIngredientToFoodItemAsync(int foodItemId, int ingredientId, CancellationToken cancellationToken = default);
 
     Task RemoveIngredientFromFoodItemAsync(int foodItemId, int ingredientId, CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<IngredientViewModel>> GetIngredientsForFoodItemAsync(int foodItemId, CancellationToken cancellationToken = default);
 }
