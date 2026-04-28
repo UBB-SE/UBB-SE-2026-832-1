@@ -25,7 +25,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<DailyLog> DailyLogs { get; set; } = default!;
 
     public DbSet<Ingredient> Ingredients { get; set; } = default!;
-
     public DbSet<Conversation> Conversations { get; set; } = default!;
 
     public DbSet<Message> Messages { get; set; } = default!;
@@ -83,7 +82,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.HasKey(i => i.FoodId);
             entity.Property(i => i.Name).IsRequired().HasMaxLength(200);
         });
-
+=========
         modelBuilder.Entity<Conversation>()
             .HasOne(c => c.User)
             .WithMany()
