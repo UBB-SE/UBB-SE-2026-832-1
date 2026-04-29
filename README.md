@@ -61,4 +61,3 @@ When running `WebAPI`, test:
 
 - Swagger UI: `http://localhost:5066/swagger`
 - Users endpoint: `http://localhost:5066/api/users`
-

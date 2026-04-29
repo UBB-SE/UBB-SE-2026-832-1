@@ -14,6 +14,8 @@ public static class DataAccessServiceCollectionExtensions
             options.UseSqlite(DatabasePaths.GetConnectionString()));
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IFoodItemRepository, FoodItemRepository>();
+        services.AddScoped<IMealPlanRepository, MealPlanRepository>();
         services.AddScoped<IRepositoryAchievements, RepositoryAchievements>();
         services.AddScoped<IRepositoryNotification, RepositoryNotification>();
         services.AddScoped<IRepositoryNutrition, RepositoryNutrition>();
