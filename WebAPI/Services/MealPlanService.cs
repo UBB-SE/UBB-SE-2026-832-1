@@ -1,6 +1,7 @@
 using System;
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
+using ClassLibrary.Models;
 
 namespace WebAPI.Services;
 
@@ -26,29 +27,7 @@ public sealed class MealPlanService : IMealPlanService
 
         var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(id, cancellationToken);
 
-        return new MealPlanDto
-        {
-            MealPlanId = mealPlan.MealPlanId,
-            UserId = mealPlan.UserId,
-            CreatedAt = mealPlan.CreatedAt,
-            GoalType = mealPlan.GoalType,
-            FoodItems = foodItems.Select(foodItem => new FoodItemDto
-            {
-                FoodItemId = foodItem.FoodItemId,
-                Name = foodItem.Name,
-                Calories = foodItem.Calories,
-                Carbohydrates = foodItem.Carbohydrates,
-                Fat = foodItem.Fat,
-                Protein = foodItem.Protein,
-                IsVegan = foodItem.IsVegan,
-                IsKeto = foodItem.IsKeto,
-                IsGlutenFree = foodItem.IsGlutenFree,
-                IsLactoseFree = foodItem.IsLactoseFree,
-                IsNutFree = foodItem.IsNutFree,
-                Description = foodItem.Description,
-                ImageUrl = foodItem.ImageUrl,
-            }).ToList(),
-        };
+        return MapToMealPlanDto(mealPlan, foodItems);
     }
 
     public async Task<IReadOnlyList<MealPlanDto>> GetByUserIdAsync(int userId, CancellationToken cancellationToken = default)
@@ -59,30 +38,7 @@ public sealed class MealPlanService : IMealPlanService
         foreach (var mealPlan in mealPlans)
         {
             var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(mealPlan.MealPlanId, cancellationToken);
-
-            results.Add(new MealPlanDto
-            {
-                MealPlanId = mealPlan.MealPlanId,
-                UserId = mealPlan.UserId,
-                CreatedAt = mealPlan.CreatedAt,
-                GoalType = mealPlan.GoalType,
-                FoodItems = foodItems.Select(foodItem => new FoodItemDto
-                {
-                    FoodItemId = foodItem.FoodItemId,
-                    Name = foodItem.Name,
-                    Calories = foodItem.Calories,
-                    Carbohydrates = foodItem.Carbohydrates,
-                    Fat = foodItem.Fat,
-                    Protein = foodItem.Protein,
-                    IsVegan = foodItem.IsVegan,
-                    IsKeto = foodItem.IsKeto,
-                    IsGlutenFree = foodItem.IsGlutenFree,
-                    IsLactoseFree = foodItem.IsLactoseFree,
-                    IsNutFree = foodItem.IsNutFree,
-                    Description = foodItem.Description,
-                    ImageUrl = foodItem.ImageUrl,
-                }).ToList(),
-            });
+            results.Add(MapToMealPlanDto(mealPlan, foodItems));
         }
 
         return results;
@@ -101,23 +57,7 @@ public sealed class MealPlanService : IMealPlanService
     public async Task<IReadOnlyList<FoodItemDto>> GetFoodItemsForPlanAsync(int mealPlanId, CancellationToken cancellationToken = default)
     {
         var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(mealPlanId, cancellationToken);
-
-        return foodItems.Select(foodItem => new FoodItemDto
-        {
-            FoodItemId = foodItem.FoodItemId,
-            Name = foodItem.Name,
-            Calories = foodItem.Calories,
-            Carbohydrates = foodItem.Carbohydrates,
-            Fat = foodItem.Fat,
-            Protein = foodItem.Protein,
-            IsVegan = foodItem.IsVegan,
-            IsKeto = foodItem.IsKeto,
-            IsGlutenFree = foodItem.IsGlutenFree,
-            IsLactoseFree = foodItem.IsLactoseFree,
-            IsNutFree = foodItem.IsNutFree,
-            Description = foodItem.Description,
-            ImageUrl = foodItem.ImageUrl,
-        }).ToList();
+        return MapToFoodItemDtos(foodItems);
     }
 
     public (int TotalCalories, int TotalProtein, int TotalCarbohydrates, int TotalFat) CalculateTotalNutrition(IReadOnlyList<FoodItemDto> foodItems)
@@ -149,5 +89,42 @@ public sealed class MealPlanService : IMealPlanService
             Math.Abs(totalProtein - targetProtein) <= targetProtein * tolerance &&
             Math.Abs(totalCarbohydrates - targetCarbohydrates) <= targetCarbohydrates * tolerance &&
             Math.Abs(totalFat - targetFat) <= targetFat * tolerance;
+    }
+
+    private static FoodItemDto MapToFoodItemDto(FoodItem foodItem)
+    {
+        return new FoodItemDto
+        {
+            FoodItemId = foodItem.FoodItemId,
+            Name = foodItem.Name,
+            Calories = foodItem.Calories,
+            Carbohydrates = foodItem.Carbohydrates,
+            Fat = foodItem.Fat,
+            Protein = foodItem.Protein,
+            IsVegan = foodItem.IsVegan,
+            IsKeto = foodItem.IsKeto,
+            IsGlutenFree = foodItem.IsGlutenFree,
+            IsLactoseFree = foodItem.IsLactoseFree,
+            IsNutFree = foodItem.IsNutFree,
+            Description = foodItem.Description,
+            ImageUrl = foodItem.ImageUrl,
+        };
+    }
+
+    private static List<FoodItemDto> MapToFoodItemDtos(IReadOnlyList<FoodItem> foodItems)
+    {
+        return foodItems.Select(MapToFoodItemDto).ToList();
+    }
+
+    private static MealPlanDto MapToMealPlanDto(MealPlan mealPlan, IReadOnlyList<FoodItem> foodItems)
+    {
+        return new MealPlanDto
+        {
+            MealPlanId = mealPlan.MealPlanId,
+            UserId = mealPlan.UserId,
+            CreatedAt = mealPlan.CreatedAt,
+            GoalType = mealPlan.GoalType,
+            FoodItems = MapToFoodItemDtos(foodItems),
+        };
     }
 }
