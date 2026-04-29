@@ -10,42 +10,43 @@ using ClassLibrary.Data;
 using ClassLibrary.Models;
 using ClassLibrary.IRepositories;
 
-public sealed class WorkoutAnalyticsRepository(AppDbContext dbContext) : IWorkoutAnalyticsRepository
+public sealed class WorkoutAnalyticsRepository : IWorkoutAnalyticsRepository
 {
-    public async Task SaveWorkoutAsync(WorkoutLog log, CancellationToken cancellationToken = default)
+    private readonly AppDbContext _databaseContext;
+
+    public WorkoutAnalyticsRepository(AppDbContext databaseContext)
     {
-        await dbContext.WorkoutLogs.AddAsync(log, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        _databaseContext = databaseContext;
+    }
+
+    public async Task SaveWorkoutAsync(WorkoutLog workoutLog, CancellationToken cancellationToken = default)
+    {
+        await _databaseContext.WorkoutLogs.AddAsync(workoutLog, cancellationToken);
+        await _databaseContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<int> GetTotalWorkoutsAsync(int clientId, CancellationToken cancellationToken = default)
     {
-        return await dbContext.WorkoutLogs
+        return await _databaseContext.WorkoutLogs
             .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId, cancellationToken);
     }
 
     public async Task<IReadOnlyList<WorkoutLog>> GetWorkoutsInRangeAsync(
         int clientId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
-        return await dbContext.WorkoutLogs
+        return await _databaseContext.WorkoutLogs
             .AsNoTracking()
             .Where(workoutLog => workoutLog.Client.ClientId == clientId && workoutLog.Date >= startDate && workoutLog.Date <= endDate)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<int> GetTotalWorkoutCountAsync(int clientId, CancellationToken cancellationToken = default)
-    {
-        return await dbContext.WorkoutLogs
-            .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId, cancellationToken);
-    }
-
-    public async Task<(IReadOnlyList<WorkoutLog> Items, int TotalCount)> GetWorkoutHistoryPageAsync(
+    public async Task<(IReadOnlyList<WorkoutLog> WorkoutLogs, int TotalCount)> GetWorkoutHistoryPageAsync(
         int clientId, int skip, int take, CancellationToken cancellationToken = default)
     {
-        var totalCount = await dbContext.WorkoutLogs
+        var totalCount = await _databaseContext.WorkoutLogs
             .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId, cancellationToken);
 
-        var items = await dbContext.WorkoutLogs
+        var workoutLogs = await _databaseContext.WorkoutLogs
             .AsNoTracking()
             .Where(workoutLog => workoutLog.Client.ClientId == clientId)
             .OrderByDescending(workoutLog => workoutLog.Date)
@@ -54,13 +55,13 @@ public sealed class WorkoutAnalyticsRepository(AppDbContext dbContext) : IWorkou
             .Take(take)
             .ToListAsync(cancellationToken);
 
-        return (items, totalCount);
+        return (workoutLogs, totalCount);
     }
 
     public async Task<WorkoutLog?> GetWorkoutLogWithSetsAsync(
         int clientId, int workoutLogId, CancellationToken cancellationToken = default)
     {
-        return await dbContext.WorkoutLogs
+        return await _databaseContext.WorkoutLogs
             .AsNoTracking()
             .Include(workoutLog => workoutLog.Exercises)
             .FirstOrDefaultAsync(workoutLog => workoutLog.WorkoutLogId == workoutLogId && workoutLog.Client.ClientId == clientId, cancellationToken);
