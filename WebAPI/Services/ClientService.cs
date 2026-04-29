@@ -339,57 +339,57 @@ public sealed class ClientService : IClientService
         };
     }
 
-    private static WorkoutLog MapToWorkoutLog(WorkoutLogDataTransferObject dto)
+    private static WorkoutLog MapToWorkoutLog(WorkoutLogDataTransferObject workoutLogDataTransferObject)
     {
-        var workoutType = Enum.TryParse<WorkoutType>(dto.Type, ignoreCase: true, out var parsedType) ? parsedType : WorkoutType.CUSTOM;
+        var workoutType = Enum.TryParse<WorkoutType>(workoutLogDataTransferObject.Type, ignoreCase: true, out var parsedType) ? parsedType : WorkoutType.CUSTOM;
 
         return new WorkoutLog
         {
-            WorkoutLogId = dto.WorkoutLogId,
-            WorkoutName = dto.WorkoutName,
-            Date = dto.Date,
-            Duration = dto.Duration,
-            SourceTemplateId = dto.SourceTemplateId,
+            WorkoutLogId = workoutLogDataTransferObject.WorkoutLogId,
+            WorkoutName = workoutLogDataTransferObject.WorkoutName,
+            Date = workoutLogDataTransferObject.Date,
+            Duration = workoutLogDataTransferObject.Duration,
+            SourceTemplateId = workoutLogDataTransferObject.SourceTemplateId,
             Type = workoutType,
-            TotalCaloriesBurned = dto.TotalCaloriesBurned,
-            AverageMetabolicEquivalent = dto.AverageMetabolicEquivalent,
-            IntensityTag = dto.IntensityTag,
-            Rating = dto.Rating,
-            TrainerNotes = dto.TrainerNotes,
-            Exercises = dto.Exercises.Select(MapToLoggedExercise).ToList(),
+            TotalCaloriesBurned = workoutLogDataTransferObject.TotalCaloriesBurned,
+            AverageMetabolicEquivalent = workoutLogDataTransferObject.AverageMetabolicEquivalent,
+            IntensityTag = workoutLogDataTransferObject.IntensityTag,
+            Rating = workoutLogDataTransferObject.Rating,
+            TrainerNotes = workoutLogDataTransferObject.TrainerNotes,
+            Exercises = workoutLogDataTransferObject.Exercises.Select(MapToLoggedExercise).ToList(),
         };
     }
 
-    private static LoggedExercise MapToLoggedExercise(LoggedExerciseDataTransferObject dto)
+    private static LoggedExercise MapToLoggedExercise(LoggedExerciseDataTransferObject loggedExerciseDataTransferObject)
     {
-        var targetMuscles = Enum.TryParse<MuscleGroup>(dto.TargetMuscles, ignoreCase: true, out var parsedMuscles) ? parsedMuscles : MuscleGroup.OTHER;
+        var targetMuscles = Enum.TryParse<MuscleGroup>(loggedExerciseDataTransferObject.TargetMuscles, ignoreCase: true, out var parsedMuscles) ? parsedMuscles : MuscleGroup.OTHER;
 
         return new LoggedExercise
         {
-            LoggedExerciseId = dto.LoggedExerciseId,
-            ExerciseName = dto.ExerciseName,
+            LoggedExerciseId = loggedExerciseDataTransferObject.LoggedExerciseId,
+            ExerciseName = loggedExerciseDataTransferObject.ExerciseName,
             TargetMuscles = targetMuscles,
-            Sets = dto.Sets.Select(MapToLoggedSet).ToList(),
-            MetabolicEquivalent = dto.MetabolicEquivalent,
-            ExerciseCaloriesBurned = dto.ExerciseCaloriesBurned,
-            PerformanceRatio = dto.PerformanceRatio,
-            IsSystemAdjusted = dto.IsSystemAdjusted,
-            AdjustmentNote = dto.AdjustmentNote,
+            Sets = loggedExerciseDataTransferObject.Sets.Select(MapToLoggedSet).ToList(),
+            MetabolicEquivalent = loggedExerciseDataTransferObject.MetabolicEquivalent,
+            ExerciseCaloriesBurned = loggedExerciseDataTransferObject.ExerciseCaloriesBurned,
+            PerformanceRatio = loggedExerciseDataTransferObject.PerformanceRatio,
+            IsSystemAdjusted = loggedExerciseDataTransferObject.IsSystemAdjusted,
+            AdjustmentNote = loggedExerciseDataTransferObject.AdjustmentNote,
         };
     }
 
-    private static LoggedSet MapToLoggedSet(LoggedSetDataTransferObject dto)
+    private static LoggedSet MapToLoggedSet(LoggedSetDataTransferObject loggedSetDataTransferObject)
     {
         return new LoggedSet
         {
-            LoggedSetId = dto.LoggedSetId,
-            ExerciseName = dto.ExerciseName,
-            SetIndex = dto.SetIndex,
-            TargetReps = dto.TargetReps,
-            ActualReps = dto.ActualReps,
-            TargetWeight = dto.TargetWeight,
-            ActualWeight = dto.ActualWeight,
-            SetNumber = dto.SetNumber,
+            LoggedSetId = loggedSetDataTransferObject.LoggedSetId,
+            ExerciseName = loggedSetDataTransferObject.ExerciseName,
+            SetIndex = loggedSetDataTransferObject.SetIndex,
+            TargetReps = loggedSetDataTransferObject.TargetReps,
+            ActualReps = loggedSetDataTransferObject.ActualReps,
+            TargetWeight = loggedSetDataTransferObject.TargetWeight,
+            ActualWeight = loggedSetDataTransferObject.ActualWeight,
+            SetNumber = loggedSetDataTransferObject.SetNumber,
         };
     }
 }
