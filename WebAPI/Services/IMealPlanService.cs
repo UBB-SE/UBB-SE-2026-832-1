@@ -13,4 +13,8 @@ public interface IMealPlanService
     Task RemoveFoodItemFromPlanAsync(int mealPlanId, int foodItemId, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<FoodItemDto>> GetFoodItemsForPlanAsync(int mealPlanId, CancellationToken cancellationToken = default);
+
+    (int TotalCalories, int TotalProtein, int TotalCarbohydrates, int TotalFat) CalculateTotalNutrition(IReadOnlyList<FoodItemDto> foodItems);
+
+    bool ValidateMealPlan(IReadOnlyList<FoodItemDto> foodItems, int targetCalories, int targetProtein, int targetCarbohydrates, int targetFat, double tolerance = 0.10);
 }
