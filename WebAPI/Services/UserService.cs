@@ -3,20 +3,26 @@ using ClassLibrary.IRepositories;
 
 namespace WebAPI.Services;
 
-public sealed class UserService(IUserRepository userRepository) : IUserService
+public sealed class UserService : IUserService
 {
+    private readonly IUserRepository userRepository;
+
+    public UserService(IUserRepository userRepository)
+    {
+        this.userRepository = userRepository;
+    }
+
     public async Task<IReadOnlyList<UserDto>> GetUsersAsync(CancellationToken cancellationToken = default)
     {
-        var users = await userRepository.GetAllAsync(cancellationToken);
+        var users = await this.userRepository.GetAllAsync(cancellationToken);
 
         return users
             .Select(user => new UserDto
             {
                 Id = user.UserId,
-                Email = user.Email,
-                FullName = user.FullName
+                Username = user.Username,
+                Role = user.Role
             })
             .ToList();
     }
 }
-

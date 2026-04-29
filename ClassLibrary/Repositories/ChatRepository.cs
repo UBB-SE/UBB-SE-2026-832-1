@@ -1,9 +1,9 @@
-namespace ClassLibrary.Repositories;
-
 using ClassLibrary.Data;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
+
+namespace ClassLibrary.Repositories;
 
 public class ChatRepository : IChatRepository
 {
@@ -17,22 +17,19 @@ public class ChatRepository : IChatRepository
     public async Task<IEnumerable<Conversation>> GetAllConversationsAsync()
     {
         return await context.Conversations
-            .Include(c => c.User)
-            .OrderByDescending(c => c.HasUnanswered)
-            .ThenByDescending(c => c.Id)
+            .Include(conversation => conversation.User)
+            .OrderByDescending(conversation => conversation.HasUnanswered)
+            .ThenByDescending(conversation => conversation.Id)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Conversation>> GetConversationsWithUserMessagesAsync()
     {
-        // Note: Since User model doesn't have a Role property, this method returns all conversations with messages.
-        // To distinguish between user and nutritionist messages, consider adding an IsFromNutritionist
-        // property to the Message model or adding Role property to User model.
         return await context.Conversations
-            .Include(c => c.User)
-            .Where(c => c.Messages.Any())
-            .OrderByDescending(c => c.HasUnanswered)
-            .ThenByDescending(c => c.Id)
+            .Include(conversation => conversation.User)
+            .Where(conversation => conversation.Messages.Any())
+            .OrderByDescending(conversation => conversation.HasUnanswered)
+            .ThenByDescending(conversation => conversation.Id)
             .Distinct()
             .ToListAsync();
     }
@@ -40,10 +37,10 @@ public class ChatRepository : IChatRepository
     public async Task<IEnumerable<Conversation>> GetConversationsWithMessagesAsync()
     {
         return await context.Conversations
-            .Include(c => c.User)
-            .Where(c => c.Messages.Any())
-            .OrderByDescending(c => c.HasUnanswered)
-            .ThenByDescending(c => c.Id)
+            .Include(conversation => conversation.User)
+            .Where(conversation => conversation.Messages.Any())
+            .OrderByDescending(conversation => conversation.HasUnanswered)
+            .ThenByDescending(conversation => conversation.Id)
             .Distinct()
             .ToListAsync();
     }
@@ -51,10 +48,10 @@ public class ChatRepository : IChatRepository
     public async Task<IEnumerable<Conversation>> GetConversationsWhereNutritionistRespondedAsync(Guid nutritionistId)
     {
         return await context.Conversations
-            .Include(c => c.User)
-            .Where(c => c.Messages.Any(m => EF.Property<Guid>(m.Sender, "Id") == nutritionistId))
-            .OrderByDescending(c => c.HasUnanswered)
-            .ThenByDescending(c => c.Id)
+            .Include(conversation => conversation.User)
+            .Where(conversation => conversation.Messages.Any(message => EF.Property<Guid>(message.Sender, "Id") == nutritionistId))
+            .OrderByDescending(conversation => conversation.HasUnanswered)
+            .ThenByDescending(conversation => conversation.Id)
             .Distinct()
             .ToListAsync();
     }
@@ -62,8 +59,8 @@ public class ChatRepository : IChatRepository
     public async Task<Conversation> GetOrCreateConversationForUserAsync(Guid userId)
     {
         var conversation = await context.Conversations
-            .Include(c => c.User)
-            .FirstOrDefaultAsync(c => EF.Property<Guid>(c.User, "Id") == userId);
+            .Include(conversationItem => conversationItem.User)
+            .FirstOrDefaultAsync(conversationItem => EF.Property<Guid>(conversationItem.User, "Id") == userId);
 
         if (conversation != null)
         {
@@ -91,10 +88,10 @@ public class ChatRepository : IChatRepository
     public async Task<IEnumerable<Message>> GetMessagesForConversationAsync(int conversationId)
     {
         return await context.Messages
-            .Include(m => m.Sender)
-            .Include(m => m.Conversation)
-            .Where(m => EF.Property<int>(m.Conversation, "Id") == conversationId)
-            .OrderBy(m => m.SentAt)
+            .Include(message => message.Sender)
+            .Include(message => message.Conversation)
+            .Where(message => EF.Property<int>(message.Conversation, "Id") == conversationId)
+            .OrderBy(message => message.SentAt)
             .ToListAsync();
     }
 

@@ -9,7 +9,7 @@
   - `Repositories` - repository implementations
   - `Data` - EF Core `AppDbContext`
   - `Extensions` - registration and initialization helpers:
-    - `ServiceCollectionExtensions` for DI registrations
+    - `DataAccessServiceCollectionExtensions` for data-access DI registrations
     - `DatabaseInitializer` for seed data
 - `WebAPI`
   - `Controllers` - HTTP endpoints
@@ -29,14 +29,10 @@
 - Keep EF context definitions in `ClassLibrary/Data`.
 - Model object links via class references, not foreign-key id fields.
 - `WebAPI` should call extension methods for data-layer wiring, not reference data-layer internals directly.
+- Keep registration ownership explicit: `WebAPI` registers API services; `ClassLibrary` registers data access.
 - `WinUI` communicates with backend through services/proxies, not direct database access.
-
-## Data Access
-
-- EF Core is configured with an in-memory database (`AppDb`) for now.
-- `AppDbContext` lives in `ClassLibrary/Data/AppDbContext.cs`.
-- DI registration is done via `AddClassLibraryDataAccess()` in `ClassLibrary/Extensions/ServiceCollectionExtensions.cs`.
-- Seed data is applied via `SeedClassLibraryData()` in `ClassLibrary/Extensions/DatabaseInitializer.cs`.
+- `WinUI` proxy services must receive all dependencies via constructor injection (e.g., `HttpClient`, config, auth handlers) and avoid instantiating dependencies inside the proxy.
+- Request flow: `WinUI` (`ServiceProxy`) -> `WebAPI` (`Controller`) -> `WebAPI` (`IUserService`/ `Service`) -> `ClassLibrary` (`IRepository` + `Repository` + `AppDbContext`) -> `database`
 
 ## Prerequisites
 
@@ -58,3 +54,4 @@ When running `WebAPI`, test:
 
 - Swagger UI: `http://localhost:5066/swagger`
 - Users endpoint: `http://localhost:5066/api/users`
+

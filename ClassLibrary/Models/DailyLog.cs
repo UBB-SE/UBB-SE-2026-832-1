@@ -16,12 +16,10 @@ public class DailyLog
 
     public double Fats { get; set; }
 
-    // Foreign key properties - EF Core recognizes by ClassNameId convention
     public Guid UserId { get; set; }
 
     public int MealId { get; set; }
 
-    // Navigation properties
     public virtual User User { get; set; } = null!;
     public virtual Meal Meal { get; set; } = null!;
 }

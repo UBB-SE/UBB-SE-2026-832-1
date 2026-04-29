@@ -4,9 +4,30 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Data;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public sealed class AppDbContext : DbContext
 {
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
+    {
+    }
+
     public DbSet<User> Users { get; set; } = default!;
+
+    public DbSet<UserData> UserData { get; set; } = default!;
+
+    public DbSet<FoodItem> FoodItems { get; set; } = default!;
+
+    public DbSet<MealPlan> MealPlans { get; set; } = default!;
+
+    public DbSet<Ingredient> Ingredients { get; set; } = default!;
+
+    public DbSet<Inventory> Inventories { get; set; } = default!;
+
+    public DbSet<Favorite> Favorites { get; set; } = default!;
+
+    public DbSet<FoodItemIngredient> FoodItemIngredients { get; set; } = default!;
+
+    public DbSet<MealPlanFoodItem> MealPlanFoodItems { get; set; } = default!;
 
     public DbSet<Client> Clients { get; set; } = default!;
 
@@ -24,7 +45,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<DailyLog> DailyLogs { get; set; } = default!;
 
-    public DbSet<Ingredient> Ingredients { get; set; } = default!;
     public DbSet<Conversation> Conversations { get; set; } = default!;
 
     public DbSet<Message> Messages { get; set; } = default!;
@@ -33,6 +53,18 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Favorite>()
+            .HasIndex(favorite => new { favorite.UserId, favorite.FoodItemId })
+            .IsUnique();
+
+        modelBuilder.Entity<FoodItemIngredient>()
+            .HasIndex(foodItemIngredient => new { foodItemIngredient.FoodItemId, foodItemIngredient.IngredientId })
+            .IsUnique();
+
+        modelBuilder.Entity<MealPlanFoodItem>()
+            .HasIndex(mealPlanFoodItem => new { mealPlanFoodItem.MealPlanId, mealPlanFoodItem.FoodItemId })
+            .IsUnique();
+
         modelBuilder.Entity<ClientNutritionPlan>()
             .HasKey("ClientId", "NutritionPlanId");
 
@@ -52,33 +84,28 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                 value => JsonSerializer.Serialize(value, (JsonSerializerOptions?)null),
                 value => JsonSerializer.Deserialize<List<string>>(value, (JsonSerializerOptions?)null) ?? new List<string>());
 
-        // DailyLog configuration - relationships with explicit ClassNameId foreign keys
         modelBuilder.Entity<DailyLog>(entity =>
         {
-            entity.HasKey(dl => dl.Id);
-
-            entity.HasOne(dl => dl.User)
+            entity.HasOne(dailyLog => dailyLog.User)
                 .WithMany()
-                .HasForeignKey(dl => dl.UserId)
+                .HasForeignKey(dailyLog => dailyLog.UserId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(dl => dl.Meal)
+            entity.HasOne(dailyLog => dailyLog.Meal)
                 .WithMany()
-                .HasForeignKey(dl => dl.MealId)
+                .HasForeignKey(dailyLog => dailyLog.MealId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.Property(dl => dl.LoggedAt).IsRequired();
+            entity.Property(dailyLog => dailyLog.LoggedAt).IsRequired();
         });
 
-        // Ingredient configuration
         modelBuilder.Entity<Ingredient>(entity =>
         {
-            entity.HasKey(i => i.FoodId);
-            entity.Property(i => i.Name).IsRequired().HasMaxLength(200);
+            entity.Property(ingredient => ingredient.Name).IsRequired().HasMaxLength(200);
         });
-=========
+
         modelBuilder.Entity<Conversation>()
             .HasOne(conversation => conversation.User)
             .WithMany()
