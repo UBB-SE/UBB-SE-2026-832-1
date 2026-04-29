@@ -30,6 +30,7 @@
 - Model object links via class references, not foreign-key id fields.
 - `WebAPI` should call extension methods for data-layer wiring, not reference data-layer internals directly.
 - `WinUI` communicates with backend through services/proxies, not direct database access.
+- `WinUI` proxy services must receive all dependencies via constructor injection (e.g., `HttpClient`, config, auth handlers) and avoid instantiating dependencies inside the proxy.
 
 ## Data Access
 
