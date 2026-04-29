@@ -1,10 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace ClassLibrary.Models;
-
-/// <summary>
-/// Represents a food ingredient with nutritional values per 100g.
-/// </summary>
 public class Ingredient
 {
     [Key]

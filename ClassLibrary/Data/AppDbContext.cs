@@ -28,42 +28,42 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ClientAchievement>()
-            .HasKey(ca => new { ca.ClientId, ca.AchievementId });
+            .HasKey(clientAchievement => new { clientAchievement.ClientId, clientAchievement.AchievementId });
 
         modelBuilder.Entity<ClientAchievement>()
-            .HasOne(ca => ca.Achievement)
-            .WithMany(a => a.ClientAchievements)
-            .HasForeignKey(ca => ca.AchievementId);
+            .HasOne(clientAchievement => clientAchievement.Achievement)
+            .WithMany(achievement => achievement.ClientAchievements)
+            .HasForeignKey(clientAchievement => clientAchievement.AchievementId);
 
         modelBuilder.Entity<NutritionPlan>()
-            .HasKey(np => np.PlanId);
+            .HasKey(nutritionPlan => nutritionPlan.PlanId);
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasKey(cnp => new { cnp.ClientId, cnp.NutritionPlanId });
+            .HasKey(clientNutritionPlan => new { clientNutritionPlan.ClientId, clientNutritionPlan.NutritionPlanId });
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasOne(cnp => cnp.NutritionPlan)
+            .HasOne(clientNutritionPlan => clientNutritionPlan.NutritionPlan)
             .WithMany()
-            .HasForeignKey(cnp => cnp.NutritionPlanId);
+            .HasForeignKey(clientNutritionPlan => clientNutritionPlan.NutritionPlanId);
 
         modelBuilder.Entity<Meal>()
-            .Property(m => m.Ingredients)
+            .Property(meal => meal.Ingredients)
             .HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+                jsonValue => JsonSerializer.Serialize(jsonValue, (JsonSerializerOptions?)null),
+                jsonValue => JsonSerializer.Deserialize<List<string>>(jsonValue, (JsonSerializerOptions?)null) ?? new List<string>());
 
         modelBuilder.Entity<Reminder>()
-            .Property(r => r.Name)
+            .Property(reminder => reminder.Name)
             .IsRequired()
             .HasMaxLength(255);
         modelBuilder.Entity<Reminder>()
-            .Property(r => r.Frequency)
+            .Property(reminder => reminder.Frequency)
             .HasMaxLength(50);
         modelBuilder.Entity<Reminder>()
-            .Ignore(r => r.FullDateTimeDisplay);
+            .Ignore(reminder => reminder.FullDateTimeDisplay);
         modelBuilder.Entity<Reminder>()
-            .HasOne(r => r.User)
-            .WithMany(u => u.Reminders)
+            .HasOne(reminder => reminder.User)
+            .WithMany(user => user.Reminders)
             .IsRequired();
     }
 }

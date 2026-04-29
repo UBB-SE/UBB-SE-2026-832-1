@@ -11,39 +11,41 @@ namespace ClassLibrary.Repositories;
 
 public class IngredientRepository : IIngredientRepository
 {
-    private readonly AppDbContext context;
+    private readonly AppDbContext databaseContext;
 
-    public IngredientRepository(AppDbContext context)
+    public IngredientRepository(AppDbContext databaseContext)
     {
-        this.context = context;
+        this.databaseContext = databaseContext;
     }
 
     public async Task<int> GetOrCreateIngredientIdByNameAsync(string name)
     {
-        var ingredient = await context.Ingredients
-            .FirstOrDefaultAsync(i => i.Name.ToLower() == name.ToLower());
+        var ingredientEntity = await databaseContext.Ingredients
+            .FirstOrDefaultAsync(ingredient => ingredient.Name.ToLower() == name.ToLower());
 
-        if (ingredient != null) return ingredient.IngredientId;
+        if (ingredientEntity != null) return ingredientEntity.IngredientId;
 
         var newIngredient = new Ingredient { Name = name };
-        await context.Ingredients.AddAsync(newIngredient);
-        await context.SaveChangesAsync();
+        await databaseContext.Ingredients.AddAsync(newIngredient);
+        await databaseContext.SaveChangesAsync();
 
         return newIngredient.IngredientId;
     }
 
     public async Task<List<KeyValuePair<int, string>>> SearchIngredientsAsync(string search)
     {
-        return await context.Ingredients
-            .Where(i => EF.Functions.Like(i.Name, $"%{search}%"))
-            .OrderBy(i => i.Name)
+        return await databaseContext.Ingredients
+            .Where(ingredient => EF.Functions.Like(ingredient.Name, $"%{search}%"))
+            .OrderBy(ingredient => ingredient.Name)
             .Take(20)
-            .Select(i => new KeyValuePair<int, string>(i.IngredientId, i.Name))
+            .Select(ingredient => new KeyValuePair<int, string>(ingredient.IngredientId, ingredient.Name))
             .ToListAsync();
     }
 
     public async Task<List<Ingredient>> GetAllAsync()
     {
-        return await context.Ingredients.OrderBy(i => i.Name).ToListAsync();
+        return await databaseContext.Ingredients
+            .OrderBy(ingredient => ingredient.Name)
+            .ToListAsync();
     }
 }

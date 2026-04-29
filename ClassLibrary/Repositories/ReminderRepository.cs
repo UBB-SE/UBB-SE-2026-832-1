@@ -11,49 +11,49 @@ namespace ClassLibrary.Repositories;
 
 public class ReminderRepository : IReminderRepository
 {
-    private readonly AppDbContext context;
+    private readonly AppDbContext databaseContext;
 
-    public ReminderRepository(AppDbContext context)
+    public ReminderRepository(AppDbContext databaseContext)
     {
-        this.context = context;
+        this.databaseContext = databaseContext;
     }
 
     public async Task<Reminder?> GetByIdAsync(int id)
     {
-        return await context.Reminders.FindAsync(id);
+        return await databaseContext.Reminders.FindAsync(id);
     }
 
     public async Task<IEnumerable<Reminder>> GetAllAsync()
     {
-        return await context.Reminders.ToListAsync();
+        return await databaseContext.Reminders.ToListAsync();
     }
 
     public async Task<IEnumerable<Reminder>> GetAllByUserIdAsync(Guid userId)
     {
-        return await context.Reminders
-            .Where(r => r.User.Id == userId)
+        return await databaseContext.Reminders
+            .Where(reminder => reminder.User.Id == userId)
             .ToListAsync();
     }
 
     public async Task AddAsync(Reminder entity)
     {
-        await context.Reminders.AddAsync(entity);
-        await context.SaveChangesAsync();
+        await databaseContext.Reminders.AddAsync(entity);
+        await databaseContext.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Reminder entity)
     {
-        context.Reminders.Update(entity);
-        await context.SaveChangesAsync();
+        databaseContext.Reminders.Update(entity);
+        await databaseContext.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)
     {
-        var reminder = await context.Reminders.FindAsync(id);
+        var reminder = await databaseContext.Reminders.FindAsync(id);
         if (reminder != null)
         {
-            context.Reminders.Remove(reminder);
-            await context.SaveChangesAsync();
+            databaseContext.Reminders.Remove(reminder);
+            await databaseContext.SaveChangesAsync();
         }
     }
 
@@ -62,12 +62,12 @@ public class ReminderRepository : IReminderRepository
         var todayString = DateTime.Now.ToString("yyyy-MM-dd");
         var currentTime = DateTime.Now.TimeOfDay;
 
-        return await context.Reminders
-            .Where(r => r.User.Id == userId)
-            .Where(r => string.Compare(r.ReminderDate, todayString) > 0 ||
-                        (r.ReminderDate == todayString && r.Time >= currentTime))
-            .OrderBy(r => r.ReminderDate)
-            .ThenBy(r => r.Time)
+        return await databaseContext.Reminders
+            .Where(reminder => reminder.User.Id == userId)
+            .Where(reminder => string.Compare(reminder.ReminderDate, todayString) > 0 ||
+                               (reminder.ReminderDate == todayString && reminder.Time >= currentTime))
+            .OrderBy(reminder => reminder.ReminderDate)
+            .ThenBy(reminder => reminder.Time)
             .FirstOrDefaultAsync();
     }
 }
