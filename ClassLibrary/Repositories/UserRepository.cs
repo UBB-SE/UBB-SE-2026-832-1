@@ -9,67 +9,74 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
 
-public sealed class UserRepository(AppDbContext dbContext) : IUserRepository
+public sealed class UserRepository : IUserRepository
 {
-    public async Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    private readonly AppDbContext databaseContext;
+
+    public UserRepository(AppDbContext databaseContext)
     {
-        return await dbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.UserId == id, cancellationToken);
+        this.databaseContext = databaseContext;
     }
 
     public async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await dbContext.Users
+        return await this.databaseContext.Users
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await this.databaseContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(user => user.UserId == id, cancellationToken);
+    }
+
     public async Task AddAsync(User entity, CancellationToken cancellationToken = default)
     {
-        dbContext.Users.Add(entity);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        this.databaseContext.Users.Add(entity);
+        await this.databaseContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task UpdateAsync(User entity, CancellationToken cancellationToken = default)
     {
-        dbContext.Users.Update(entity);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        this.databaseContext.Users.Update(entity);
+        await this.databaseContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var entity = await dbContext.Users.FindAsync([id], cancellationToken);
+        var entity = await this.databaseContext.Users.FindAsync([id], cancellationToken);
         if (entity is not null)
         {
-            dbContext.Users.Remove(entity);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            this.databaseContext.Users.Remove(entity);
+            await this.databaseContext.SaveChangesAsync(cancellationToken);
         }
     }
 
     public async Task<User?> GetByUsernameAndPasswordAsync(string username, string password, CancellationToken cancellationToken = default)
     {
-        return await dbContext.Users
+        return await this.databaseContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Username == username && u.Password == password, cancellationToken);
+            .FirstOrDefaultAsync(user => user.Username == username && user.Password == password, cancellationToken);
     }
 
     public async Task AddUserDataAsync(UserData data, CancellationToken cancellationToken = default)
     {
-        dbContext.UserData.Add(data);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        this.databaseContext.UserData.Add(data);
+        await this.databaseContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<UserData?> GetUserDataByUserIdAsync(int userId, CancellationToken cancellationToken = default)
     {
-        return await dbContext.UserData
+        return await this.databaseContext.UserData
             .AsNoTracking()
-            .FirstOrDefaultAsync(ud => ud.UserId == userId, cancellationToken);
+            .FirstOrDefaultAsync(userData => userData.UserId == userId, cancellationToken);
     }
 
     public async Task UpdateUserDataAsync(UserData data, CancellationToken cancellationToken = default)
     {
-        dbContext.UserData.Update(data);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        this.databaseContext.UserData.Update(data);
+        await this.databaseContext.SaveChangesAsync(cancellationToken);
     }
 }

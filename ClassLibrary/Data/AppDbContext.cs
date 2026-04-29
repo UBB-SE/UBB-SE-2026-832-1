@@ -4,8 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Data;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public sealed class AppDbContext : DbContext
 {
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
+    {
+    }
+
     public DbSet<User> Users { get; set; } = default!;
 
     public DbSet<UserData> UserData { get; set; } = default!;

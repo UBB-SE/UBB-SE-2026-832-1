@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ClassLibrary.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class DataAccessServiceCollectionExtensions
 {
     public static IServiceCollection AddClassLibraryDataAccess(this IServiceCollection services)
     {
