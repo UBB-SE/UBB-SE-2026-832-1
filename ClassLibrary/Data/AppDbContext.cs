@@ -47,13 +47,16 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Favorite>()
-            .HasKey(f => new { f.UserId, f.FoodItemId });
+            .HasIndex(favorite => new { favorite.UserId, favorite.FoodItemId })
+            .IsUnique();
 
         modelBuilder.Entity<FoodItemIngredient>()
-            .HasKey(fi => new { fi.FoodItemId, fi.IngredientId });
+            .HasIndex(foodItemIngredient => new { foodItemIngredient.FoodItemId, foodItemIngredient.IngredientId })
+            .IsUnique();
 
         modelBuilder.Entity<MealPlanFoodItem>()
-            .HasKey(mpf => new { mpf.MealPlanId, mpf.FoodItemId });
+            .HasIndex(mealPlanFoodItem => new { mealPlanFoodItem.MealPlanId, mealPlanFoodItem.FoodItemId })
+            .IsUnique();
 
         modelBuilder.Entity<ClientNutritionPlan>()
             .HasKey("ClientId", "NutritionPlanId");
