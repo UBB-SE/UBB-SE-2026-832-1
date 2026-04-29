@@ -1,8 +1,10 @@
 using ClassLibrary.Data;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Repositories;
+using ClassLibrary.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+
 
 namespace ClassLibrary.Extensions;
 
@@ -13,6 +15,7 @@ public static class DataAccessServiceCollectionExtensions
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(DatabasePaths.GetConnectionString()));
 
+       
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IFoodItemRepository, FoodItemRepository>();
         services.AddScoped<IMealPlanRepository, MealPlanRepository>();
@@ -21,6 +24,8 @@ public static class DataAccessServiceCollectionExtensions
         services.AddScoped<IRepositoryNutrition, RepositoryNutrition>();
         services.AddScoped<IChatRepository, ChatRepository>();
         services.AddScoped<IDailyLogRepository, DailyLogRepository>();
+        services.AddScoped<IRepositoryTrainer, RepositoryTrainer>();
+        services.AddScoped<IRepositoryWorkoutLog, RepositoryWorkoutLog>();
 
         return services;
     }
