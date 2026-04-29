@@ -32,13 +32,6 @@
 - `WinUI` communicates with backend through services/proxies, not direct database access.
 - `WinUI` proxy services must receive all dependencies via constructor injection (e.g., `HttpClient`, config, auth handlers) and avoid instantiating dependencies inside the proxy.
 
-## Data Access
-
-- EF Core is configured with an in-memory database (`AppDb`) for now.
-- `AppDbContext` lives in `ClassLibrary/Data/AppDbContext.cs`.
-- DI registration is done via `AddClassLibraryDataAccess()` in `ClassLibrary/Extensions/ServiceCollectionExtensions.cs`.
-- Seed data is applied via `SeedClassLibraryData()` in `ClassLibrary/Extensions/DatabaseInitializer.cs`.
-
 ## Prerequisites
 
 - Windows + Visual Studio 2022
