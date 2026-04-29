@@ -34,13 +34,6 @@
 - `WinUI` proxy services must receive all dependencies via constructor injection (e.g., `HttpClient`, config, auth handlers) and avoid instantiating dependencies inside the proxy.
 - Request flow: `WinUI` (`ServiceProxy`) -> `WebAPI` (`Controller`) -> `WebAPI` (`IUserService`/ `Service`) -> `ClassLibrary` (`IRepository` + `Repository` + `AppDbContext`) -> `database`
 
-## Data Access
-
-- EF Core is configured with an in-memory database (`AppDb`) for now.
-- `AppDbContext` lives in `ClassLibrary/Data/AppDbContext.cs`.
-- DI registration is done via `AddClassLibraryDataAccess()` in `ClassLibrary/Extensions/DataAccessServiceCollectionExtensions.cs`.
-- Seed data is applied via `SeedClassLibraryData()` in `ClassLibrary/Extensions/DatabaseInitializer.cs`.
-
 ## Prerequisites
 
 - Windows + Visual Studio 2022
