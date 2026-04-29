@@ -37,6 +37,8 @@ public sealed class AppDbContext : DbContext
 
     public DbSet<Notification> Notifications { get; set; } = default!;
 
+    public DbSet<Reminder> Reminders { get; set; } = default!;
+
     public DbSet<NutritionPlan> NutritionPlans { get; set; } = default!;
 
     public DbSet<Meal> Meals { get; set; } = default!;

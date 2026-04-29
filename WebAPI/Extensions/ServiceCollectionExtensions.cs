@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRepositoryTrainer, RepositoryTrainer>();
+        services.AddScoped<IReminderService, ReminderService>();
 
         return services;
     }
