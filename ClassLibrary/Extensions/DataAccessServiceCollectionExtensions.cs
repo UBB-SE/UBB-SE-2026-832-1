@@ -21,6 +21,8 @@ public static class DataAccessServiceCollectionExtensions
         services.AddScoped<IRepositoryNutrition, RepositoryNutrition>();
         services.AddScoped<IChatRepository, ChatRepository>();
         services.AddScoped<IDailyLogRepository, DailyLogRepository>();
+        services.AddScoped<IRepositoryWorkoutLog, RepositoryWorkoutLog>();
+        services.AddScoped<IRepositoryWorkoutTemplate, RepositoryWorkoutTemplate>();
 
         return services;
     }
