@@ -32,7 +32,7 @@
 - Keep registration ownership explicit: `WebAPI` registers API services; `ClassLibrary` registers data access.
 - `WinUI` communicates with backend through services/proxies, not direct database access.
 - `WinUI` proxy services must receive all dependencies via constructor injection (e.g., `HttpClient`, config, auth handlers) and avoid instantiating dependencies inside the proxy.
-- Request flow: `WinUI` (`*ServiceProxy`) -> `WebAPI` (`IUserService`/ `Service`) -> `ClassLibrary` (`IRepository` + `Repository` + `AppDbContext`) -> `database`
+- Request flow: `WinUI` (`ServiceProxy`) -> `WebAPI` (`Controller`) -> `WebAPI` (`IUserService`/ `Service`) -> `ClassLibrary` (`IRepository` + `Repository` + `AppDbContext`) -> `database`
 
 ## Data Access
 
