@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
 using ClassLibrary.Models;
@@ -27,13 +28,13 @@ public sealed class TrainerService : ITrainerService
         this.nutritionRepository = nutritionRepository;
     }
 
-    public async Task<List<ClientDto>> GetAssignedClientsAsync(int trainerId)
+    public async Task<IReadOnlyList<ClientDto>> GetAssignedClientsAsync(int trainerId, CancellationToken cancellationToken = default)
     {
         var clients = await trainerRepository.GetTrainerClientsAsync(trainerId);
         return clients.Select(c => new ClientDto { Id = c.UserId, Name = c.Username }).ToList();
     }
 
-    public async Task<List<WorkoutHistoryResponseDto>> GetClientWorkoutHistoryAsync(int clientId)
+    public async Task<IReadOnlyList<WorkoutHistoryResponseDto>> GetClientWorkoutHistoryAsync(int clientId, CancellationToken cancellationToken = default)
     {
         var logs = await workoutLogRepository.GetWorkoutHistoryAsync(clientId);
         return logs.Select(l => new WorkoutHistoryResponseDto
@@ -47,7 +48,7 @@ public sealed class TrainerService : ITrainerService
         }).ToList();
     }
 
-    public async Task<bool> SaveWorkoutFeedbackAsync(WorkoutFeedbackRequestDto request)
+    public async Task<bool> SaveWorkoutFeedbackAsync(WorkoutFeedbackRequestDto request, CancellationToken cancellationToken = default)
     {
         if (request is null)
         {
@@ -57,7 +58,7 @@ public sealed class TrainerService : ITrainerService
         return await workoutLogRepository.UpdateWorkoutLogFeedbackAsync(request.LogId, request.Rating, request.TrainerNotes);
     }
 
-    public async Task<List<WorkoutTemplateDto>> GetAvailableWorkoutsAsync(int clientId)
+    public async Task<IReadOnlyList<WorkoutTemplateDto>> GetAvailableWorkoutsAsync(int clientId, CancellationToken cancellationToken = default)
     {
         var workouts = await workoutTemplateRepository.GetAvailableWorkoutsAsync(clientId);
         return workouts.Select(w => new WorkoutTemplateDto
@@ -67,12 +68,12 @@ public sealed class TrainerService : ITrainerService
         }).ToList();
     }
 
-    public async Task<bool> DeleteWorkoutTemplateAsync(int templateId)
+    public async Task<bool> DeleteWorkoutTemplateAsync(int templateId, CancellationToken cancellationToken = default)
     {
         return await trainerRepository.DeleteWorkoutTemplateAsync(templateId);
     }
 
-    public async Task<(bool Success, string ErrorMessage)> AssignNewRoutineAsync(RoutineRequestDto request)
+    public async Task<(bool Success, string ErrorMessage)> AssignNewRoutineAsync(RoutineRequestDto request, CancellationToken cancellationToken = default)
     {
         if (request == null)
         {
@@ -100,7 +101,9 @@ public sealed class TrainerService : ITrainerService
                 TemplateExerciseId = e.Id,
                 Name = e.ExerciseName,
                 TargetSets = e.TargetSets,
-                TargetReps = e.TargetReps
+                TargetReps = e.TargetReps,
+                MuscleGroup = e.MuscleGroup,
+                TargetWeight = e.TargetWeight
             }).ToList()
         };
 
@@ -113,12 +116,12 @@ public sealed class TrainerService : ITrainerService
         return (true, string.Empty);
     }
 
-    public async Task<List<string>> GetAllExerciseNamesAsync()
+    public async Task<IReadOnlyList<string>> GetAllExerciseNamesAsync(CancellationToken cancellationToken = default)
     {
         return await workoutTemplateRepository.GetAllExerciseNamesAsync();
     }
 
-    public async Task<bool> CreateAndAssignNutritionPlanAsync(NutritionPlanRequestDto request)
+    public async Task<bool> CreateAndAssignNutritionPlanAsync(NutritionPlanRequestDto request, CancellationToken cancellationToken = default)
     {
         if (request is null || request.ClientId <= 0)
         {
