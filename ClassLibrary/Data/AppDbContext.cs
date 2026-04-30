@@ -66,9 +66,6 @@ public sealed class AppDbContext : DbContext
         modelBuilder.Entity<Meal>()
             .Property(meal => meal.Ingredients)
             .HasConversion(
-modelBuilder.Entity<Meal>()
-            .Property(meal => meal.Ingredients)
-            .HasConversion(
                 jsonValue => JsonSerializer.Serialize(jsonValue, (JsonSerializerOptions?)null),
                 jsonValue => JsonSerializer.Deserialize<List<string>>(jsonValue, (JsonSerializerOptions?)null) ?? new List<string>())
             .Metadata.SetValueComparer(new ValueComparer<List<string>>(
