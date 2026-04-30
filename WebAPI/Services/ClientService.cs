@@ -7,8 +7,8 @@ namespace WebAPI.Services;
 
 public sealed class ClientService : IClientService
 {
-    private const string UnlockedAchievementIcon = "&#xE73E;";
-    private const string LockedAchievementIcon = "&#xE72E;";
+    private const string UNLOCKED_ACHIEVEMENT_ICON = "&#xE73E;";
+    private const string LOCKED_ACHIEVEMENT_ICON = "&#xE72E;";
 
     private readonly IRepositoryAchievements achievementsRepository;
     private readonly IRepositoryNotification notificationRepository;
@@ -46,7 +46,7 @@ public sealed class ClientService : IClientService
             Description = item.Description,
             Criteria = item.Criteria,
             IsUnlocked = item.IsUnlocked,
-            Icon = item.IsUnlocked ? UnlockedAchievementIcon : LockedAchievementIcon,
+            Icon = item.IsUnlocked ? UNLOCKED_ACHIEVEMENT_ICON : LOCKED_ACHIEVEMENT_ICON,
         }).ToList();
     }
 
@@ -85,8 +85,7 @@ public sealed class ClientService : IClientService
             return null;
         }
 
-        var meals = await this.nutritionRepository.GetMealsForPlanAsync(activePlan.NutritionPlanId, cancellationToken);
-        return MapNutritionPlan(activePlan, meals);
+        return MapNutritionPlan(activePlan, activePlan.Meals);
     }
 
     public async Task<IReadOnlyList<WorkoutLogDataTransferObject>> GetWorkoutHistoryAsync(int clientId, CancellationToken cancellationToken = default)
@@ -144,7 +143,7 @@ public sealed class ClientService : IClientService
         var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(clientId, cancellationToken);
         var totalCalories = logs.Sum(log => log.TotalCaloriesBurned);
 
-        var latestLog = logs.FirstOrDefault();
+        var latestLog = logs.OrderByDescending(log => log.Date).FirstOrDefault();
         string latestSessionHint;
         List<LoggedExerciseDataTransferObject> loggedExercises;
 
@@ -178,7 +177,7 @@ public sealed class ClientService : IClientService
             return Task.FromResult(false);
         }
 
-        return Task.FromResult(false);
+        throw new NotImplementedException("Deload confirmation requires progression service integration which is not yet available.");
     }
 
     public async Task<bool> SyncNutritionAsync(NutritionSyncRequestDataTransferObject request, CancellationToken cancellationToken = default)
