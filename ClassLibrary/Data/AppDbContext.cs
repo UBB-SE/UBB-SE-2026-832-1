@@ -1,16 +1,38 @@
 using System.Text.Json;
 using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ClassLibrary.Data;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public sealed class AppDbContext : DbContext
 {
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
+    {
+    }
+
     public DbSet<User> Users { get; set; } = default!;
 
-    public DbSet<Achievement> Achievements { get; set; } = default!;
+    public DbSet<UserData> UserData { get; set; } = default!;
 
-    public DbSet<ClientAchievement> ClientAchievements { get; set; } = default!;
+    public DbSet<FoodItem> FoodItems { get; set; } = default!;
+
+    public DbSet<MealPlan> MealPlans { get; set; } = default!;
+
+    public DbSet<Ingredient> Ingredients { get; set; } = default!;
+
+    public DbSet<Inventory> Inventories { get; set; } = default!;
+
+    public DbSet<Favorite> Favorites { get; set; } = default!;
+
+    public DbSet<FoodItemIngredient> FoodItemIngredients { get; set; } = default!;
+
+    public DbSet<MealPlanFoodItem> MealPlanFoodItems { get; set; } = default!;
+
+    public DbSet<Client> Clients { get; set; } = default!;
+
+    public DbSet<Achievement> Achievements { get; set; } = default!;
 
     public DbSet<WorkoutLog> WorkoutLogs { get; set; } = default!;
 
@@ -22,38 +44,37 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
 
-    public DbSet<Ingredient> Ingredients { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ClientAchievement>()
-            .HasKey(ca => new { ca.ClientId, ca.AchievementId });
+        modelBuilder.Entity<Favorite>()
+            .HasIndex(favorite => new { favorite.UserId, favorite.FoodItemId })
+            .IsUnique();
 
-        modelBuilder.Entity<ClientAchievement>()
-            .HasOne(ca => ca.Achievement)
-            .WithMany(a => a.ClientAchievements)
-            .HasForeignKey(ca => ca.AchievementId);
+        modelBuilder.Entity<FoodItemIngredient>()
+            .HasIndex(foodItemIngredient => new { foodItemIngredient.FoodItemId, foodItemIngredient.IngredientId })
+            .IsUnique();
 
-        modelBuilder.Entity<NutritionPlan>()
-            .HasKey(np => np.PlanId);
-
-        modelBuilder.Entity<ClientNutritionPlan>()
-            .HasKey(cnp => new { cnp.ClientId, cnp.NutritionPlanId });
+        modelBuilder.Entity<MealPlanFoodItem>()
+            .HasIndex(mealPlanFoodItem => new { mealPlanFoodItem.MealPlanId, mealPlanFoodItem.FoodItemId })
+            .IsUnique();
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasOne(cnp => cnp.NutritionPlan)
+            .HasKey("ClientId", "NutritionPlanId");
+
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasOne(clientNutritionPlan => clientNutritionPlan.Client)
+            .WithMany(client => client.ClientNutritionPlans)
+            .HasForeignKey("ClientId");
+
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasOne(clientNutritionPlan => clientNutritionPlan.NutritionPlan)
             .WithMany()
-            .HasForeignKey(cnp => cnp.NutritionPlanId);
+            .HasForeignKey("NutritionPlanId");
 
         modelBuilder.Entity<Meal>()
-            .Property(m => m.Ingredients)
+            .Property(meal => meal.Ingredients)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
-
-        modelBuilder.Entity<Ingredient>()
-            .Property(i => i.Name)
-            .IsRequired()
-            .HasMaxLength(255);
     }
 }

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ClassLibrary.Models;
 
 public enum NotificationType
@@ -10,27 +12,27 @@ public enum NotificationType
 
 public class Notification
 {
-    public int Id { get; set; }
-    public int ClientId { get; set; }
+    public int NotificationId { get; set; }
+
+    [Required]
+    public Client Client { get; set; } = null!;
+
+    [Required]
+    [MaxLength(200)]
     public string Title { get; set; } = string.Empty;
+
+    [Required]
+    [MaxLength(1000)]
     public string Message { get; set; } = string.Empty;
+
+    [Required]
     public NotificationType Type { get; set; }
+
     public int RelatedId { get; set; }
+
+    [Required]
     public DateTime DateCreated { get; set; }
+
+    [Required]
     public bool IsRead { get; set; }
-
-    public Notification()
-    {
-        DateCreated = DateTime.Now;
-    }
-
-    public Notification(string title, string message, NotificationType type, int relatedId)
-    {
-        Title = title;
-        Message = message;
-        Type = type;
-        RelatedId = relatedId;
-        DateCreated = DateTime.Now;
-        IsRead = false;
-    }
 }

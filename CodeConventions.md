@@ -28,6 +28,7 @@
 
 - `using` directives for namespace use always must be declared at the top of the file
 - modifiers occur in the following order: `public protected internal private new abstract virtual override sealed static readonly extern unsafe volatile async`
+- use explicit constructors over primary constructors
 - Class member ordering:
   - Group class members in the following order: 
     - Nested classes, enums, delegates and events.
