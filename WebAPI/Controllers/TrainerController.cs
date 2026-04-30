@@ -75,6 +75,11 @@ public class TrainerController : ControllerBase
     public async Task<IActionResult> CreateAndAssignNutritionPlan([FromBody] NutritionPlanRequestDto request)
     {
         var result = await trainerService.CreateAndAssignNutritionPlanAsync(request);
-        return Ok(result);
+        if (!result)
+        {
+            return BadRequest("Failed to create and assign nutrition plan.");
+        }
+
+        return Ok(true);
     }
 }
