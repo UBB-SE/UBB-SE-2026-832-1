@@ -104,6 +104,11 @@ public sealed class ClientService : IClientService
             return false;
         }
 
+        if (request.WorkoutLog.Client == null || request.WorkoutLog.Client.ClientId <= 0)
+        {
+            return false;
+        }
+
         var client = await this.clientRepository.GetByIdAsync(request.WorkoutLog.Client.ClientId, cancellationToken);
         if (client == null)
         {
@@ -206,7 +211,7 @@ public sealed class ClientService : IClientService
         {
             var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(request.ClientId, cancellationToken);
             var totalCalories = logs.Sum(log => log.TotalCaloriesBurned);
-            var lastIntensityTag = logs.FirstOrDefault()?.IntensityTag;
+            var lastIntensityTag = logs.OrderByDescending(log => log.Date).FirstOrDefault()?.IntensityTag;
             var workoutDifficulty = string.IsNullOrWhiteSpace(lastIntensityTag) ? "unknown" : lastIntensityTag;
 
             var payload = new
@@ -222,6 +227,10 @@ public sealed class ClientService : IClientService
             var httpClient = this.httpClientFactory.CreateClient();
             var response = await httpClient.PostAsync(syncEndpoint, content, cancellationToken);
             return response.IsSuccessStatusCode;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
         }
         catch
         {
@@ -353,7 +362,7 @@ public sealed class ClientService : IClientService
 
         var workoutLog = new WorkoutLog
         {
-            WorkoutLogId = workoutLogDataTransferObject.WorkoutLogId,
+            WorkoutLogId = 0,
             Client = client,
             WorkoutName = workoutLogDataTransferObject.WorkoutName,
             Date = workoutLogDataTransferObject.Date,
@@ -367,7 +376,7 @@ public sealed class ClientService : IClientService
             TrainerNotes = workoutLogDataTransferObject.TrainerNotes,
         };
 
-        foreach (var loggedExerciseDataTransferObject in workoutLogDataTransferObject.Exercises)
+        foreach (var loggedExerciseDataTransferObject in workoutLogDataTransferObject.Exercises ?? Enumerable.Empty<LoggedExerciseDataTransferObject>())
         {
             var loggedExercise = MapToLoggedExercise(loggedExerciseDataTransferObject, workoutLog);
             workoutLog.Exercises.Add(loggedExercise);
@@ -382,7 +391,7 @@ public sealed class ClientService : IClientService
 
         var loggedExercise = new LoggedExercise
         {
-            LoggedExerciseId = loggedExerciseDataTransferObject.LoggedExerciseId,
+            LoggedExerciseId = 0,
             WorkoutLog = parentWorkoutLog,
             ExerciseName = loggedExerciseDataTransferObject.ExerciseName,
             TargetMuscles = targetMuscles,
@@ -393,7 +402,7 @@ public sealed class ClientService : IClientService
             AdjustmentNote = loggedExerciseDataTransferObject.AdjustmentNote,
         };
 
-        foreach (var loggedSetDataTransferObject in loggedExerciseDataTransferObject.Sets)
+        foreach (var loggedSetDataTransferObject in loggedExerciseDataTransferObject.Sets ?? Enumerable.Empty<LoggedSetDataTransferObject>())
         {
             var loggedSet = MapToLoggedSet(loggedSetDataTransferObject, parentWorkoutLog, loggedExercise);
             loggedExercise.Sets.Add(loggedSet);
@@ -406,7 +415,7 @@ public sealed class ClientService : IClientService
     {
         return new LoggedSet
         {
-            LoggedSetId = loggedSetDataTransferObject.LoggedSetId,
+            LoggedSetId = 0,
             WorkoutLog = parentWorkoutLog,
             Exercise = parentLoggedExercise,
             ExerciseName = loggedSetDataTransferObject.ExerciseName,

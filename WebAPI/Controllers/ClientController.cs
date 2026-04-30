@@ -84,13 +84,20 @@ public sealed class ClientController : ControllerBase
     [HttpPost("confirm-deload")]
     public async Task<IActionResult> ConfirmDeload([FromBody] ConfirmDeloadRequestDataTransferObject request, CancellationToken cancellationToken)
     {
-        var success = await this.clientService.ConfirmDeloadAsync(request, cancellationToken);
-        if (!success)
+        try
         {
-            return this.BadRequest("Failed to confirm deload.");
-        }
+            var success = await this.clientService.ConfirmDeloadAsync(request, cancellationToken);
+            if (!success)
+            {
+                return this.BadRequest("Failed to confirm deload.");
+            }
 
-        return this.Ok();
+            return this.Ok();
+        }
+        catch (NotImplementedException)
+        {
+            return this.StatusCode(StatusCodes.Status501NotImplemented, "Deload confirmation is not yet implemented.");
+        }
     }
 
     [HttpPost("sync-nutrition")]

@@ -34,8 +34,7 @@ public sealed class RepositoryWorkoutLog : IRepositoryWorkoutLog
         }
 
         await this.databaseContext.WorkoutLogs.AddAsync(log, cancellationToken);
-        await this.databaseContext.SaveChangesAsync(cancellationToken);
-        return true;
+        return await this.databaseContext.SaveChangesAsync(cancellationToken) > 0;
     }
 
     public async Task<bool> UpdateWorkoutLogAsync(WorkoutLog log, CancellationToken cancellationToken = default)
