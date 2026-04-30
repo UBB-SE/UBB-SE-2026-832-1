@@ -1,4 +1,4 @@
-﻿namespace ClassLibrary.Models;
+namespace ClassLibrary.Models;
 
 public sealed class Ingredient
 {
