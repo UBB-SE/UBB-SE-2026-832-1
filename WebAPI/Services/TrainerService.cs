@@ -42,7 +42,7 @@ public sealed class TrainerService : ITrainerService
             Id = l.WorkoutLogId,
             Name = l.WorkoutName,
             DurationMinutes = (int)l.Duration.TotalMinutes,
-            Rating = (int)l.Rating,
+            Rating = Convert.ToInt32(Math.Round(l.Rating, MidpointRounding.AwayFromZero)),
             TrainerNotes = l.TrainerNotes,
             Date = l.Date
         }).ToList();
