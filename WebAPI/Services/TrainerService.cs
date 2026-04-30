@@ -118,7 +118,7 @@ public sealed class TrainerService : ITrainerService
 
     public async Task<IReadOnlyList<string>> GetAllExerciseNamesAsync(CancellationToken cancellationToken = default)
     {
-        return await workoutTemplateRepository.GetAllExerciseNamesAsync();
+        return (await workoutTemplateRepository.GetAllExerciseNamesAsync()).ToList();
     }
 
     public async Task<bool> CreateAndAssignNutritionPlanAsync(NutritionPlanRequestDto request, CancellationToken cancellationToken = default)
