@@ -6,21 +6,24 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ClassLibrary.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class DataAccessServiceCollectionExtensions
 {
-    private const string IN_MEMORY_DATABASE_NAME = "AppDb";
-
     public static IServiceCollection AddClassLibraryDataAccess(this IServiceCollection services)
     {
         services.AddDbContext<AppDbContext>(options =>
-            options.UseInMemoryDatabase(IN_MEMORY_DATABASE_NAME));
+            options.UseSqlite(DatabasePaths.GetConnectionString()));
+
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IFoodItemRepository, FoodItemRepository>();
+        services.AddScoped<IMealPlanRepository, MealPlanRepository>();
         services.AddScoped<IRepositoryAchievements, RepositoryAchievements>();
         services.AddScoped<IRepositoryNotification, RepositoryNotification>();
         services.AddScoped<IRepositoryNutrition, RepositoryNutrition>();
+        services.AddScoped<IChatRepository, ChatRepository>();
+        services.AddScoped<IDailyLogRepository, DailyLogRepository>();
         services.AddScoped<IIngredientRepository, IngredientRepository>();
+        services.AddScoped<IReminderRepository, ReminderRepository>();
 
         return services;
     }
 }
-

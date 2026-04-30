@@ -1,50 +1,66 @@
+using System.Collections.Generic;
 using System.Text.Json;
 using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Data;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public sealed class AppDbContext : DbContext
 {
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
+    {
+    }
+
     public DbSet<User> Users { get; set; } = default!;
-
+    public DbSet<UserData> UserData { get; set; } = default!;
+    public DbSet<FoodItem> FoodItems { get; set; } = default!;
+    public DbSet<MealPlan> MealPlans { get; set; } = default!;
+    public DbSet<Ingredient> Ingredients { get; set; } = default!;
+    public DbSet<Inventory> Inventories { get; set; } = default!;
+    public DbSet<Favorite> Favorites { get; set; } = default!;
+    public DbSet<FoodItemIngredient> FoodItemIngredients { get; set; } = default!;
+    public DbSet<MealPlanFoodItem> MealPlanFoodItems { get; set; } = default!;
+    public DbSet<Client> Clients { get; set; } = default!;
     public DbSet<Achievement> Achievements { get; set; } = default!;
-
-    public DbSet<ClientAchievement> ClientAchievements { get; set; } = default!;
-
     public DbSet<WorkoutLog> WorkoutLogs { get; set; } = default!;
-
     public DbSet<Notification> Notifications { get; set; } = default!;
-
     public DbSet<NutritionPlan> NutritionPlans { get; set; } = default!;
-
     public DbSet<Meal> Meals { get; set; } = default!;
-
     public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
+    public DbSet<DailyLog> DailyLogs { get; set; } = default!;
+    public DbSet<Conversation> Conversations { get; set; } = default!;
+    public DbSet<Message> Messages { get; set; } = default!;
+    public DbSet<Reminder> Reminders { get; set; } = default!;
 
-    public DbSet<Ingredient> Ingredients { get; set; }
-
-    public DbSet<Reminder> Reminders { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ClientAchievement>()
-            .HasKey(clientAchievement => new { clientAchievement.ClientId, clientAchievement.AchievementId });
+        base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<ClientAchievement>()
-            .HasOne(clientAchievement => clientAchievement.Achievement)
-            .WithMany(achievement => achievement.ClientAchievements)
-            .HasForeignKey(clientAchievement => clientAchievement.AchievementId);
+        modelBuilder.Entity<Favorite>()
+            .HasIndex(favorite => new { favorite.UserId, favorite.FoodItemId })
+            .IsUnique();
 
-        modelBuilder.Entity<NutritionPlan>()
-            .HasKey(nutritionPlan => nutritionPlan.PlanId);
+        modelBuilder.Entity<FoodItemIngredient>()
+            .HasIndex(foodItemIngredient => new { foodItemIngredient.FoodItemId, foodItemIngredient.IngredientId })
+            .IsUnique();
+
+        modelBuilder.Entity<MealPlanFoodItem>()
+            .HasIndex(mealPlanFoodItem => new { mealPlanFoodItem.MealPlanId, mealPlanFoodItem.FoodItemId })
+            .IsUnique();
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasKey(clientNutritionPlan => new { clientNutritionPlan.ClientId, clientNutritionPlan.NutritionPlanId });
+            .HasKey("ClientId", "NutritionPlanId");
+
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasOne(clientNutritionPlan => clientNutritionPlan.Client)
+            .WithMany(client => client.ClientNutritionPlans)
+            .HasForeignKey("ClientId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
             .HasOne(clientNutritionPlan => clientNutritionPlan.NutritionPlan)
             .WithMany()
-            .HasForeignKey(clientNutritionPlan => clientNutritionPlan.NutritionPlanId);
+            .HasForeignKey("NutritionPlanId");
 
         modelBuilder.Entity<Meal>()
             .Property(meal => meal.Ingredients)
@@ -52,15 +68,58 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                 jsonValue => JsonSerializer.Serialize(jsonValue, (JsonSerializerOptions?)null),
                 jsonValue => JsonSerializer.Deserialize<List<string>>(jsonValue, (JsonSerializerOptions?)null) ?? new List<string>());
 
+        modelBuilder.Entity<DailyLog>(entity =>
+        {
+            entity.HasOne(dailyLog => dailyLog.User)
+                .WithMany()
+                .HasForeignKey(dailyLog => dailyLog.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(dailyLog => dailyLog.Meal)
+                .WithMany()
+                .HasForeignKey(dailyLog => dailyLog.MealId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(dailyLog => dailyLog.LoggedAt).IsRequired();
+        });
+
+        modelBuilder.Entity<Ingredient>(entity =>
+        {
+            entity.Property(ingredient => ingredient.Name).IsRequired().HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<Conversation>()
+            .HasOne(conversation => conversation.User)
+            .WithMany()
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Conversation>()
+            .HasMany(conversation => conversation.Messages)
+            .WithOne(message => message.Conversation)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Message>()
+            .HasOne(message => message.Sender)
+            .WithMany()
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
+
         modelBuilder.Entity<Reminder>()
             .Property(reminder => reminder.Name)
             .IsRequired()
             .HasMaxLength(255);
+
         modelBuilder.Entity<Reminder>()
             .Property(reminder => reminder.Frequency)
             .HasMaxLength(50);
+
         modelBuilder.Entity<Reminder>()
             .Ignore(reminder => reminder.FullDateTimeDisplay);
+
         modelBuilder.Entity<Reminder>()
             .HasOne(reminder => reminder.User)
             .WithMany(user => user.Reminders)

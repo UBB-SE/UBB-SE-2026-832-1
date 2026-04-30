@@ -1,5 +1,5 @@
 using ClassLibrary.Extensions;
-using WebAPI.Services;
+using WebAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +7,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddClassLibraryDataAccess();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddWebApiServices();
 
 var app = builder.Build();
 app.Services.SeedClassLibraryData();

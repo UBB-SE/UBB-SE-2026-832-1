@@ -28,10 +28,10 @@ public class ReminderRepository : IReminderRepository
         return await databaseContext.Reminders.ToListAsync();
     }
 
-    public async Task<IEnumerable<Reminder>> GetAllByUserIdAsync(Guid userId)
+    public async Task<IEnumerable<Reminder>> GetAllByUserIdAsync(int userId)
     {
         return await databaseContext.Reminders
-            .Where(reminder => reminder.User.Id == userId)
+            .Where(reminder => reminder.User.UserId == userId)
             .ToListAsync();
     }
 
@@ -57,13 +57,13 @@ public class ReminderRepository : IReminderRepository
         }
     }
 
-    public async Task<Reminder?> GetNextReminderAsync(Guid userId)
+    public async Task<Reminder?> GetNextReminderAsync(int userId)
     {
         var todayString = DateTime.Now.ToString("yyyy-MM-dd");
         var currentTime = DateTime.Now.TimeOfDay;
 
         return await databaseContext.Reminders
-            .Where(reminder => reminder.User.Id == userId)
+            .Where(reminder => reminder.User.UserId == userId)
             .Where(reminder => string.Compare(reminder.ReminderDate, todayString) > 0 ||
                                (reminder.ReminderDate == todayString && reminder.Time >= currentTime))
             .OrderBy(reminder => reminder.ReminderDate)

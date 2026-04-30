@@ -1,12 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ClassLibrary.Models;
 
 public class NutritionPlan
 {
-    public int PlanId { get; set; }
+    public int NutritionPlanId { get; set; }
 
-    public DateTime StartDate { get; set; } = DateTime.Today;
+    [Required]
+    public DateTime StartDate { get; set; }
 
-    public DateTime EndDate { get; set; } = DateTime.Today.AddDays(30);
+    [Required]
+    public DateTime EndDate { get; set; }
 
     public List<Meal> Meals { get; set; } = new();
 }
