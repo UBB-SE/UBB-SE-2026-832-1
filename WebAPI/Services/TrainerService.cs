@@ -39,7 +39,7 @@ public sealed class TrainerService : ITrainerService
         return logs.Select(l => new WorkoutHistoryResponseDto
         {
             Id = l.WorkoutLogId,
-            Notes = l.TrainerNotes,
+            Name = l.WorkoutName,
             DurationMinutes = (int)l.Duration.TotalMinutes,
             Rating = (int)l.Rating,
             TrainerNotes = l.TrainerNotes,
@@ -125,10 +125,18 @@ public sealed class TrainerService : ITrainerService
             return false;
         }
 
+        var startDate = request.StartDate.Date;
+        var endDate = request.EndDate.Date;
+
+        if (endDate < startDate)
+        {
+            return false;
+        }
+
         var plan = new NutritionPlan
         {
-            StartDate = request.StartDate.Date,
-            EndDate = request.EndDate.Date,
+            StartDate = startDate,
+            EndDate = endDate,
         };
 
         var planId = await nutritionRepository.InsertNutritionPlanAsync(plan);
