@@ -42,6 +42,8 @@ public sealed class TemplateExerciseDto
     public string ExerciseName { get; set; } = string.Empty;
     public int TargetSets { get; set; }
     public int TargetReps { get; set; }
+    public string MuscleGroup { get; set; } = string.Empty;
+    public decimal TargetWeight { get; set; }
 }
 
 public sealed class WorkoutTemplateDto
