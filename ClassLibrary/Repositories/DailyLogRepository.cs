@@ -24,14 +24,14 @@ public sealed class DailyLogRepository : IDailyLogRepository
     {
         return await this.databaseContext.DailyLogs
             .AsNoTracking()
-            .AnyAsync(dl => dl.User.UserId == userId, cancellationToken);
+            .AnyAsync(dailyLog => dailyLog.User.UserId == userId, cancellationToken);
     }
 
     public async Task<DailyLog?> GetNutritionTotalsForRangeAsync(int userId, DateTime startInclusive, DateTime endExclusive, CancellationToken cancellationToken = default)
     {
         var logs = await this.databaseContext.DailyLogs
             .AsNoTracking()
-            .Where(dl => dl.User.UserId == userId && dl.LoggedAt >= startInclusive && dl.LoggedAt < endExclusive)
+            .Where(dailyLog => dailyLog.User.UserId == userId && dailyLog.LoggedAt >= startInclusive && dailyLog.LoggedAt < endExclusive)
             .ToListAsync(cancellationToken);
 
         if (logs.Count == 0)
@@ -43,10 +43,10 @@ public sealed class DailyLogRepository : IDailyLogRepository
         {
             User = new User { UserId = userId },
             LoggedAt = startInclusive,
-            Calories = logs.Sum(l => l.Calories),
-            Protein = logs.Sum(l => l.Protein),
-            Carbohydrates = logs.Sum(l => l.Carbohydrates),
-            Fats = logs.Sum(l => l.Fats),
+            Calories = logs.Sum(dailyLog => dailyLog.Calories),
+            Protein = logs.Sum(dailyLog => dailyLog.Protein),
+            Carbohydrates = logs.Sum(dailyLog => dailyLog.Carbohydrates),
+            Fats = logs.Sum(dailyLog => dailyLog.Fats),
         };
     }
 }

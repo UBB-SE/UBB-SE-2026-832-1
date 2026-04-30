@@ -15,7 +15,7 @@ public sealed class FoodItemRepository(AppDbContext dbContext) : IFoodItemReposi
     {
         return await dbContext.FoodItems
             .AsNoTracking()
-            .FirstOrDefaultAsync(f => f.FoodItemId == id, cancellationToken);
+            .FirstOrDefaultAsync(foodItem => foodItem.FoodItemId == id, cancellationToken);
     }
 
     public async Task<IReadOnlyList<FoodItem>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -53,33 +53,33 @@ public sealed class FoodItemRepository(AppDbContext dbContext) : IFoodItemReposi
 
         if (filter.IsVegan)
         {
-            query = query.Where(f => f.IsVegan);
+            query = query.Where(foodItem => foodItem.IsVegan);
         }
 
         if (filter.IsKeto)
         {
-            query = query.Where(f => f.IsKeto);
+            query = query.Where(foodItem => foodItem.IsKeto);
         }
 
         if (filter.IsGlutenFree)
         {
-            query = query.Where(f => f.IsGlutenFree);
+            query = query.Where(foodItem => foodItem.IsGlutenFree);
         }
 
         if (filter.IsLactoseFree)
         {
-            query = query.Where(f => f.IsLactoseFree);
+            query = query.Where(foodItem => foodItem.IsLactoseFree);
         }
 
         if (filter.IsNutFree)
         {
-            query = query.Where(f => f.IsNutFree);
+            query = query.Where(foodItem => foodItem.IsNutFree);
         }
 
         if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
             var term = filter.SearchTerm.ToLower();
-            query = query.Where(f => f.Name.ToLower().Contains(term));
+            query = query.Where(foodItem => foodItem.Name.ToLower().Contains(term));
         }
 
         return await query.ToListAsync(cancellationToken);
@@ -88,7 +88,9 @@ public sealed class FoodItemRepository(AppDbContext dbContext) : IFoodItemReposi
     public async Task ToggleFavoriteAsync(int userId, int foodItemId, CancellationToken cancellationToken = default)
     {
         var existing = await dbContext.Favorites
-            .FirstOrDefaultAsync(f => f.UserId == userId && f.FoodItemId == foodItemId, cancellationToken);
+            .FirstOrDefaultAsync(
+                favorite => EF.Property<int>(favorite, "UserId") == userId && EF.Property<int>(favorite, "FoodItemId") == foodItemId,
+                cancellationToken);
 
         if (existing is not null)
         {
@@ -96,7 +98,11 @@ public sealed class FoodItemRepository(AppDbContext dbContext) : IFoodItemReposi
         }
         else
         {
-            dbContext.Favorites.Add(new Favorite { UserId = userId, FoodItemId = foodItemId });
+            dbContext.Favorites.Add(new Favorite
+            {
+                User = new User { UserId = userId },
+                FoodItem = new FoodItem { FoodItemId = foodItemId },
+            });
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -106,8 +112,8 @@ public sealed class FoodItemRepository(AppDbContext dbContext) : IFoodItemReposi
     {
         return await dbContext.Favorites
             .AsNoTracking()
-            .Where(f => f.UserId == userId)
-            .Join(dbContext.FoodItems, f => f.FoodItemId, fi => fi.FoodItemId, (f, fi) => fi)
+            .Where(favorite => EF.Property<int>(favorite, "UserId") == userId)
+            .Select(favorite => favorite.FoodItem)
             .ToListAsync(cancellationToken);
     }
 }

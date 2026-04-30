@@ -14,8 +14,6 @@ public class Notification
 {
     public int NotificationId { get; set; }
 
-    public int ClientId { get; set; }
-
     public Client Client { get; set; } = null!;
 
     [Required]

@@ -121,7 +121,7 @@ public sealed class MealPlanService : IMealPlanService
         return new MealPlanDto
         {
             MealPlanId = mealPlan.MealPlanId,
-            UserId = mealPlan.UserId,
+            UserId = mealPlan.User.UserId,
             CreatedAt = mealPlan.CreatedAt,
             GoalType = mealPlan.GoalType,
             FoodItems = MapToFoodItemDtos(foodItems),
