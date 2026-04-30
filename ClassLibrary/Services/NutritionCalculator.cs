@@ -37,11 +37,11 @@ public static class NutritionCalculator
             return 0;
         }
 
-        var today = DateTime.Today;
-        var birth = birthDate.Value.DateTime;
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var birth = DateOnly.FromDateTime(birthDate.Value.Date);
 
         int age = today.Year - birth.Year;
-        if (birth.Date > today.AddYears(-age))
+        if (birth > today.AddYears(-age))
         {
             age--;
         }
@@ -59,7 +59,7 @@ public static class NutritionCalculator
         double heightMeters = userData.Height / 100.0;
         double bodyMassIndex = userData.Weight / (heightMeters * heightMeters);
 
-        return (int)Math.Round(bodyMassIndex);
+        return Math.Round(bodyMassIndex);
     }
 
     public static int CalculateCalorieNeeds(UserData userData)
