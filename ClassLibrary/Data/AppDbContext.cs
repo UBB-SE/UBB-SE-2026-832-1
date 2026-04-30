@@ -50,6 +50,8 @@ public sealed class AppDbContext : DbContext
 
     public DbSet<Message> Messages { get; set; } = default!;
 
+    public DbSet<ShoppingItem> ShoppingItems { get; set; } = default!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Favorite>()

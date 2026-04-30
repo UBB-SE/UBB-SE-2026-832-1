@@ -13,6 +13,8 @@ public static class DataAccessServiceCollectionExtensions
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(DatabasePaths.GetConnectionString()));
 
+        services.AddScoped<IInventoryRepository, InventoryRepository>();
+        services.AddScoped<IShoppingListRepository, ShoppingListRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IFoodItemRepository, FoodItemRepository>();
         services.AddScoped<IMealPlanRepository, MealPlanRepository>();
