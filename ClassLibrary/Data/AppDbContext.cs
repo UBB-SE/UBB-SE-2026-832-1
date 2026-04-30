@@ -44,12 +44,6 @@ public sealed class AppDbContext : DbContext
 
     public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
 
-    public DbSet<DailyLog> DailyLogs { get; set; } = default!;
-
-    public DbSet<Conversation> Conversations { get; set; } = default!;
-
-    public DbSet<Message> Messages { get; set; } = default!;
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Favorite>()
@@ -80,51 +74,7 @@ public sealed class AppDbContext : DbContext
         modelBuilder.Entity<Meal>()
             .Property(meal => meal.Ingredients)
             .HasConversion(
-                value => JsonSerializer.Serialize(value, (JsonSerializerOptions?)null),
-                value => JsonSerializer.Deserialize<List<string>>(value, (JsonSerializerOptions?)null) ?? new List<string>())
-            .Metadata.SetValueComparer(new ValueComparer<List<string>>(
-                (c1, c2) => (c1 ?? new List<string>()).SequenceEqual(c2 ?? new List<string>()),
-                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                c => c.ToList()));
-
-        modelBuilder.Entity<DailyLog>(entity =>
-        {
-            entity.HasOne(dailyLog => dailyLog.User)
-                .WithMany()
-                .HasForeignKey("UserId")
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasOne(dailyLog => dailyLog.Meal)
-                .WithMany()
-                .HasForeignKey("MealId")
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.Property(dailyLog => dailyLog.LoggedAt).IsRequired();
-        });
-
-        modelBuilder.Entity<Ingredient>(entity =>
-        {
-            entity.Property(ingredient => ingredient.Name).IsRequired().HasMaxLength(200);
-        });
-
-        modelBuilder.Entity<Conversation>()
-            .HasOne(conversation => conversation.User)
-            .WithMany()
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Conversation>()
-            .HasMany(conversation => conversation.Messages)
-            .WithOne(message => message.Conversation)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Message>()
-            .HasOne(message => message.Sender)
-            .WithMany()
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Restrict);
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
     }
 }

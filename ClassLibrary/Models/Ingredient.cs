@@ -1,6 +1,7 @@
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace ClassLibrary.Models;
 
-public sealed class Ingredient
 {
     public int IngredientId { get; set; }
 
