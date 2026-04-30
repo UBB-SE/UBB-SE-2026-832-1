@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Repositories;
-using ClassLibrary.Models;
 
 namespace WinUI.Services
 {
@@ -42,7 +41,7 @@ namespace WinUI.Services
         public async Task<ShoppingItemDto?> AddItemAsync(int userId, AddShoppingItemRequest request)
         {
             
-            int ingredientId = await _ingredientRepository.GetOrCreateIngredientIdAsync(request.ItemName);
+            int ingredientId = await _ingredientRepository.GetOrCreateIngredientIdByNameAsync(request.ItemName);
 
             var item = new ShoppingItem
             {
