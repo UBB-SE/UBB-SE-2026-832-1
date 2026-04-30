@@ -15,6 +15,7 @@ public sealed class ClientService : IClientService
     private readonly IRepositoryNutrition nutritionRepository;
     private readonly IRepositoryWorkoutLog workoutLogRepository;
     private readonly IRepositoryWorkoutTemplate workoutTemplateRepository;
+    private readonly IRepositoryClient clientRepository;
     private readonly IHttpClientFactory httpClientFactory;
     private readonly IConfiguration configuration;
 
@@ -24,6 +25,7 @@ public sealed class ClientService : IClientService
         IRepositoryNutrition nutritionRepository,
         IRepositoryWorkoutLog workoutLogRepository,
         IRepositoryWorkoutTemplate workoutTemplateRepository,
+        IRepositoryClient clientRepository,
         IHttpClientFactory httpClientFactory,
         IConfiguration configuration)
     {
@@ -32,6 +34,7 @@ public sealed class ClientService : IClientService
         this.nutritionRepository = nutritionRepository;
         this.workoutLogRepository = workoutLogRepository;
         this.workoutTemplateRepository = workoutTemplateRepository;
+        this.clientRepository = clientRepository;
         this.httpClientFactory = httpClientFactory;
         this.configuration = configuration;
     }
@@ -101,7 +104,13 @@ public sealed class ClientService : IClientService
             return false;
         }
 
-        var log = MapToWorkoutLog(request.WorkoutLog);
+        var client = await this.clientRepository.GetByIdAsync(request.WorkoutLog.Client.ClientId, cancellationToken);
+        if (client == null)
+        {
+            return false;
+        }
+
+        var log = MapToWorkoutLog(request.WorkoutLog, client);
         log.Date = DateTime.Now;
         return await this.workoutLogRepository.SaveWorkoutLogAsync(log, cancellationToken);
     }
@@ -338,13 +347,14 @@ public sealed class ClientService : IClientService
         };
     }
 
-    private static WorkoutLog MapToWorkoutLog(WorkoutLogDataTransferObject workoutLogDataTransferObject)
+    private static WorkoutLog MapToWorkoutLog(WorkoutLogDataTransferObject workoutLogDataTransferObject, Client client)
     {
         var workoutType = Enum.TryParse<WorkoutType>(workoutLogDataTransferObject.Type, ignoreCase: true, out var parsedType) ? parsedType : WorkoutType.CUSTOM;
 
-        return new WorkoutLog
+        var workoutLog = new WorkoutLog
         {
             WorkoutLogId = workoutLogDataTransferObject.WorkoutLogId,
+            Client = client,
             WorkoutName = workoutLogDataTransferObject.WorkoutName,
             Date = workoutLogDataTransferObject.Date,
             Duration = workoutLogDataTransferObject.Duration,
@@ -355,33 +365,50 @@ public sealed class ClientService : IClientService
             IntensityTag = workoutLogDataTransferObject.IntensityTag,
             Rating = workoutLogDataTransferObject.Rating,
             TrainerNotes = workoutLogDataTransferObject.TrainerNotes,
-            Exercises = workoutLogDataTransferObject.Exercises.Select(MapToLoggedExercise).ToList(),
         };
+
+        foreach (var loggedExerciseDataTransferObject in workoutLogDataTransferObject.Exercises)
+        {
+            var loggedExercise = MapToLoggedExercise(loggedExerciseDataTransferObject, workoutLog);
+            workoutLog.Exercises.Add(loggedExercise);
+        }
+
+        return workoutLog;
     }
 
-    private static LoggedExercise MapToLoggedExercise(LoggedExerciseDataTransferObject loggedExerciseDataTransferObject)
+    private static LoggedExercise MapToLoggedExercise(LoggedExerciseDataTransferObject loggedExerciseDataTransferObject, WorkoutLog parentWorkoutLog)
     {
         var targetMuscles = Enum.TryParse<MuscleGroup>(loggedExerciseDataTransferObject.TargetMuscles, ignoreCase: true, out var parsedMuscles) ? parsedMuscles : MuscleGroup.OTHER;
 
-        return new LoggedExercise
+        var loggedExercise = new LoggedExercise
         {
             LoggedExerciseId = loggedExerciseDataTransferObject.LoggedExerciseId,
+            WorkoutLog = parentWorkoutLog,
             ExerciseName = loggedExerciseDataTransferObject.ExerciseName,
             TargetMuscles = targetMuscles,
-            Sets = loggedExerciseDataTransferObject.Sets.Select(MapToLoggedSet).ToList(),
             MetabolicEquivalent = loggedExerciseDataTransferObject.MetabolicEquivalent,
             ExerciseCaloriesBurned = loggedExerciseDataTransferObject.ExerciseCaloriesBurned,
             PerformanceRatio = loggedExerciseDataTransferObject.PerformanceRatio,
             IsSystemAdjusted = loggedExerciseDataTransferObject.IsSystemAdjusted,
             AdjustmentNote = loggedExerciseDataTransferObject.AdjustmentNote,
         };
+
+        foreach (var loggedSetDataTransferObject in loggedExerciseDataTransferObject.Sets)
+        {
+            var loggedSet = MapToLoggedSet(loggedSetDataTransferObject, parentWorkoutLog, loggedExercise);
+            loggedExercise.Sets.Add(loggedSet);
+        }
+
+        return loggedExercise;
     }
 
-    private static LoggedSet MapToLoggedSet(LoggedSetDataTransferObject loggedSetDataTransferObject)
+    private static LoggedSet MapToLoggedSet(LoggedSetDataTransferObject loggedSetDataTransferObject, WorkoutLog parentWorkoutLog, LoggedExercise parentLoggedExercise)
     {
         return new LoggedSet
         {
             LoggedSetId = loggedSetDataTransferObject.LoggedSetId,
+            WorkoutLog = parentWorkoutLog,
+            Exercise = parentLoggedExercise,
             ExerciseName = loggedSetDataTransferObject.ExerciseName,
             SetIndex = loggedSetDataTransferObject.SetIndex,
             TargetReps = loggedSetDataTransferObject.TargetReps,
