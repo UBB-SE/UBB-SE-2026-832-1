@@ -1,17 +1,35 @@
+using ClassLibrary.Data;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
 
 public sealed class RepositoryWorkoutTemplate : IRepositoryWorkoutTemplate
 {
-    public Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId, CancellationToken cancellationToken = default)
+    private readonly AppDbContext databaseContext;
+
+    public RepositoryWorkoutTemplate(AppDbContext databaseContext)
     {
-        throw new NotImplementedException();
+        this.databaseContext = databaseContext;
     }
 
-    public Task<WorkoutTemplate?> GetByIdAsync(int workoutTemplateId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await this.databaseContext.WorkoutTemplates
+            .AsNoTracking()
+            .Where(workoutTemplate => workoutTemplate.ClientId == clientId)
+            .Include(workoutTemplate => workoutTemplate.Client)
+            .OrderBy(workoutTemplate => workoutTemplate.WorkoutTemplateId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<WorkoutTemplate?> GetByIdAsync(int workoutTemplateId, CancellationToken cancellationToken = default)
+    {
+        return await this.databaseContext.WorkoutTemplates
+            .AsNoTracking()
+            .Include(workoutTemplate => workoutTemplate.Client)
+            .Include(workoutTemplate => workoutTemplate.Exercises)
+            .FirstOrDefaultAsync(workoutTemplate => workoutTemplate.WorkoutTemplateId == workoutTemplateId, cancellationToken);
     }
 }

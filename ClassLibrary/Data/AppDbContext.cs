@@ -35,6 +35,8 @@ public sealed class AppDbContext : DbContext
 
     public DbSet<WorkoutLog> WorkoutLogs { get; set; } = default!;
 
+    public DbSet<WorkoutTemplate> WorkoutTemplates { get; set; } = default!;
+
     public DbSet<Notification> Notifications { get; set; } = default!;
 
     public DbSet<NutritionPlan> NutritionPlans { get; set; } = default!;
