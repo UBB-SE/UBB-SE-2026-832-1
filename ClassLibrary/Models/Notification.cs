@@ -14,7 +14,8 @@ public class Notification
 {
     public int NotificationId { get; set; }
 
-    [Required]
+    public int ClientId { get; set; }
+
     public Client Client { get; set; } = null!;
 
     [Required]
@@ -25,14 +26,11 @@ public class Notification
     [MaxLength(1000)]
     public string Message { get; set; } = string.Empty;
 
-    [Required]
     public NotificationType Type { get; set; }
 
     public int RelatedId { get; set; }
 
-    [Required]
     public DateTime DateCreated { get; set; }
 
-    [Required]
     public bool IsRead { get; set; }
 }
