@@ -71,7 +71,7 @@ public sealed class UserRepository : IUserRepository
     {
         return await this.databaseContext.UserData
             .AsNoTracking()
-            .FirstOrDefaultAsync(userData => userData.UserId == userId, cancellationToken);
+            .FirstOrDefaultAsync(userData => userData.User.UserId == userId, cancellationToken);
     }
 
     public async Task UpdateUserDataAsync(UserData data, CancellationToken cancellationToken = default)

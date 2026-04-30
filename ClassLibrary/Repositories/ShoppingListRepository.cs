@@ -43,7 +43,11 @@ public sealed class ShoppingListRepository : IShoppingListRepository
     {
         return await databaseContext.ShoppingItems
             .Include(shoppingItem => shoppingItem.Ingredient)
-            .FirstOrDefaultAsync(shoppingItem => shoppingItem.UserId == userId && shoppingItem.IngredientId == ingredientId, cancellationToken);
+            .FirstOrDefaultAsync(
+                shoppingItem =>
+                    shoppingItem.User.UserId == userId &&
+                    shoppingItem.Ingredient.IngredientId == ingredientId,
+                cancellationToken);
     }
 
     public async Task<IReadOnlyList<ShoppingItem>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken = default)
@@ -51,7 +55,7 @@ public sealed class ShoppingListRepository : IShoppingListRepository
         return await databaseContext.ShoppingItems
             .AsNoTracking()
             .Include(shoppingItem => shoppingItem.Ingredient)
-            .Where(shoppingItem => shoppingItem.UserId == userId)
+            .Where(shoppingItem => shoppingItem.User.UserId == userId)
             .ToListAsync(cancellationToken);
     }
 

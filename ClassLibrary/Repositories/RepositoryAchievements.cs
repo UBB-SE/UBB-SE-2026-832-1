@@ -26,13 +26,13 @@ public sealed class RepositoryAchievements : IRepositoryAchievements
     public async Task<int> GetWorkoutCountAsync(int clientId, CancellationToken cancellationToken = default)
     {
         return await this.databaseContext.WorkoutLogs
-            .CountAsync(workoutLog => workoutLog.ClientId == clientId, cancellationToken);
+            .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId, cancellationToken);
     }
 
     public async Task<int> GetDistinctWorkoutDayCountAsync(int clientId, CancellationToken cancellationToken = default)
     {
         return await this.databaseContext.WorkoutLogs
-            .Where(workoutLog => workoutLog.ClientId == clientId)
+            .Where(workoutLog => workoutLog.Client.ClientId == clientId)
             .Select(workoutLog => workoutLog.Date.Date)
             .Distinct()
             .CountAsync(cancellationToken);
@@ -46,14 +46,14 @@ public sealed class RepositoryAchievements : IRepositoryAchievements
 
         return await this.databaseContext.WorkoutLogs
             .CountAsync(
-                workoutLog => workoutLog.ClientId == clientId && workoutLog.Date >= cutoff && workoutLog.Date < tomorrow,
+                workoutLog => workoutLog.Client.ClientId == clientId && workoutLog.Date >= cutoff && workoutLog.Date < tomorrow,
                 cancellationToken);
     }
 
     public async Task<int> GetConsecutiveWorkoutDayStreakAsync(int clientId, CancellationToken cancellationToken = default)
     {
         var dates = await this.databaseContext.WorkoutLogs
-            .Where(workoutLog => workoutLog.ClientId == clientId)
+            .Where(workoutLog => workoutLog.Client.ClientId == clientId)
             .Select(workoutLog => workoutLog.Date.Date)
             .Distinct()
             .OrderByDescending(date => date)
