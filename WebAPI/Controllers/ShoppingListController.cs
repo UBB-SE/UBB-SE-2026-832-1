@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebApi.Services;
+using ClassLibrary.DTOs;
 
 namespace WebApi.Controllers
 {
@@ -20,8 +21,15 @@ namespace WebApi.Controllers
             _shoppingListService = shoppingListService;
         }
 
+        [HttpPost("user/{userId}")] 
+        public async Task<IActionResult> AddItem(int userId, [FromBody] AddShoppingItemRequest request)
+        {
+            await _shoppingListService.AddItemAsync(userId, request);
+            return Ok();
+        }
+
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<ShoppingItem>>> GetByUserId(int userId)
+        public async Task<ActionResult<IEnumerable<ShoppingItemDto>>> GetByUserId(int userId)
         {
             var items = await _shoppingListService.GetAllByUserIdAsync(userId);
             return Ok(items);
