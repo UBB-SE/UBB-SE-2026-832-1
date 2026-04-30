@@ -7,7 +7,7 @@ namespace ClassLibrary.IRepositories;
 
 public interface ITrainerRepository
 {
-    Task<List<User>> GetTrainerClientsAsync(int trainerId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<User>> GetTrainerClientsAsync(int trainerId, CancellationToken cancellationToken = default);
     Task<bool> SaveTrainerWorkoutAsync(WorkoutTemplate template, CancellationToken cancellationToken = default);
     Task<bool> DeleteWorkoutTemplateAsync(int templateId, CancellationToken cancellationToken = default);
 }
