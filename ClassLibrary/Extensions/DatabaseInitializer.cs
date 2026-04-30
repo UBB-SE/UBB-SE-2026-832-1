@@ -11,6 +11,8 @@ public static class DatabaseInitializer
         using var scope = serviceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+        dbContext.Database.EnsureCreated();
+
         if (dbContext.Users.Any())
         {
             return;

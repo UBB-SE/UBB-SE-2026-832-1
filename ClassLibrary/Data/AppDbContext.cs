@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ClassLibrary.Data;
 
@@ -65,20 +66,27 @@ public sealed class AppDbContext : DbContext
         modelBuilder.Entity<Meal>()
             .Property(meal => meal.Ingredients)
             .HasConversion(
+modelBuilder.Entity<Meal>()
+            .Property(meal => meal.Ingredients)
+            .HasConversion(
                 jsonValue => JsonSerializer.Serialize(jsonValue, (JsonSerializerOptions?)null),
-                jsonValue => JsonSerializer.Deserialize<List<string>>(jsonValue, (JsonSerializerOptions?)null) ?? new List<string>());
+                jsonValue => JsonSerializer.Deserialize<List<string>>(jsonValue, (JsonSerializerOptions?)null) ?? new List<string>())
+            .Metadata.SetValueComparer(new ValueComparer<List<string>>(
+                (c1, c2) => (c1 ?? new List<string>()).SequenceEqual(c2 ?? new List<string>()),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToList()));
 
         modelBuilder.Entity<DailyLog>(entity =>
         {
             entity.HasOne(dailyLog => dailyLog.User)
                 .WithMany()
-                .HasForeignKey(dailyLog => dailyLog.UserId)
+                .HasForeignKey("UserId")
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(dailyLog => dailyLog.Meal)
                 .WithMany()
-                .HasForeignKey(dailyLog => dailyLog.MealId)
+                .HasForeignKey("MealId")
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
