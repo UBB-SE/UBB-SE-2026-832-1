@@ -142,13 +142,13 @@ public sealed class TrainerService : ITrainerService
             EndDate = endDate,
         };
 
-        var planId = await nutritionRepository.InsertNutritionPlanAsync(plan);
+        var planId = await nutritionRepository.InsertNutritionPlanAsync(plan, cancellationToken);
         if (planId <= 0)
         {
             return false;
         }
 
-        await nutritionRepository.AssignNutritionPlanToClientAsync(request.ClientId, planId);
+        await nutritionRepository.AssignNutritionPlanToClientAsync(request.ClientId, planId, cancellationToken);
         return true;
     }
 }
