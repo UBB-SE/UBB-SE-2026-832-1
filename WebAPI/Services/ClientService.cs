@@ -294,7 +294,7 @@ public sealed class ClientService : IClientService
         return new WorkoutTemplateDataTransferObject
         {
             WorkoutTemplateId = template.WorkoutTemplateId,
-            ClientId = template.ClientId,
+            ClientId = template.Client?.ClientId ?? 0,
             Client = MapClient(template.Client),
             Name = template.Name,
             Type = template.Type.ToString(),

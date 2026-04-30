@@ -18,7 +18,7 @@ public sealed class RepositoryWorkoutTemplate : IRepositoryWorkoutTemplate
     {
         return await this.databaseContext.WorkoutTemplates
             .AsNoTracking()
-            .Where(workoutTemplate => workoutTemplate.ClientId == clientId)
+            .Where(workoutTemplate => workoutTemplate.Client.ClientId == clientId)
             .Include(workoutTemplate => workoutTemplate.Client)
             .OrderBy(workoutTemplate => workoutTemplate.WorkoutTemplateId)
             .ToListAsync(cancellationToken);

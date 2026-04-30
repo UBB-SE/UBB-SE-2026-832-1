@@ -12,7 +12,7 @@ public sealed class WorkoutLogDataTransferObject
 
     public TimeSpan Duration { get; set; }
 
-    public int SourceTemplateId { get; set; }
+    public int? SourceTemplateId { get; set; }
 
     public string Type { get; set; } = string.Empty;
 
