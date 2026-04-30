@@ -8,7 +8,7 @@ namespace ClassLibrary.IRepositories;
 public interface IWorkoutTemplateRepository
 {
     Task<List<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId, CancellationToken cancellationToken = default);
-    Task<List<string>> GetAllExerciseNamesAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<string>> GetAllExerciseNamesAsync(CancellationToken cancellationToken = default);
 }
 
 public interface IWorkoutLogRepository
