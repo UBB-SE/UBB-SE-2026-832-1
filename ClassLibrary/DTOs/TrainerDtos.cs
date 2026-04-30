@@ -1,7 +1,7 @@
-namespace ClassLibrary.DTOs;
-
 using System;
 using System.Collections.Generic;
+
+namespace ClassLibrary.DTOs;
 
 public sealed class WorkoutHistoryResponseDto
 {
