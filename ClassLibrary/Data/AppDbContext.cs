@@ -1,6 +1,7 @@
 using System.Text.Json;
 using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ClassLibrary.Data;
 
@@ -80,19 +81,23 @@ public sealed class AppDbContext : DbContext
             .Property(meal => meal.Ingredients)
             .HasConversion(
                 value => JsonSerializer.Serialize(value, (JsonSerializerOptions?)null),
-                value => JsonSerializer.Deserialize<List<string>>(value, (JsonSerializerOptions?)null) ?? new List<string>());
+                value => JsonSerializer.Deserialize<List<string>>(value, (JsonSerializerOptions?)null) ?? new List<string>())
+            .Metadata.SetValueComparer(new ValueComparer<List<string>>(
+                (c1, c2) => (c1 ?? new List<string>()).SequenceEqual(c2 ?? new List<string>()),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToList()));
 
         modelBuilder.Entity<DailyLog>(entity =>
         {
             entity.HasOne(dailyLog => dailyLog.User)
                 .WithMany()
-                .HasForeignKey(dailyLog => dailyLog.UserId)
+                .HasForeignKey("UserId")
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(dailyLog => dailyLog.Meal)
                 .WithMany()
-                .HasForeignKey(dailyLog => dailyLog.MealId)
+                .HasForeignKey("MealId")
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
