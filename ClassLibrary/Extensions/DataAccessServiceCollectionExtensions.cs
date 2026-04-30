@@ -19,6 +19,10 @@ public static class DataAccessServiceCollectionExtensions
         services.AddScoped<IRepositoryAchievements, RepositoryAchievements>();
         services.AddScoped<IRepositoryNotification, RepositoryNotification>();
         services.AddScoped<IRepositoryNutrition, RepositoryNutrition>();
+        services.AddScoped<IChatRepository, ChatRepository>();
+        services.AddScoped<IDailyLogRepository, DailyLogRepository>();
+        services.AddScoped<IIngredientRepository, IngredientRepository>();
+        services.AddScoped<IReminderRepository, ReminderRepository>();
 
         return services;
     }
