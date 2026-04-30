@@ -25,7 +25,25 @@ namespace WebApi.Services
             _ingredientRepository = ingredientRepository;
             _inventoryRepository = inventoryRepository;
         }
+        public async Task GenerateShoppingListFromMealPlanAsync(int userId)
+        {
+            // Use the repository method we refactored earlier
+            var itemsNeeded = await _shoppingRepository.GetIngredientsNeededFromMealPlanAsync(userId);
+            foreach (var item in itemsNeeded)
+            {
+                await _shoppingRepository.AddAsync(item);
+            }
+        }
 
+        public async Task DeleteAsync(int id)
+        {
+            await _shoppingRepository.DeleteAsync(id);
+        }
+
+        public async Task<IEnumerable<ShoppingItem>> GetAllByUserIdAsync(int userId)
+        {
+            return await _shoppingRepository.GetAllByUserIdAsync(userId);
+        }
         public async Task<IEnumerable<ShoppingItemDto>> GetShoppingItemsAsync(int userId)
         {
             var items = await _shoppingRepository.GetAllByUserIdAsync(userId);
