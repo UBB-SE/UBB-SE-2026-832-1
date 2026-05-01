@@ -26,8 +26,10 @@ public sealed class NotificationRepository : INotificationRepository
 
     public async Task SaveNotificationAsync(Notification notification, CancellationToken cancellationToken = default)
     {
-        notification.DateCreated = DateTime.Now;
-        notification.IsRead = false;
+        if (notification.DateCreated == default)
+        {
+            notification.DateCreated = DateTime.Now;
+        }
         await this.databaseContext.Notifications.AddAsync(notification, cancellationToken);
         var rowsAffected = await this.databaseContext.SaveChangesAsync(cancellationToken);
         if (rowsAffected == 0)
