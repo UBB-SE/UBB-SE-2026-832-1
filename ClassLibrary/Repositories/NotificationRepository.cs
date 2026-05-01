@@ -24,9 +24,15 @@ public sealed class NotificationRepository : INotificationRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<bool> SaveNotificationAsync(Notification notification, CancellationToken cancellationToken = default)
+    public async Task SaveNotificationAsync(Notification notification, CancellationToken cancellationToken = default)
     {
+        notification.DateCreated = DateTime.Now;
+        notification.IsRead = false;
         await this.databaseContext.Notifications.AddAsync(notification, cancellationToken);
-        return await this.databaseContext.SaveChangesAsync(cancellationToken) > 0;
+        var rowsAffected = await this.databaseContext.SaveChangesAsync(cancellationToken);
+        if (rowsAffected == 0)
+        {
+            throw new Exception("Notification could not be saved.");
+        }
     }
 }
