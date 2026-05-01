@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 namespace ClassLibrary.Repositories;
 
 
-public sealed class RepositoryNutrition : IRepositoryNutrition
+public sealed class NutritionRepository : INutritionRepository
 {
     private readonly AppDbContext databaseContext;
 
-    public RepositoryNutrition(AppDbContext databaseContext)
+    public NutritionRepository(AppDbContext databaseContext)
     {
         this.databaseContext = databaseContext;
     }
