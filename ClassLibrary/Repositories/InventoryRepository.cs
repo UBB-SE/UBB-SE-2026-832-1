@@ -22,7 +22,6 @@ public sealed class InventoryRepository : IInventoryRepository
         return await this.databaseContext.Inventories
             .AsNoTracking()
             .Include(inventory => inventory.Ingredient)
-            .Include(inventory => inventory.User)
             .Where(inventory => EF.Property<int>(inventory, "UserId") == userId)
             .ToListAsync(cancellationToken);
     }
