@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
 
-public sealed class RepositoryClient : IRepositoryClient
+public sealed class ClientRepository : IClientRepository
 {
     private readonly AppDbContext databaseContext;
 
-    public RepositoryClient(AppDbContext databaseContext)
+    public ClientRepository(AppDbContext databaseContext)
     {
         this.databaseContext = databaseContext;
     }

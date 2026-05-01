@@ -1,4 +1,4 @@
-﻿namespace ClassLibrary.DTOs.Analytics;
+namespace ClassLibrary.DTOs.Analytics;
 
 public sealed class WorkoutHistoryRow
 {

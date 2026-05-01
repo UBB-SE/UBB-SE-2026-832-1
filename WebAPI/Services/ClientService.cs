@@ -10,22 +10,22 @@ public sealed class ClientService : IClientService
     private const string UNLOCKED_ACHIEVEMENT_ICON = "&#xE73E;";
     private const string LOCKED_ACHIEVEMENT_ICON = "&#xE72E;";
 
-    private readonly IRepositoryAchievements achievementsRepository;
-    private readonly IRepositoryNotification notificationRepository;
-    private readonly IRepositoryNutrition nutritionRepository;
-    private readonly IRepositoryWorkoutLog workoutLogRepository;
-    private readonly IRepositoryWorkoutTemplate workoutTemplateRepository;
-    private readonly IRepositoryClient clientRepository;
+    private readonly IAchievementsRepository achievementsRepository;
+    private readonly INotificationRepository notificationRepository;
+    private readonly INutritionRepository nutritionRepository;
+    private readonly IWorkoutLogRepository workoutLogRepository;
+    private readonly IWorkoutTemplateRepository workoutTemplateRepository;
+    private readonly IClientRepository clientRepository;
     private readonly IHttpClientFactory httpClientFactory;
     private readonly IConfiguration configuration;
 
     public ClientService(
-        IRepositoryAchievements achievementsRepository,
-        IRepositoryNotification notificationRepository,
-        IRepositoryNutrition nutritionRepository,
-        IRepositoryWorkoutLog workoutLogRepository,
-        IRepositoryWorkoutTemplate workoutTemplateRepository,
-        IRepositoryClient clientRepository,
+        IAchievementsRepository achievementsRepository,
+        INotificationRepository notificationRepository,
+        INutritionRepository nutritionRepository,
+        IWorkoutLogRepository workoutLogRepository,
+        IWorkoutTemplateRepository workoutTemplateRepository,
+        IClientRepository clientRepository,
         IHttpClientFactory httpClientFactory,
         IConfiguration configuration)
     {
@@ -117,7 +117,8 @@ public sealed class ClientService : IClientService
 
         var log = MapToWorkoutLog(request.WorkoutLog, client);
         log.Date = DateTime.Now;
-        return await this.workoutLogRepository.SaveWorkoutLogAsync(log, cancellationToken);
+        await this.workoutLogRepository.SaveWorkoutLogAsync(log, cancellationToken);
+        return true;
     }
 
     public async Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetAvailableWorkoutsAsync(int clientId, CancellationToken cancellationToken = default)
