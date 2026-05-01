@@ -1,7 +1,7 @@
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 
-namespace WebApi.Services;
+namespace WebAPI.Services;
 
 public sealed class UserService : IUserService
 {

@@ -12,36 +12,36 @@ namespace ClassLibrary.Repositories
 {
     public class ShoppingListRepository : IShoppingListRepository
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext databaseContext;
 
         public ShoppingListRepository(AppDbContext context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            databaseContext = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task AddAsync(ShoppingItem item)
         {
-            await _context.ShoppingItems.AddAsync(item);
-            await _context.SaveChangesAsync();
+            await databaseContext.ShoppingItems.AddAsync(item);
+            await databaseContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<ShoppingItem>> GetAllAsync()
         {
-            return await _context.ShoppingItems
+            return await databaseContext.ShoppingItems
                 .Include(s => s.Ingredient)
                 .ToListAsync();
         }
 
         public async Task<ShoppingItem?> GetByIdAsync(int id)
         {
-            return await _context.ShoppingItems
+            return await databaseContext.ShoppingItems
                 .Include(s => s.Ingredient)
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<ShoppingItem?> GetByUserAndIngredientAsync(int userId, int ingredientId)
         {
-            return await _context.ShoppingItems
+            return await databaseContext.ShoppingItems
                 .FirstOrDefaultAsync(s => s.UserId == userId && s.IngredientId == ingredientId);
         }
 
@@ -94,13 +94,13 @@ namespace ClassLibrary.Repositories
                 double inventoryQty = await _context.Inventories
                     .Where(inv => inv.UserId == userId && inv.IngredientId == mpItem.FoodItemId)
                     .Select(inv => (double?)inv.QuantityGrams)
-                    .FirstOrDefaultAsync() ?? 0;
+                    .SumAsync() ?? 0;
 
                 
                 double existingShoppingQty = await _context.ShoppingItems
                     .Where(si => si.UserId == userId && si.IngredientId == mpItem.FoodItemId)
                     .Select(si => (double?)si.QuantityGrams)
-                    .FirstOrDefaultAsync() ?? 0;
+                    .SumAsync() ?? 0;
 
                 
                 double requiredQty = 100.0;

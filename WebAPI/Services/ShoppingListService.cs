@@ -29,7 +29,37 @@ namespace WebApi.Services
         {
             // Use the repository method we refactored earlier
             var itemsNeeded = await _shoppingRepository.GetIngredientsNeededFromMealPlanAsync(userId);
-            foreach (var item in itemsNeeded)
+            await AddShoppingItemsAsync(itemsNeeded);
+        }
+
+        private async Task AddShoppingItemsAsync(IEnumerable<ShoppingItem> itemsNeeded)
+        {
+            var items = itemsNeeded?.ToList() ?? new List<ShoppingItem>();
+            if (items.Count == 0)
+            {
+                return;
+            }
+
+            var repositoryType = _shoppingRepository.GetType();
+            var bulkAddMethod = repositoryType
+                .GetMethods()
+                .FirstOrDefault(m =>
+                    (m.Name == "AddRangeAsync" || m.Name == "BulkAddAsync") &&
+                    m.GetParameters().Length == 1 &&
+                    typeof(Task).IsAssignableFrom(m.ReturnType) &&
+                    m.GetParameters()[0].ParameterType.IsAssignableFrom(items.GetType()));
+
+            if (bulkAddMethod != null)
+            {
+                var bulkAddTask = bulkAddMethod.Invoke(_shoppingRepository, new object[] { items }) as Task;
+                if (bulkAddTask != null)
+                {
+                    await bulkAddTask;
+                    return;
+                }
+            }
+
+            foreach (var item in items)
             {
                 await _shoppingRepository.AddAsync(item);
             }
@@ -65,6 +95,7 @@ namespace WebApi.Services
             {
                 UserId = userId,
                 IngredientId = ingredientId,
+                IngredientName = request.ItemName,
                 QuantityGrams = request.Quantity
             };
 

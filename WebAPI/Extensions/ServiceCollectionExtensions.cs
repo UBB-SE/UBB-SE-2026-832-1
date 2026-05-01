@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using WebApi.Services;
 using ClassLibrary.IRepositories;
 
-namespace WebApi.Extensions;
+namespace WebAPI.Extensions;
 
 public static class ServiceCollectionExtensions
 {
