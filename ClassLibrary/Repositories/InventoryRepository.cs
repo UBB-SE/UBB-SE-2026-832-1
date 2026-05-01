@@ -26,9 +26,32 @@ public sealed class InventoryRepository : IInventoryRepository
             .ToListAsync(cancellationToken);
     }
 
+    private async Task<Inventory?> GetByUserIdAndIngredientIdAsync(int userId, int ingredientId, CancellationToken cancellationToken)
+    {
+        return await this.databaseContext.Inventories
+            .FirstOrDefaultAsync(
+                existingInventory =>
+                    EF.Property<int>(existingInventory, "UserId") == userId &&
+                    EF.Property<int>(existingInventory, "IngredientId") == ingredientId,
+                cancellationToken);
+    }
+
     public async Task AddAsync(Inventory inventory, CancellationToken cancellationToken = default)
     {
-        this.databaseContext.Inventories.Add(inventory);
+        var entry = this.databaseContext.Entry(inventory);
+        var userId = entry.Property<int>("UserId").CurrentValue;
+        var ingredientId = entry.Property<int>("IngredientId").CurrentValue;
+
+        var existing = await this.GetByUserIdAndIngredientIdAsync(userId, ingredientId, cancellationToken);
+        if (existing is not null)
+        {
+            existing.QuantityGrams += inventory.QuantityGrams;
+        }
+        else
+        {
+            this.databaseContext.Inventories.Add(inventory);
+        }
+
         await this.databaseContext.SaveChangesAsync(cancellationToken);
     }
 

@@ -140,7 +140,6 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
                     .Select(mealPlanFoodItem => EF.Property<int>(mealPlanFoodItem, "FoodItemId"))
                     .Contains(EF.Property<int>(foodItemIngredient, "FoodItemId")))
             .Select(foodItemIngredient => EF.Property<int>(foodItemIngredient, "IngredientId"))
-            .Distinct()
             .ToListAsync(cancellationToken);
     }
 

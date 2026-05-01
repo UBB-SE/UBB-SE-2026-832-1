@@ -55,7 +55,7 @@ public sealed class InventoryController : ControllerBase
         return this.Ok();
     }
 
-    [HttpDelete("{inventoryId}")]
+    [HttpDelete("{inventoryId:int}")]
     public async Task<IActionResult> RemoveItem(int inventoryId, CancellationToken cancellationToken)
     {
         await this.inventoryService.RemoveItemAsync(inventoryId, cancellationToken);

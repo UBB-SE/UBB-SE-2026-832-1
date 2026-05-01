@@ -30,30 +30,53 @@ public sealed class InventoryService : IInventoryService
     public async Task<bool> ConsumeMealAsync(ConsumeMealRequestDataTransferObject request, CancellationToken cancellationToken = default)
     {
         var requiredIngredientIds = await this.mealPlanRepository.GetIngredientIdsForMealPlanAsync(request.MealPlanId, cancellationToken);
+        var requiredQuantityByIngredientId = requiredIngredientIds
+            .GroupBy(ingredientId => ingredientId)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Count() * DEFAULT_INGREDIENTS_QUANTITY);
+
         var inventoryByIngredientId = (await this.inventoryRepository.GetAllByUserIdAsync(request.UserId, cancellationToken))
             .GroupBy(inventoryItem => inventoryItem.Ingredient.IngredientId)
-            .ToDictionary(group => group.Key, group => group.First());
+            .ToDictionary(
+                group => group.Key,
+                group => group.OrderBy(inventoryItem => inventoryItem.InventoryId).ToList());
 
-        foreach (int ingredientId in requiredIngredientIds)
+        foreach (var requiredIngredient in requiredQuantityByIngredientId)
         {
-            if (!inventoryByIngredientId.TryGetValue(ingredientId, out var stock) || stock.QuantityGrams < DEFAULT_INGREDIENTS_QUANTITY)
+            if (!inventoryByIngredientId.TryGetValue(requiredIngredient.Key, out var stocks) ||
+                stocks.Sum(stock => stock.QuantityGrams) < requiredIngredient.Value)
             {
                 return false;
             }
         }
 
-        foreach (int ingredientId in requiredIngredientIds)
+        foreach (var requiredIngredient in requiredQuantityByIngredientId)
         {
-            var stock = inventoryByIngredientId[ingredientId];
-            stock.QuantityGrams -= DEFAULT_INGREDIENTS_QUANTITY;
+            int remainingQuantityToConsume = requiredIngredient.Value;
 
-            if (stock.QuantityGrams <= 0)
+            foreach (var stock in inventoryByIngredientId[requiredIngredient.Key])
             {
-                await this.inventoryRepository.DeleteAsync(stock.InventoryId, cancellationToken);
-            }
-            else
-            {
-                await this.inventoryRepository.UpdateAsync(stock, cancellationToken);
+                if (remainingQuantityToConsume <= 0)
+                {
+                    break;
+                }
+
+                int quantityToConsume = stock.QuantityGrams >= remainingQuantityToConsume
+                    ? remainingQuantityToConsume
+                    : stock.QuantityGrams;
+
+                stock.QuantityGrams -= quantityToConsume;
+                remainingQuantityToConsume -= quantityToConsume;
+
+                if (stock.QuantityGrams <= 0)
+                {
+                    await this.inventoryRepository.DeleteAsync(stock.InventoryId, cancellationToken);
+                }
+                else
+                {
+                    await this.inventoryRepository.UpdateAsync(stock, cancellationToken);
+                }
             }
         }
 
@@ -96,7 +119,7 @@ public sealed class InventoryService : IInventoryService
 
     public async Task<IReadOnlyList<IngredientDataTransferObject>> GetAllIngredientsAsync(CancellationToken cancellationToken = default)
     {
-        var ingredients = await this.ingredientRepository.GetAllAsync();
+        var ingredients = await this.ingredientRepository.GetAllAsync().WaitAsync(cancellationToken);
         return ingredients.Select(MapToIngredientDto).ToList();
     }
 
