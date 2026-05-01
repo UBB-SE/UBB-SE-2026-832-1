@@ -2,7 +2,7 @@ using ClassLibrary.Models;
 
 namespace ClassLibrary.IRepositories;
 
-public interface IRepositoryNotification
+public interface INotificationRepository
 {
     Task<IReadOnlyList<Notification>> GetNotificationsAsync(int clientId, CancellationToken cancellationToken = default);
 

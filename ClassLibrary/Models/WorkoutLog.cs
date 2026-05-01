@@ -6,22 +6,18 @@ public sealed class WorkoutLog
 {
     public int WorkoutLogId { get; set; }
 
-    [Required]
     public Client Client { get; set; } = null!;
 
     [Required]
     [MaxLength(200)]
     public string WorkoutName { get; set; } = string.Empty;
 
-    [Required]
     public DateTime Date { get; set; }
 
-    [Required]
     public TimeSpan Duration { get; set; }
 
-    public int SourceTemplateId { get; set; }
+    public int? SourceTemplateId { get; set; }
 
-    [Required]
     public WorkoutType Type { get; set; }
 
     public List<LoggedExercise> Exercises { get; set; } = new();

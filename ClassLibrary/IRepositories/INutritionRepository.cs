@@ -2,7 +2,7 @@ using ClassLibrary.Models;
 
 namespace ClassLibrary.IRepositories;
 
-public interface IRepositoryNutrition
+public interface INutritionRepository
 {
     Task<int> InsertNutritionPlanAsync(NutritionPlan plan, CancellationToken cancellationToken = default);
 

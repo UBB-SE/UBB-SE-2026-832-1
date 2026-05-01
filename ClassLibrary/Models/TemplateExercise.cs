@@ -11,9 +11,6 @@ public class TemplateExercise
     public string Name { get; set; } = string.Empty;
 
     [Required]
-    public int WorkoutTemplateId { get; set; }
-
-    [Required]
     public WorkoutTemplate WorkoutTemplate { get; set; } = null!;
 
     [Required]

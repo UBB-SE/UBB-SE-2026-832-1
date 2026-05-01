@@ -19,13 +19,23 @@ public static class DataAccessServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IFoodItemRepository, FoodItemRepository>();
         services.AddScoped<IMealPlanRepository, MealPlanRepository>();
-        services.AddScoped<IRepositoryAchievements, RepositoryAchievements>();
-        services.AddScoped<IRepositoryNotification, RepositoryNotification>();
-        services.AddScoped<IRepositoryNutrition, RepositoryNutrition>();
+        services.AddScoped<IAchievementsRepository, AchievementsRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<INutritionRepository, NutritionRepository>();
         services.AddScoped<IChatRepository, ChatRepository>();
         services.AddScoped<IDailyLogRepository, DailyLogRepository>();
+<<<<<<< HEAD
         services.AddScoped<IRepositoryTrainer, RepositoryTrainer>();
         services.AddScoped<IRepositoryWorkoutLog, RepositoryWorkoutLog>();
+=======
+        services.AddScoped<IWorkoutLogRepository, WorkoutLogRepository>();
+        services.AddScoped<IWorkoutTemplateRepository, WorkoutTemplateRepository>();
+        services.AddScoped<IClientRepository, ClientRepository>();
+        services.AddScoped<IIngredientRepository, IngredientRepository>();
+        services.AddScoped<IReminderRepository, ReminderRepository>();
+        services.AddScoped<IShoppingListRepository, ShoppingListRepository>();
+        services.AddScoped<IWorkoutAnalyticsRepository, WorkoutAnalyticsRepository>();
+>>>>>>> 2f64b3d61771a5aa0ef07602dc2e1b7a66cd0df7
 
         return services;
     }

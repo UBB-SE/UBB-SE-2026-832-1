@@ -2,7 +2,7 @@ using ClassLibrary.Models;
 
 namespace ClassLibrary.IRepositories;
 
-public interface IRepositoryAchievements
+public interface IAchievementsRepository
 {
     Task<int> GetConsecutiveWorkoutDayStreakAsync(int clientId, CancellationToken cancellationToken = default);
 
