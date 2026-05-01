@@ -131,15 +131,14 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
 
     public async Task<IReadOnlyList<int>> GetIngredientIdsForMealPlanAsync(int mealPlanId, CancellationToken cancellationToken = default)
     {
-        return await dbContext.FoodItemIngredients
+        return await dbContext.MealPlanFoodItems
             .AsNoTracking()
-            .Where(
-                foodItemIngredient => dbContext.MealPlanFoodItems
-                    .AsNoTracking()
-                    .Where(mealPlanFoodItem => EF.Property<int>(mealPlanFoodItem, "MealPlanId") == mealPlanId)
-                    .Select(mealPlanFoodItem => EF.Property<int>(mealPlanFoodItem, "FoodItemId"))
-                    .Contains(EF.Property<int>(foodItemIngredient, "FoodItemId")))
-            .Select(foodItemIngredient => EF.Property<int>(foodItemIngredient, "IngredientId"))
+            .Where(mealPlanFoodItem => EF.Property<int>(mealPlanFoodItem, "MealPlanId") == mealPlanId)
+            .Join(
+                dbContext.FoodItemIngredients.AsNoTracking(),
+                mealPlanFoodItem => EF.Property<int>(mealPlanFoodItem, "FoodItemId"),
+                foodItemIngredient => EF.Property<int>(foodItemIngredient, "FoodItemId"),
+                (_, foodItemIngredient) => EF.Property<int>(foodItemIngredient, "IngredientId"))
             .ToListAsync(cancellationToken);
     }
 

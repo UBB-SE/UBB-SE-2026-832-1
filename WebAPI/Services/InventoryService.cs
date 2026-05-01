@@ -119,7 +119,11 @@ public sealed class InventoryService : IInventoryService
 
     public async Task<IReadOnlyList<IngredientDataTransferObject>> GetAllIngredientsAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var ingredients = await this.ingredientRepository.GetAllAsync();
+
+        cancellationToken.ThrowIfCancellationRequested();
         return ingredients.Select(MapToIngredientDto).ToList();
     }
 
