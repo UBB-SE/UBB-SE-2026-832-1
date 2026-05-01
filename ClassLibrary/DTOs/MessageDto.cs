@@ -1,4 +1,4 @@
-﻿namespace ClassLibrary.DTOs
+namespace ClassLibrary.DTOs
 {
     public class MessageDto
     {

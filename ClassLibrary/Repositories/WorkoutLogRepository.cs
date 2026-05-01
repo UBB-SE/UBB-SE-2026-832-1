@@ -1,16 +1,15 @@
-﻿using ClassLibrary.Data;
+using ClassLibrary.Data;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
-using ClassLibrary.IRepositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
 
-public sealed class RepositoryWorkoutLog : IRepositoryWorkoutLog
+public sealed class WorkoutLogRepository : IWorkoutLogRepository
 {
     private readonly AppDbContext databaseContext;
 
-    public RepositoryWorkoutLog(AppDbContext databaseContext)
+    public WorkoutLogRepository(AppDbContext databaseContext)
     {
         this.databaseContext = databaseContext;
     }
@@ -27,26 +26,22 @@ public sealed class RepositoryWorkoutLog : IRepositoryWorkoutLog
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<bool> SaveWorkoutLogAsync(WorkoutLog log, CancellationToken cancellationToken = default)
+    public async Task SaveWorkoutLogAsync(WorkoutLog log, CancellationToken cancellationToken = default)
     {
         if (log == null)
         {
-            return false;
-        }
+            throw new ArgumentNullException(nameof(log));
         }
 
         await this.databaseContext.WorkoutLogs.AddAsync(log, cancellationToken);
-        return await this.databaseContext.SaveChangesAsync(cancellationToken) > 0;
+        await this.databaseContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> UpdateWorkoutLogAsync(WorkoutLog log, CancellationToken cancellationToken = default)
+    public async Task UpdateWorkoutLogAsync(WorkoutLog log, CancellationToken cancellationToken = default)
     {
-            var log = await _context.WorkoutLogs
-                .FirstOrDefaultAsync(w => w.WorkoutLogId == workoutLogId);
-
         if (log == null)
         {
-            return false;
+            throw new ArgumentNullException(nameof(log));
         }
 
         var existing = await this.databaseContext.WorkoutLogs
@@ -54,12 +49,11 @@ public sealed class RepositoryWorkoutLog : IRepositoryWorkoutLog
 
         if (existing == null)
         {
-            return false;
+            throw new KeyNotFoundException($"Workout log with ID {log.WorkoutLogId} not found.");
         }
 
         this.databaseContext.Entry(existing).CurrentValues.SetValues(log);
         await this.databaseContext.SaveChangesAsync(cancellationToken);
-        return true;
     }
 
     public async Task<double> GetClientWeightAsync(int clientId, CancellationToken cancellationToken = default)

@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
 
-public sealed class RepositoryNotification : IRepositoryNotification
+public sealed class NotificationRepository : INotificationRepository
 {
     private readonly AppDbContext databaseContext;
 
-    public RepositoryNotification(AppDbContext databaseContext)
+    public NotificationRepository(AppDbContext databaseContext)
     {
         this.databaseContext = databaseContext;
     }
