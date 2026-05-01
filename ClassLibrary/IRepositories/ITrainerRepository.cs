@@ -1,6 +1,6 @@
 using ClassLibrary.Models;
 
-namespace ClassLibrary.Repositories.Interfaces
+namespace ClassLibrary.IRepositories
 {
     public interface ITrainerRepository
     {

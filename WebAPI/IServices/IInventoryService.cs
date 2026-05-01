@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
 
-namespace WebAPI.Services.Interfaces;
+namespace WebAPI.IServices;
 
 public interface IInventoryService
 {

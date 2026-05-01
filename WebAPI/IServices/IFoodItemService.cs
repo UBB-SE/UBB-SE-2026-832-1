@@ -1,7 +1,7 @@
 using ClassLibrary.DTOs;
 using ClassLibrary.Filters;
 
-namespace WebAPI.Services;
+namespace WebAPI.IServices;
 
 public interface IFoodItemService
 {

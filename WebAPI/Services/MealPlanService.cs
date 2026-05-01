@@ -2,6 +2,7 @@ using System;
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
+using WebAPI.IServices;
 
 namespace WebAPI.Services;
 

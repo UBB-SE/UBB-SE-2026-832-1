@@ -1,6 +1,6 @@
 using ClassLibrary.DTOs;
 
-namespace WebAPI.Services.Interfaces;
+namespace WebAPI.IServices;
 
 public interface IClientService
 {

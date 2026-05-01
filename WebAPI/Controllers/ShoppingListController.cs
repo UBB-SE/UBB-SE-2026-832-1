@@ -2,7 +2,7 @@ using ClassLibrary.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WebAPI.Services;
+using WebAPI.IServices;
 using ClassLibrary.DTOs;
 
 namespace WebAPI.Controllers

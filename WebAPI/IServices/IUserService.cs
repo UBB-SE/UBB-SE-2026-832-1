@@ -1,9 +1,8 @@
 using ClassLibrary.DTOs;
 
-namespace WebAPI.Services;
+namespace WebAPI.IServices;
 
 public interface IUserService
 {
     Task<IReadOnlyList<UserDto>> GetUsersAsync();
 }
-
