@@ -1,4 +1,4 @@
-namespace ClassLibrary.Models;
+namespace ClassLibrary.Filters;
 
 public sealed class FoodItemFilter
 {
