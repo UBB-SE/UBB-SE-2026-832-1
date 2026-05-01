@@ -26,4 +26,6 @@ public interface IMealPlanRepository
     Task AddIngredientToFoodItemAsync(int foodItemId, int ingredientId, CancellationToken cancellationToken = default);
 
     Task RemoveIngredientFromFoodItemAsync(int foodItemId, int ingredientId, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<int>> GetIngredientIdsForMealPlanAsync(int mealPlanId, CancellationToken cancellationToken = default);
 }
