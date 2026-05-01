@@ -18,6 +18,5 @@ public sealed class AchievementShowcaseItem
     [MaxLength(500)]
     public string Criteria { get; init; } = string.Empty;
 
-    [Required]
     public bool IsUnlocked { get; init; }
 }

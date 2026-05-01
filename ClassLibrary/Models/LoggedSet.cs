@@ -6,7 +6,6 @@ public sealed class LoggedSet
 {
     public int LoggedSetId { get; set; }
 
-    [Required]
     public WorkoutLog WorkoutLog { get; set; } = null!;
 
     [Required]
