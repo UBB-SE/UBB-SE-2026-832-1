@@ -12,17 +12,14 @@ public static class ServiceCollectionExtensions
     {
         services.AddHttpClient();
 
-        
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IClientService, ClientService>();
         services.AddScoped<IFoodItemService, FoodItemService>();
         services.AddScoped<IMealPlanService, MealPlanService>();
-
-        
         services.AddScoped<IReminderService, ReminderService>();
 
-        
-        
+        services.AddScoped<IInventoryService, InventoryService>();
+        services.AddScoped<IShoppingListService, ShoppingListService>();
 
         return services;
     }
