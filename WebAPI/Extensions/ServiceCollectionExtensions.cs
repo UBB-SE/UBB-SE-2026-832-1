@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IFoodItemService, FoodItemService>();
         services.AddScoped<IMealPlanService, MealPlanService>();
         services.AddScoped<IInventoryService, InventoryService>();
+        services.AddScoped<IShoppingListService, ShoppingListService>();
         return services;
     }
 }
