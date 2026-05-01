@@ -32,7 +32,7 @@ public sealed class NotificationRepository : INotificationRepository
         var rowsAffected = await this.databaseContext.SaveChangesAsync(cancellationToken);
         if (rowsAffected == 0)
         {
-            throw new Exception("Notification could not be saved.");
+            throw new InvalidOperationException("Notification could not be saved.");
         }
     }
 }
