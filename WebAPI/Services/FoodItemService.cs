@@ -1,4 +1,5 @@
 using ClassLibrary.DTOs;
+using ClassLibrary.Filters;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 

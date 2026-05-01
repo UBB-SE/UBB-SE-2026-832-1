@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
 
-public class IngredientRepository : IIngredientRepository
+public sealed class IngredientRepository : IIngredientRepository
 {
     private readonly AppDbContext databaseContext;
 

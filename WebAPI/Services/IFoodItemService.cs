@@ -1,5 +1,5 @@
 using ClassLibrary.DTOs;
-using ClassLibrary.Models;
+using ClassLibrary.Filters;
 
 namespace WebAPI.Services;
 
