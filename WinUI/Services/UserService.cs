@@ -11,9 +11,9 @@ public sealed class UserService : IUserService
         this.serviceProxy = serviceProxy;
     }
 
-    public Task<IReadOnlyList<UserDto>> GetUsersAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<UserDto>> GetUsersAsync()
     {
-        return this.serviceProxy.GetUsersAsync(cancellationToken);
+        return this.serviceProxy.GetUsersAsync();
     }
 }
 

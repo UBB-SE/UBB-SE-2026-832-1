@@ -39,9 +39,9 @@ public sealed class ClientService : IClientService
         this.configuration = configuration;
     }
 
-    public async Task<IReadOnlyList<AchievementDataTransferObject>> GetAchievementsAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<AchievementDataTransferObject>> GetAchievementsAsync(int clientId)
     {
-        var showcaseItems = await this.achievementsRepository.GetAchievementShowcaseForClientAsync(clientId, cancellationToken);
+        var showcaseItems = await this.achievementsRepository.GetAchievementShowcaseForClientAsync(clientId);
         return showcaseItems.Select(item => new AchievementDataTransferObject
         {
             AchievementId = item.AchievementId,
@@ -53,20 +53,20 @@ public sealed class ClientService : IClientService
         }).ToList();
     }
 
-    public async Task<IReadOnlyList<NotificationDataTransferObject>> GetNotificationsAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<NotificationDataTransferObject>> GetNotificationsAsync(int clientId)
     {
-        var notifications = await this.notificationRepository.GetNotificationsAsync(clientId, cancellationToken);
+        var notifications = await this.notificationRepository.GetNotificationsAsync(clientId);
         return notifications.Select(MapNotification).ToList();
     }
 
-    public async Task<NutritionPlanDataTransferObject?> GetActiveNutritionPlanAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<NutritionPlanDataTransferObject?> GetActiveNutritionPlanAsync(int clientId)
     {
         if (clientId <= 0)
         {
             return null;
         }
 
-        var plans = await this.nutritionRepository.GetNutritionPlansForClientAsync(clientId, cancellationToken);
+        var plans = await this.nutritionRepository.GetNutritionPlansForClientAsync(clientId);
         var today = DateTime.Today;
         NutritionPlan? activePlan = null;
 
@@ -91,13 +91,13 @@ public sealed class ClientService : IClientService
         return MapNutritionPlan(activePlan, activePlan.Meals);
     }
 
-    public async Task<IReadOnlyList<WorkoutLogDataTransferObject>> GetWorkoutHistoryAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<WorkoutLogDataTransferObject>> GetWorkoutHistoryAsync(int clientId)
     {
-        var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(clientId, cancellationToken);
+        var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(clientId);
         return logs.Select(MapWorkoutLog).ToList();
     }
 
-    public async Task<bool> FinalizeWorkoutAsync(FinalizeWorkoutRequestDataTransferObject request, CancellationToken cancellationToken = default)
+    public async Task<bool> FinalizeWorkoutAsync(FinalizeWorkoutRequestDataTransferObject request)
     {
         if (request?.WorkoutLog == null)
         {
@@ -109,7 +109,7 @@ public sealed class ClientService : IClientService
             return false;
         }
 
-        var client = await this.clientRepository.GetByIdAsync(request.WorkoutLog.Client.ClientId, cancellationToken);
+        var client = await this.clientRepository.GetByIdAsync(request.WorkoutLog.Client.ClientId);
         if (client == null)
         {
             return false;
@@ -117,19 +117,19 @@ public sealed class ClientService : IClientService
 
         var log = MapToWorkoutLog(request.WorkoutLog, client);
         log.Date = DateTime.Now;
-        await this.workoutLogRepository.SaveWorkoutLogAsync(log, cancellationToken);
+        await this.workoutLogRepository.SaveWorkoutLogAsync(log);
         return true;
     }
 
-    public async Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetAvailableWorkoutsAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetAvailableWorkoutsAsync(int clientId)
     {
-        var templates = await this.workoutTemplateRepository.GetAvailableWorkoutsAsync(clientId, cancellationToken);
+        var templates = await this.workoutTemplateRepository.GetAvailableWorkoutsAsync(clientId);
         return templates.Select(MapWorkoutTemplate).ToList();
     }
 
-    public async Task<PreviousBestWeightsDataTransferObject> GetPreviousBestWeightsAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<PreviousBestWeightsDataTransferObject> GetPreviousBestWeightsAsync(int clientId)
     {
-        var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(clientId, cancellationToken);
+        var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(clientId);
         var bestWeightsByExerciseName = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var log in logs)
@@ -153,9 +153,9 @@ public sealed class ClientService : IClientService
         };
     }
 
-    public async Task<ClientProfileSnapshotDataTransferObject> GetClientProfileSnapshotAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<ClientProfileSnapshotDataTransferObject> GetClientProfileSnapshotAsync(int clientId)
     {
-        var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(clientId, cancellationToken);
+        var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(clientId);
         var totalCalories = logs.Sum(log => log.TotalCaloriesBurned);
 
         var latestLog = logs.OrderByDescending(log => log.Date).FirstOrDefault();
@@ -173,7 +173,7 @@ public sealed class ClientService : IClientService
             loggedExercises = new List<LoggedExerciseDataTransferObject>();
         }
 
-        var activePlan = await this.GetActiveNutritionPlanAsync(clientId, cancellationToken);
+        var activePlan = await this.GetActiveNutritionPlanAsync(clientId);
         var meals = activePlan?.Meals ?? new List<MealDataTransferObject>();
 
         return new ClientProfileSnapshotDataTransferObject
@@ -185,7 +185,7 @@ public sealed class ClientService : IClientService
         };
     }
 
-    public Task<bool> ConfirmDeloadAsync(ConfirmDeloadRequestDataTransferObject request, CancellationToken cancellationToken = default)
+    public Task<bool> ConfirmDeloadAsync(ConfirmDeloadRequestDataTransferObject request)
     {
         if (request == null || request.NotificationId <= 0)
         {
@@ -195,7 +195,7 @@ public sealed class ClientService : IClientService
         throw new NotImplementedException("Deload confirmation requires progression service integration which is not yet available.");
     }
 
-    public async Task<bool> SyncNutritionAsync(NutritionSyncRequestDataTransferObject request, CancellationToken cancellationToken = default)
+    public async Task<bool> SyncNutritionAsync(NutritionSyncRequestDataTransferObject request)
     {
         if (request == null || request.ClientId <= 0)
         {
@@ -210,7 +210,7 @@ public sealed class ClientService : IClientService
 
         try
         {
-            var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(request.ClientId, cancellationToken);
+            var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(request.ClientId);
             var totalCalories = logs.Sum(log => log.TotalCaloriesBurned);
             var lastIntensityTag = logs.OrderByDescending(log => log.Date).FirstOrDefault()?.IntensityTag;
             var workoutDifficulty = string.IsNullOrWhiteSpace(lastIntensityTag) ? "unknown" : lastIntensityTag;
@@ -226,7 +226,7 @@ public sealed class ClientService : IClientService
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
             var httpClient = this.httpClientFactory.CreateClient();
-            var response = await httpClient.PostAsync(syncEndpoint, content, cancellationToken);
+            var response = await httpClient.PostAsync(syncEndpoint, content);
             return response.IsSuccessStatusCode;
         }
         catch (OperationCanceledException)

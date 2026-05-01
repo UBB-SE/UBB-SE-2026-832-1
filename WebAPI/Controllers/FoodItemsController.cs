@@ -17,16 +17,16 @@ public sealed class FoodItemsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll()
     {
-        var foodItems = await this.foodItemService.GetAllAsync(cancellationToken);
+        var foodItems = await this.foodItemService.GetAllAsync();
         return this.Ok(foodItems);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById(int id)
     {
-        var foodItem = await this.foodItemService.GetByIdAsync(id, cancellationToken);
+        var foodItem = await this.foodItemService.GetByIdAsync(id);
 
         if (foodItem is null)
         {
@@ -37,9 +37,9 @@ public sealed class FoodItemsController : ControllerBase
     }
 
     [HttpGet("filter")]
-    public async Task<IActionResult> GetFiltered([FromQuery] FoodItemFilter filter, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetFiltered([FromQuery] FoodItemFilter filter)
     {
-        var foodItems = await this.foodItemService.GetFilteredAsync(filter, cancellationToken);
+        var foodItems = await this.foodItemService.GetFilteredAsync(filter);
         return this.Ok(foodItems);
     }
 }

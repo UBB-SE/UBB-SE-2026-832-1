@@ -14,22 +14,22 @@ public sealed class WorkoutTemplateRepository : IWorkoutTemplateRepository
         this.databaseContext = databaseContext;
     }
 
-    public async Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId)
     {
         return await this.databaseContext.WorkoutTemplates
             .AsNoTracking()
             .Where(workoutTemplate => workoutTemplate.Client.ClientId == clientId)
             .Include(workoutTemplate => workoutTemplate.Client)
             .OrderBy(workoutTemplate => workoutTemplate.WorkoutTemplateId)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<WorkoutTemplate?> GetByIdAsync(int workoutTemplateId, CancellationToken cancellationToken = default)
+    public async Task<WorkoutTemplate?> GetByIdAsync(int workoutTemplateId)
     {
         return await this.databaseContext.WorkoutTemplates
             .AsNoTracking()
             .Include(workoutTemplate => workoutTemplate.Client)
             .Include(workoutTemplate => workoutTemplate.Exercises)
-            .FirstOrDefaultAsync(workoutTemplate => workoutTemplate.WorkoutTemplateId == workoutTemplateId, cancellationToken);
+            .FirstOrDefaultAsync(workoutTemplate => workoutTemplate.WorkoutTemplateId == workoutTemplateId);
     }
 }

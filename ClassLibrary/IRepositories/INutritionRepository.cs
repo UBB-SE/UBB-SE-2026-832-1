@@ -4,13 +4,13 @@ namespace ClassLibrary.IRepositories;
 
 public interface INutritionRepository
 {
-    Task<int> InsertNutritionPlanAsync(NutritionPlan plan, CancellationToken cancellationToken = default);
+    Task<int> InsertNutritionPlanAsync(NutritionPlan plan);
 
-    Task InsertMealAsync(Meal meal, int nutritionPlanId, CancellationToken cancellationToken = default);
+    Task InsertMealAsync(Meal meal, int nutritionPlanId);
 
-    Task AssignNutritionPlanToClientAsync(int clientId, int nutritionPlanId, CancellationToken cancellationToken = default);
+    Task AssignNutritionPlanToClientAsync(int clientId, int nutritionPlanId);
 
-    Task<IReadOnlyList<NutritionPlan>> GetNutritionPlansForClientAsync(int clientId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<NutritionPlan>> GetNutritionPlansForClientAsync(int clientId);
 
-    Task<IReadOnlyList<Meal>> GetMealsForPlanAsync(int nutritionPlanId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Meal>> GetMealsForPlanAsync(int nutritionPlanId);
 }

@@ -4,6 +4,6 @@ namespace WebAPI.Services;
 
 public interface IUserService
 {
-    Task<IReadOnlyList<UserDto>> GetUsersAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<UserDto>> GetUsersAsync();
 }
 

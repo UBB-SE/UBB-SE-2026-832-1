@@ -13,9 +13,9 @@ public sealed class UserServiceProxy : IUserServiceProxy
         this.httpClient = httpClient;
     }
 
-    public async Task<IReadOnlyList<UserDto>> GetUsersAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<UserDto>> GetUsersAsync()
     {
-        var users = await this.httpClient.GetFromJsonAsync<List<UserDto>>($"{API_BASE_ADDRESS}/api/users", cancellationToken);
+        var users = await this.httpClient.GetFromJsonAsync<List<UserDto>>($"{API_BASE_ADDRESS}/api/users");
         return users ?? [];
     }
 }
