@@ -69,13 +69,15 @@ public static class NutritionCalculator
             return 0;
         }
 
+        string gender = userData.Gender ?? string.Empty;
+
         double basalMetabolicRate =
-            userData.Gender.Equals(GENDER_MALE, StringComparison.OrdinalIgnoreCase)
+            gender.Equals(GENDER_MALE, StringComparison.OrdinalIgnoreCase)
                 ? (BASAL_METABOLIC_RATE_WEIGHT_FACTOR * userData.Weight) +
                   (BASAL_METABOLIC_RATE_HEIGHT_FACTOR * userData.Height) -
                   (BASAL_METABOLIC_RATE_AGE_FACTOR * userData.Age) +
                   BASAL_METABOLIC_RATE_MALE_OFFSET
-                : userData.Gender.Equals(GENDER_FEMALE, StringComparison.OrdinalIgnoreCase)
+                : gender.Equals(GENDER_FEMALE, StringComparison.OrdinalIgnoreCase)
                     ? (BASAL_METABOLIC_RATE_WEIGHT_FACTOR * userData.Weight) +
                       (BASAL_METABOLIC_RATE_HEIGHT_FACTOR * userData.Height) -
                       (BASAL_METABOLIC_RATE_AGE_FACTOR * userData.Age) -
@@ -89,7 +91,9 @@ public static class NutritionCalculator
 
         double totalDailyEnergyExpenditure = basalMetabolicRate * ACTIVITY_MULTIPLIER;
 
-        double adjustedCalories = userData.Goal.ToLower() switch
+        string goal = (userData.Goal ?? string.Empty).ToLowerInvariant();
+
+        double adjustedCalories = goal switch
         {
             GOAL_BULK => totalDailyEnergyExpenditure + BULK_CALORIE_DELTA,
             GOAL_CUT => totalDailyEnergyExpenditure + CUT_CALORIE_DELTA,
@@ -108,7 +112,9 @@ public static class NutritionCalculator
             return 0;
         }
 
-        double proteinPerKg = userData.Goal.ToLower() switch
+        string goal = (userData.Goal ?? string.Empty).ToLowerInvariant();
+
+        double proteinPerKg = goal switch
         {
             GOAL_BULK => PROTEIN_BULK,
             GOAL_CUT => PROTEIN_CUT,
@@ -128,7 +134,9 @@ public static class NutritionCalculator
             return 0;
         }
 
-        double fatRatio = userData.Goal.ToLower() switch
+        string goal = (userData.Goal ?? string.Empty).ToLowerInvariant();
+
+        double fatRatio = goal switch
         {
             GOAL_BULK or GOAL_CUT => FAT_BULK_CUT,
             GOAL_MAINTENANCE => FAT_MAINTENANCE,
