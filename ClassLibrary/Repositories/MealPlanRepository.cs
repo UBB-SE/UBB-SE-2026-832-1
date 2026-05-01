@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using ClassLibrary.Data;
 using ClassLibrary.IRepositories;
@@ -11,51 +10,50 @@ namespace ClassLibrary.Repositories;
 
 public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanRepository
 {
-    public async Task<MealPlan?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<MealPlan?> GetByIdAsync(int id)
     {
         return await dbContext.MealPlans
             .AsNoTracking()
-            .FirstOrDefaultAsync(mealPlan => mealPlan.MealPlanId == id, cancellationToken);
+            .FirstOrDefaultAsync(mealPlan => mealPlan.MealPlanId == id);
     }
 
-    public async Task<IReadOnlyList<MealPlan>> GetByUserIdAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<MealPlan>> GetByUserIdAsync(int userId)
     {
         return await dbContext.MealPlans
             .AsNoTracking()
             .Where(mealPlan => mealPlan.User.UserId == userId)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task AddAsync(MealPlan entity, CancellationToken cancellationToken = default)
+    public async Task AddAsync(MealPlan entity)
     {
         dbContext.MealPlans.Add(entity);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(MealPlan entity, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(MealPlan entity)
     {
         dbContext.MealPlans.Update(entity);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(int id)
     {
-        var entity = await dbContext.MealPlans.FindAsync([id], cancellationToken);
+        var entity = await dbContext.MealPlans.FindAsync([id]);
         if (entity is not null)
         {
             dbContext.MealPlans.Remove(entity);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync();
         }
     }
 
-    public async Task AddFoodItemToPlanAsync(int mealPlanId, int foodItemId, CancellationToken cancellationToken = default)
+    public async Task AddFoodItemToPlanAsync(int mealPlanId, int foodItemId)
     {
         var exists = await dbContext.MealPlanFoodItems
             .AnyAsync(
                 mealPlanFoodItem =>
                     EF.Property<int>(mealPlanFoodItem, "MealPlanId") == mealPlanId &&
-                    EF.Property<int>(mealPlanFoodItem, "FoodItemId") == foodItemId,
-                cancellationToken);
+                    EF.Property<int>(mealPlanFoodItem, "FoodItemId") == foodItemId);
 
         if (!exists)
         {
@@ -64,43 +62,41 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
                 MealPlan = new MealPlan { MealPlanId = mealPlanId },
                 FoodItem = new FoodItem { FoodItemId = foodItemId },
             });
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync();
         }
     }
 
-    public async Task RemoveFoodItemFromPlanAsync(int mealPlanId, int foodItemId, CancellationToken cancellationToken = default)
+    public async Task RemoveFoodItemFromPlanAsync(int mealPlanId, int foodItemId)
     {
         var entry = await dbContext.MealPlanFoodItems
             .FirstOrDefaultAsync(
                 mealPlanFoodItem =>
                     EF.Property<int>(mealPlanFoodItem, "MealPlanId") == mealPlanId &&
-                    EF.Property<int>(mealPlanFoodItem, "FoodItemId") == foodItemId,
-                cancellationToken);
+                    EF.Property<int>(mealPlanFoodItem, "FoodItemId") == foodItemId);
 
         if (entry is not null)
         {
             dbContext.MealPlanFoodItems.Remove(entry);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync();
         }
     }
 
-    public async Task<IReadOnlyList<FoodItem>> GetFoodItemsForPlanAsync(int mealPlanId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<FoodItem>> GetFoodItemsForPlanAsync(int mealPlanId)
     {
         return await dbContext.MealPlanFoodItems
             .AsNoTracking()
             .Where(mealPlanFoodItem => EF.Property<int>(mealPlanFoodItem, "MealPlanId") == mealPlanId)
             .Select(mealPlanFoodItem => mealPlanFoodItem.FoodItem)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task AddIngredientToFoodItemAsync(int foodItemId, int ingredientId, CancellationToken cancellationToken = default)
+    public async Task AddIngredientToFoodItemAsync(int foodItemId, int ingredientId)
     {
         var exists = await dbContext.FoodItemIngredients
             .AnyAsync(
                 foodItemIngredient =>
                     EF.Property<int>(foodItemIngredient, "FoodItemId") == foodItemId &&
-                    EF.Property<int>(foodItemIngredient, "IngredientId") == ingredientId,
-                cancellationToken);
+                    EF.Property<int>(foodItemIngredient, "IngredientId") == ingredientId);
 
         if (!exists)
         {
@@ -109,27 +105,26 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
                 FoodItem = new FoodItem { FoodItemId = foodItemId },
                 Ingredient = new Ingredient { IngredientId = ingredientId },
             });
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync();
         }
     }
 
-    public async Task RemoveIngredientFromFoodItemAsync(int foodItemId, int ingredientId, CancellationToken cancellationToken = default)
+    public async Task RemoveIngredientFromFoodItemAsync(int foodItemId, int ingredientId)
     {
         var entry = await dbContext.FoodItemIngredients
             .FirstOrDefaultAsync(
                 foodItemIngredient =>
                     EF.Property<int>(foodItemIngredient, "FoodItemId") == foodItemId &&
-                    EF.Property<int>(foodItemIngredient, "IngredientId") == ingredientId,
-                cancellationToken);
+                    EF.Property<int>(foodItemIngredient, "IngredientId") == ingredientId);
 
         if (entry is not null)
         {
             dbContext.FoodItemIngredients.Remove(entry);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync();
         }
     }
 
-    public async Task<IReadOnlyList<int>> GetIngredientIdsForMealPlanAsync(int mealPlanId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<int>> GetIngredientIdsForMealPlanAsync(int mealPlanId)
     {
         return await dbContext.MealPlanFoodItems
             .AsNoTracking()
@@ -139,7 +134,7 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
                 mealPlanFoodItem => EF.Property<int>(mealPlanFoodItem, "FoodItemId"),
                 foodItemIngredient => EF.Property<int>(foodItemIngredient, "FoodItemId"),
                 (_, foodItemIngredient) => EF.Property<int>(foodItemIngredient, "IngredientId"))
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
 }

@@ -1,9 +1,8 @@
 using ClassLibrary.DTOs;
 
-namespace WinUI.Services;
+namespace WebAPI.IServices;
 
-public interface IUserServiceProxy
+public interface IUserService
 {
     Task<IReadOnlyList<UserDto>> GetUsersAsync();
 }
-

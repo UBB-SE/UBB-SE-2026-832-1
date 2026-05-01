@@ -1,5 +1,6 @@
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
+using WebAPI.IServices;
 
 namespace WebAPI.Services;
 
@@ -12,9 +13,9 @@ public sealed class UserService : IUserService
         this.userRepository = userRepository;
     }
 
-    public async Task<IReadOnlyList<UserDto>> GetUsersAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<UserDto>> GetUsersAsync()
     {
-        var users = await this.userRepository.GetAllAsync(cancellationToken);
+        var users = await this.userRepository.GetAllAsync();
 
         return users
             .Select(user => new UserDto

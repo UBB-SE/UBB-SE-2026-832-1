@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using ClassLibrary.Data;
 using ClassLibrary.Filters;
@@ -12,43 +11,43 @@ namespace ClassLibrary.Repositories;
 
 public sealed class FoodItemRepository(AppDbContext dbContext) : IFoodItemRepository
 {
-    public async Task<FoodItem?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<FoodItem?> GetByIdAsync(int id)
     {
         return await dbContext.FoodItems
             .AsNoTracking()
-            .FirstOrDefaultAsync(foodItem => foodItem.FoodItemId == id, cancellationToken);
+            .FirstOrDefaultAsync(foodItem => foodItem.FoodItemId == id);
     }
 
-    public async Task<IReadOnlyList<FoodItem>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<FoodItem>> GetAllAsync()
     {
         return await dbContext.FoodItems
             .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task AddAsync(FoodItem entity, CancellationToken cancellationToken = default)
+    public async Task AddAsync(FoodItem entity)
     {
         dbContext.FoodItems.Add(entity);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(FoodItem entity, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(FoodItem entity)
     {
         dbContext.FoodItems.Update(entity);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(int id)
     {
-        var entity = await dbContext.FoodItems.FindAsync([id], cancellationToken);
+        var entity = await dbContext.FoodItems.FindAsync([id]);
         if (entity is not null)
         {
             dbContext.FoodItems.Remove(entity);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync();
         }
     }
 
-    public async Task<IReadOnlyList<FoodItem>> GetByFilterAsync(FoodItemFilter filter, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<FoodItem>> GetByFilterAsync(FoodItemFilter filter)
     {
         var query = dbContext.FoodItems.AsNoTracking().AsQueryable();
 
@@ -83,15 +82,14 @@ public sealed class FoodItemRepository(AppDbContext dbContext) : IFoodItemReposi
             query = query.Where(foodItem => foodItem.Name.ToLower().Contains(term));
         }
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToListAsync();
     }
 
-    public async Task ToggleFavoriteAsync(int userId, int foodItemId, CancellationToken cancellationToken = default)
+    public async Task ToggleFavoriteAsync(int userId, int foodItemId)
     {
         var existing = await dbContext.Favorites
             .FirstOrDefaultAsync(
-                favorite => EF.Property<int>(favorite, "UserId") == userId && EF.Property<int>(favorite, "FoodItemId") == foodItemId,
-                cancellationToken);
+                favorite => EF.Property<int>(favorite, "UserId") == userId && EF.Property<int>(favorite, "FoodItemId") == foodItemId);
 
         if (existing is not null)
         {
@@ -106,15 +104,15 @@ public sealed class FoodItemRepository(AppDbContext dbContext) : IFoodItemReposi
             });
         }
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync();
     }
 
-    public async Task<IReadOnlyList<FoodItem>> GetFavoritesByUserIdAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<FoodItem>> GetFavoritesByUserIdAsync(int userId)
     {
         return await dbContext.Favorites
             .AsNoTracking()
             .Where(favorite => EF.Property<int>(favorite, "UserId") == userId)
             .Select(favorite => favorite.FoodItem)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 }

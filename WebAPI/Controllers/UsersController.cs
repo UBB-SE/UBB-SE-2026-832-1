@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Services;
+using WebAPI.IServices;
 
 namespace WebAPI.Controllers;
 
@@ -15,9 +15,9 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll()
     {
-        var users = await this.userService.GetUsersAsync(cancellationToken);
+        var users = await this.userService.GetUsersAsync();
         return this.Ok(users);
     }
 }
