@@ -30,17 +30,21 @@ public sealed class InventoryService : IInventoryService
     public async Task<bool> ConsumeMealAsync(ConsumeMealRequestDataTransferObject request, CancellationToken cancellationToken = default)
     {
         var requiredIngredientIds = await this.mealPlanRepository.GetIngredientIdsForMealPlanAsync(request.MealPlanId, cancellationToken);
-        var inventoryItems = (await this.inventoryRepository.GetAllByUserIdAsync(request.UserId, cancellationToken)).ToList();
+        var inventoryByIngredientId = (await this.inventoryRepository.GetAllByUserIdAsync(request.UserId, cancellationToken))
+            .GroupBy(inventoryItem => inventoryItem.Ingredient.IngredientId)
+            .ToDictionary(group => group.Key, group => group.First());
 
         foreach (int ingredientId in requiredIngredientIds)
         {
-            var stock = inventoryItems.FirstOrDefault(item => item.Ingredient.IngredientId == ingredientId);
-
-            if (stock == null || stock.QuantityGrams < DefaultIngredientsQuantity)
+            if (!inventoryByIngredientId.TryGetValue(ingredientId, out var stock) || stock.QuantityGrams < DefaultIngredientsQuantity)
             {
                 return false;
             }
+        }
 
+        foreach (int ingredientId in requiredIngredientIds)
+        {
+            var stock = inventoryByIngredientId[ingredientId];
             stock.QuantityGrams -= DefaultIngredientsQuantity;
 
             if (stock.QuantityGrams <= 0)
