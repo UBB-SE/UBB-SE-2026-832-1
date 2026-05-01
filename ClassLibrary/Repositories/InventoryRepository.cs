@@ -38,9 +38,13 @@ public sealed class InventoryRepository : IInventoryRepository
 
     public async Task AddAsync(Inventory inventory, CancellationToken cancellationToken = default)
     {
-        var entry = this.databaseContext.Entry(inventory);
-        var userId = entry.Property<int>("UserId").CurrentValue;
-        var ingredientId = entry.Property<int>("IngredientId").CurrentValue;
+        var userId = inventory.User?.UserId ?? 0;
+        var ingredientId = inventory.Ingredient?.IngredientId ?? 0;
+
+        if (userId <= 0 || ingredientId <= 0)
+        {
+            throw new ArgumentException("Inventory must include User and Ingredient navigation stubs with valid key values.");
+        }
 
         var existing = await this.GetByUserIdAndIngredientIdAsync(userId, ingredientId, cancellationToken);
         if (existing is not null)
