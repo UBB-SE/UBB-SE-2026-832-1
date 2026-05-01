@@ -15,7 +15,7 @@ public sealed class InventoryService : IInventoryService
     private readonly IMealPlanRepository mealPlanRepository;
     private readonly IIngredientRepository ingredientRepository;
 
-    private const int DefaultIngredientsQuantity = 100;
+    private const int DEFAULT_INGREDIENTS_QUANTITY = 100;
 
     public InventoryService(
         IIngredientRepository ingredientRepository,
@@ -36,7 +36,7 @@ public sealed class InventoryService : IInventoryService
 
         foreach (int ingredientId in requiredIngredientIds)
         {
-            if (!inventoryByIngredientId.TryGetValue(ingredientId, out var stock) || stock.QuantityGrams < DefaultIngredientsQuantity)
+            if (!inventoryByIngredientId.TryGetValue(ingredientId, out var stock) || stock.QuantityGrams < DEFAULT_INGREDIENTS_QUANTITY)
             {
                 return false;
             }
@@ -45,7 +45,7 @@ public sealed class InventoryService : IInventoryService
         foreach (int ingredientId in requiredIngredientIds)
         {
             var stock = inventoryByIngredientId[ingredientId];
-            stock.QuantityGrams -= DefaultIngredientsQuantity;
+            stock.QuantityGrams -= DEFAULT_INGREDIENTS_QUANTITY;
 
             if (stock.QuantityGrams <= 0)
             {
@@ -79,7 +79,7 @@ public sealed class InventoryService : IInventoryService
         {
             UserId = request.UserId,
             IngredientId = ingredientId,
-            QuantityGrams = DefaultIngredientsQuantity,
+            QuantityGrams = DEFAULT_INGREDIENTS_QUANTITY,
         }, cancellationToken);
     }
 
