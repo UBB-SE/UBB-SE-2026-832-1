@@ -1,6 +1,6 @@
 using ClassLibrary.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Services.Interfaces;
+using WebAPI.IServices;
 
 namespace WebAPI.Controllers;
 
@@ -16,37 +16,37 @@ public sealed class InventoryController : ControllerBase
     }
 
     [HttpGet("{userId}")]
-    public async Task<IActionResult> GetUserInventory(int userId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUserInventory(int userId)
     {
-        var inventory = await this.inventoryService.GetUserInventoryAsync(userId, cancellationToken);
+        var inventory = await this.inventoryService.GetUserInventoryAsync(userId);
         return this.Ok(inventory);
     }
 
     [HttpGet("ingredients")]
-    public async Task<IActionResult> GetAllIngredients(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllIngredients()
     {
-        var ingredients = await this.inventoryService.GetAllIngredientsAsync(cancellationToken);
+        var ingredients = await this.inventoryService.GetAllIngredientsAsync();
         return this.Ok(ingredients);
     }
 
     [HttpPost("add-to-pantry")]
-    public async Task<IActionResult> AddToPantry([FromBody] AddToPantryRequestDataTransferObject request, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddToPantry([FromBody] AddToPantryRequestDataTransferObject request)
     {
-        await this.inventoryService.AddToPantryAsync(request, cancellationToken);
+        await this.inventoryService.AddToPantryAsync(request);
         return this.Ok();
     }
 
     [HttpPost("add-ingredient-by-name")]
-    public async Task<IActionResult> AddIngredientByName([FromBody] AddIngredientByNameRequestDataTransferObject request, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddIngredientByName([FromBody] AddIngredientByNameRequestDataTransferObject request)
     {
-        await this.inventoryService.AddIngredientByNameToPantryAsync(request, cancellationToken);
+        await this.inventoryService.AddIngredientByNameToPantryAsync(request);
         return this.Ok();
     }
 
     [HttpPost("consume-meal")]
-    public async Task<IActionResult> ConsumeMeal([FromBody] ConsumeMealRequestDataTransferObject request, CancellationToken cancellationToken)
+    public async Task<IActionResult> ConsumeMeal([FromBody] ConsumeMealRequestDataTransferObject request)
     {
-        var success = await this.inventoryService.ConsumeMealAsync(request, cancellationToken);
+        var success = await this.inventoryService.ConsumeMealAsync(request);
         if (!success)
         {
             return this.BadRequest("Insufficient ingredients in inventory to consume meal.");
@@ -56,9 +56,9 @@ public sealed class InventoryController : ControllerBase
     }
 
     [HttpDelete("{inventoryId:int}")]
-    public async Task<IActionResult> RemoveItem(int inventoryId, CancellationToken cancellationToken)
+    public async Task<IActionResult> RemoveItem(int inventoryId)
     {
-        await this.inventoryService.RemoveItemAsync(inventoryId, cancellationToken);
+        await this.inventoryService.RemoveItemAsync(inventoryId);
         return this.Ok();
     }
 }

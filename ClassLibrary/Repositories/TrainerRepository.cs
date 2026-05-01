@@ -1,6 +1,6 @@
 using ClassLibrary.Data;
+using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
-using ClassLibrary.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories

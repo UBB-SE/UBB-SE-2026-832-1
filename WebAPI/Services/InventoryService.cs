@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
-using WebAPI.Services.Interfaces;
+using WebAPI.IServices;
 
 namespace WebAPI.Services;
 
@@ -27,16 +26,16 @@ public sealed class InventoryService : IInventoryService
         this.ingredientRepository = ingredientRepository;
     }
 
-    public async Task<bool> ConsumeMealAsync(ConsumeMealRequestDataTransferObject request, CancellationToken cancellationToken = default)
+    public async Task<bool> ConsumeMealAsync(ConsumeMealRequestDataTransferObject request)
     {
-        var requiredIngredientIds = await this.mealPlanRepository.GetIngredientIdsForMealPlanAsync(request.MealPlanId, cancellationToken);
+        var requiredIngredientIds = await this.mealPlanRepository.GetIngredientIdsForMealPlanAsync(request.MealPlanId);
         var requiredQuantityByIngredientId = requiredIngredientIds
             .GroupBy(ingredientId => ingredientId)
             .ToDictionary(
                 group => group.Key,
                 group => group.Count() * DEFAULT_INGREDIENTS_QUANTITY);
 
-        var inventoryByIngredientId = (await this.inventoryRepository.GetAllByUserIdAsync(request.UserId, cancellationToken))
+        var inventoryByIngredientId = (await this.inventoryRepository.GetAllByUserIdAsync(request.UserId))
             .GroupBy(inventoryItem => inventoryItem.Ingredient.IngredientId)
             .ToDictionary(
                 group => group.Key,
@@ -71,11 +70,11 @@ public sealed class InventoryService : IInventoryService
 
                 if (stock.QuantityGrams <= 0)
                 {
-                    await this.inventoryRepository.DeleteAsync(stock.InventoryId, cancellationToken);
+                    await this.inventoryRepository.DeleteAsync(stock.InventoryId);
                 }
                 else
                 {
-                    await this.inventoryRepository.UpdateAsync(stock, cancellationToken);
+                    await this.inventoryRepository.UpdateAsync(stock);
                 }
             }
         }
@@ -83,7 +82,7 @@ public sealed class InventoryService : IInventoryService
         return true;
     }
 
-    public async Task AddToPantryAsync(AddToPantryRequestDataTransferObject request, CancellationToken cancellationToken = default)
+    public async Task AddToPantryAsync(AddToPantryRequestDataTransferObject request)
     {
         var newItem = new Inventory
         {
@@ -92,10 +91,10 @@ public sealed class InventoryService : IInventoryService
             QuantityGrams = request.QuantityGrams,
         };
 
-        await this.inventoryRepository.AddAsync(newItem, cancellationToken);
+        await this.inventoryRepository.AddAsync(newItem);
     }
 
-    public async Task AddIngredientByNameToPantryAsync(AddIngredientByNameRequestDataTransferObject request, CancellationToken cancellationToken = default)
+    public async Task AddIngredientByNameToPantryAsync(AddIngredientByNameRequestDataTransferObject request)
     {
         int ingredientId = await this.ingredientRepository.GetOrCreateIngredientIdByNameAsync(request.IngredientName);
         await this.AddToPantryAsync(new AddToPantryRequestDataTransferObject
@@ -103,27 +102,23 @@ public sealed class InventoryService : IInventoryService
             UserId = request.UserId,
             IngredientId = ingredientId,
             QuantityGrams = DEFAULT_INGREDIENTS_QUANTITY,
-        }, cancellationToken);
+        });
     }
 
-    public async Task<IReadOnlyList<InventoryDataTransferObject>> GetUserInventoryAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<InventoryDataTransferObject>> GetUserInventoryAsync(int userId)
     {
-        var inventoryItems = await this.inventoryRepository.GetAllByUserIdAsync(userId, cancellationToken);
+        var inventoryItems = await this.inventoryRepository.GetAllByUserIdAsync(userId);
         return inventoryItems.Select(MapToInventoryDto).ToList();
     }
 
-    public async Task RemoveItemAsync(int inventoryId, CancellationToken cancellationToken = default)
+    public async Task RemoveItemAsync(int inventoryId)
     {
-        await this.inventoryRepository.DeleteAsync(inventoryId, cancellationToken);
+        await this.inventoryRepository.DeleteAsync(inventoryId);
     }
 
-    public async Task<IReadOnlyList<IngredientDataTransferObject>> GetAllIngredientsAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<IngredientDataTransferObject>> GetAllIngredientsAsync()
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
         var ingredients = await this.ingredientRepository.GetAllAsync();
-
-        cancellationToken.ThrowIfCancellationRequested();
         return ingredients.Select(MapToIngredientDto).ToList();
     }
 

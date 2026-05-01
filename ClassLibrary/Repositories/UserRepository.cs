@@ -43,6 +43,7 @@ public sealed class UserRepository : IUserRepository
     public async Task DeleteAsync(int id)
     {
         var entity = await databaseContext.Users.FindAsync(id);
+
         if (entity is not null)
         {
             databaseContext.Users.Remove(entity);

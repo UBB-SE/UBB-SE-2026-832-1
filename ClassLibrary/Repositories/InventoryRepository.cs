@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using ClassLibrary.Data;
 using ClassLibrary.IRepositories;
@@ -17,26 +16,25 @@ public sealed class InventoryRepository : IInventoryRepository
         this.databaseContext = databaseContext;
     }
 
-    public async Task<IReadOnlyList<Inventory>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Inventory>> GetAllByUserIdAsync(int userId)
     {
         return await this.databaseContext.Inventories
             .AsNoTracking()
             .Include(inventory => inventory.Ingredient)
             .Where(inventory => EF.Property<int>(inventory, "UserId") == userId)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    private async Task<Inventory?> GetByUserIdAndIngredientIdAsync(int userId, int ingredientId, CancellationToken cancellationToken)
+    private async Task<Inventory?> GetByUserIdAndIngredientIdAsync(int userId, int ingredientId)
     {
         return await this.databaseContext.Inventories
             .FirstOrDefaultAsync(
                 existingInventory =>
                     EF.Property<int>(existingInventory, "UserId") == userId &&
-                    EF.Property<int>(existingInventory, "IngredientId") == ingredientId,
-                cancellationToken);
+                    EF.Property<int>(existingInventory, "IngredientId") == ingredientId);
     }
 
-    public async Task AddAsync(Inventory inventory, CancellationToken cancellationToken = default)
+    public async Task AddAsync(Inventory inventory)
     {
         var userId = inventory.User?.UserId ?? 0;
         var ingredientId = inventory.Ingredient?.IngredientId ?? 0;
@@ -46,7 +44,7 @@ public sealed class InventoryRepository : IInventoryRepository
             throw new ArgumentException("Inventory must include User and Ingredient navigation stubs with valid key values.");
         }
 
-        var existing = await this.GetByUserIdAndIngredientIdAsync(userId, ingredientId, cancellationToken);
+        var existing = await this.GetByUserIdAndIngredientIdAsync(userId, ingredientId);
         if (existing is not null)
         {
             existing.QuantityGrams += inventory.QuantityGrams;
@@ -56,26 +54,26 @@ public sealed class InventoryRepository : IInventoryRepository
             this.databaseContext.Inventories.Add(inventory);
         }
 
-        await this.databaseContext.SaveChangesAsync(cancellationToken);
+        await this.databaseContext.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(Inventory inventory, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(Inventory inventory)
     {
-        var existing = await this.databaseContext.Inventories.FindAsync([inventory.InventoryId], cancellationToken);
+        var existing = await this.databaseContext.Inventories.FindAsync([inventory.InventoryId]);
         if (existing is not null)
         {
             existing.QuantityGrams = inventory.QuantityGrams;
-            await this.databaseContext.SaveChangesAsync(cancellationToken);
+            await this.databaseContext.SaveChangesAsync();
         }
     }
 
-    public async Task DeleteAsync(int inventoryId, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(int inventoryId)
     {
-        var entity = await this.databaseContext.Inventories.FindAsync([inventoryId], cancellationToken);
+        var entity = await this.databaseContext.Inventories.FindAsync([inventoryId]);
         if (entity is not null)
         {
             this.databaseContext.Inventories.Remove(entity);
-            await this.databaseContext.SaveChangesAsync(cancellationToken);
+            await this.databaseContext.SaveChangesAsync();
         }
     }
 }
