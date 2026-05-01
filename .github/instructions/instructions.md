@@ -39,6 +39,7 @@
 - filenames and directory names must use `PascalCase`
 - filename must be the same as the main class/struct/interface in that file
 - in each file there is a single class/struct/interface
+- All files should be named `<ClassName><Role>` or `I<ClassName><Role>` examples: UserRepository, IUserRepository, ItemService, IItemService
 
 ## Organization
 
