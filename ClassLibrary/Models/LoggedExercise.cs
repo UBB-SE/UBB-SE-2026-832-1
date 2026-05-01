@@ -10,14 +10,12 @@ public sealed class LoggedExercise
     [MaxLength(200)]
     public string ExerciseName { get; set; } = string.Empty;
 
-    [Required]
     public WorkoutLog WorkoutLog { get; set; } = null!;
 
     public int ParentTemplateExerciseId { get; set; }
 
     public List<LoggedSet> Sets { get; set; } = new();
 
-    [Required]
     public MuscleGroup TargetMuscles { get; set; }
 
     public float MetabolicEquivalent { get; set; }
