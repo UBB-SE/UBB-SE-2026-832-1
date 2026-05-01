@@ -1,61 +1,49 @@
 ﻿using ClassLibrary.Data;
 using ClassLibrary.Models;
-using ClassLibrary.Repositories.Interfaces;
+using ClassLibrary.IRepositories; // ✅ IMPORTANTE
 using Microsoft.EntityFrameworkCore;
 
-namespace ClassLibrary.Repositories
+namespace ClassLibrary.Repositories;
+
+public class RepositoryTrainer : IRepositoryTrainer
 {
-    public class RepositoryTrainer : IRepositoryTrainer
+    private readonly AppDbContext dbContext;
+
+    public RepositoryTrainer(AppDbContext dbContext)
     {
-        private readonly AppDbContext _context;
+        this.dbContext = dbContext;
+    }
 
-        public RepositoryTrainer(AppDbContext context)
+    public async Task<List<Client>> GetTrainerClientsAsync(int trainerId)
+    {
+        return await dbContext.Clients
+            .Include(client => client.WorkoutLogs)
+            .ToListAsync();
+    }
+
+    public async Task<bool> SaveTrainerWorkoutAsync(WorkoutTemplate workoutTemplate)
+    {
+        if (workoutTemplate.WorkoutTemplateId == 0)
         {
-            _context = context;
+            await dbContext.Set<WorkoutTemplate>().AddAsync(workoutTemplate);
+        }
+        else
+        {
+            dbContext.Set<WorkoutTemplate>().Update(workoutTemplate);
         }
 
-        
-        public async Task<List<Client>> GetTrainerClientsAsync(int trainerId)
-        {
-            return await _context.Clients
-                .Include(c => c.WorkoutLogs)
-                .ToListAsync();
-        }
+        return await dbContext.SaveChangesAsync() > 0;
+    }
 
-        public async Task<bool> SaveTrainerWorkoutAsync(WorkoutTemplate template)
-        {
-            try
-            {
-                if (template.WorkoutTemplateId == 0)
-                {
-                    await _context.Set<WorkoutTemplate>().AddAsync(template);
-                }
-                else
-                {
-                    _context.Set<WorkoutTemplate>().Update(template);
-                }
+    public async Task<bool> DeleteWorkoutTemplateAsync(int workoutTemplateId)
+    {
+        var workoutTemplate = await dbContext.Set<WorkoutTemplate>()
+            .FirstOrDefaultAsync(template => template.WorkoutTemplateId == workoutTemplateId);
 
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        if (workoutTemplate == null)
+            return false;
 
-        public async Task<bool> DeleteWorkoutTemplateAsync(int templateId)
-        {
-            var template = await _context.Set<WorkoutTemplate>()
-                .FirstOrDefaultAsync(t => t.WorkoutTemplateId == templateId);
-
-            if (template == null)
-                return false;
-
-            _context.Remove(template);
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
+        dbContext.Remove(workoutTemplate);
+        return await dbContext.SaveChangesAsync() > 0;
     }
 }

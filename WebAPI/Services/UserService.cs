@@ -1,52 +1,63 @@
+using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
-using ClassLibrary.Repositories.Interfaces;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserRepository userRepository;
 
         public UserService(IUserRepository userRepository)
         {
-            _userRepository = userRepository;
+            this.userRepository = userRepository;
         }
 
-        public async Task<List<User>> GetUsersAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<UserDto>> GetUsersAsync(CancellationToken cancellationToken)
         {
-            return (await _userRepository.GetAllAsync()).ToList();
+            var users = await userRepository.GetAllAsync(cancellationToken);
+
+            return users
+                .Select(user => new UserDto
+                {
+                    Id = user.UserId,
+                    Username = user.Username,
+                    Role = user.Role
+                })
+                .ToList();
         }
 
-        public async Task<bool> CheckIfUsernameExistsAsync(string username)
+        public async Task<bool> CheckIfUsernameExistsAsync(string username, CancellationToken cancellationToken = default)
         {
-            var users = await _userRepository.GetAllAsync();
-            return users.Any(u => u.Username.ToLower() == username.ToLower());
+            var users = await userRepository.GetAllAsync(cancellationToken);
+
+            return users.Any(user =>
+                string.Equals(user.Username, username, StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task<User?> LoginAsync(string username, string password)
+        public async Task<User?> LoginAsync(string username, string password, CancellationToken cancellationToken = default)
         {
-            return await _userRepository.GetByUsernameAndPasswordAsync(username, password);
+            return await userRepository.GetByUsernameAndPasswordAsync(username, password, cancellationToken);
         }
 
-        public async Task<User?> RegisterUserAsync(User user)
+        public async Task<User?> RegisterUserAsync(User user, CancellationToken cancellationToken = default)
         {
-            if (await CheckIfUsernameExistsAsync(user.Username))
+            if (await CheckIfUsernameExistsAsync(user.Username, cancellationToken))
                 return null;
 
-            await _userRepository.AddAsync(user);
+            await userRepository.AddAsync(user, cancellationToken);
             return user;
         }
 
-        public async Task<UserData?> GetUserDataAsync(int userId)
+        public async Task<UserData?> GetUserDataAsync(int userId, CancellationToken cancellationToken = default)
         {
-            return await _userRepository.GetUserDataByUserIdAsync(userId);
+            return await userRepository.GetUserDataByUserIdAsync(userId, cancellationToken);
         }
 
-        public async Task UpdateUserDataAsync(UserData data)
+        public async Task UpdateUserDataAsync(UserData data, CancellationToken cancellationToken = default)
         {
-            await _userRepository.UpdateUserDataAsync(data);
+            await userRepository.UpdateUserDataAsync(data, cancellationToken);
         }
     }
 }

@@ -5,62 +5,49 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories
 {
-    
-    
-    
-
     public class RepositoryWorkoutLog : IRepositoryWorkoutLog
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext dbContext;
 
-        public RepositoryWorkoutLog(AppDbContext context)
+        public RepositoryWorkoutLog(AppDbContext dbContext)
         {
-            _context = context;
+            this.dbContext = dbContext;
         }
 
-        public async Task<double> GetClientWeightAsync(int clientId)
+        public async Task<double> GetClientWeightAsync(int clientId, CancellationToken cancellationToken = default)
         {
-            var client = await _context.Clients
-                .FirstOrDefaultAsync(c => c.ClientId == clientId);
+            var client = await dbContext.Clients
+                .FirstOrDefaultAsync(clientEntity => clientEntity.ClientId == clientId, cancellationToken);
 
             return client?.Weight ?? 75.0;
         }
 
-        public async Task<bool> SaveWorkoutLogAsync(WorkoutLog log)
+        public async Task<bool> SaveWorkoutLogAsync(WorkoutLog workoutLog, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                await _context.WorkoutLogs.AddAsync(log);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            await dbContext.WorkoutLogs.AddAsync(workoutLog, cancellationToken);
+            return await dbContext.SaveChangesAsync(cancellationToken) > 0;
         }
 
-        public async Task<List<WorkoutLog>> GetWorkoutHistoryAsync(int clientId)
+        public async Task<IReadOnlyList<WorkoutLog>> GetWorkoutHistoryAsync(int clientId, CancellationToken cancellationToken = default)
         {
-            return await _context.WorkoutLogs
-                .Where(w => w.Client.ClientId == clientId)
-                .OrderByDescending(w => w.Date)
-                .ToListAsync();
+            return await dbContext.WorkoutLogs
+                .Where(workoutLog => workoutLog.Client.ClientId == clientId)
+                .OrderByDescending(workoutLog => workoutLog.Date)
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<bool> UpdateWorkoutLogFeedbackAsync(int workoutLogId, double rating, string notes)
+        public async Task<bool> UpdateWorkoutLogFeedbackAsync(int workoutLogId, double rating, string notes, CancellationToken cancellationToken = default)
         {
-            var log = await _context.WorkoutLogs
-                .FirstOrDefaultAsync(w => w.WorkoutLogId == workoutLogId);
+            var workoutLog = await dbContext.WorkoutLogs
+                .FirstOrDefaultAsync(logEntity => logEntity.WorkoutLogId == workoutLogId, cancellationToken);
 
-            if (log == null)
+            if (workoutLog == null)
                 return false;
 
-            log.Rating = rating;
-            log.TrainerNotes = notes;
+            workoutLog.Rating = rating;
+            workoutLog.TrainerNotes = notes;
 
-            await _context.SaveChangesAsync();
-            return true;
+            return await dbContext.SaveChangesAsync(cancellationToken) > 0;
         }
     }
 }

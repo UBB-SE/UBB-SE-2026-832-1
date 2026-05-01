@@ -25,24 +25,15 @@ public sealed class AppDbContext : DbContext
     public DbSet<Client> Clients { get; set; } = default!;
     public DbSet<Achievement> Achievements { get; set; } = default!;
     public DbSet<WorkoutLog> WorkoutLogs { get; set; } = default!;
-
     public DbSet<WorkoutTemplate> WorkoutTemplates { get; set; } = default!;
-
     public DbSet<Notification> Notifications { get; set; } = default!;
-<<<<<<< HEAD
-
     public DbSet<Reminder> Reminders { get; set; } = default!;
-
-=======
->>>>>>> 2f64b3d61771a5aa0ef07602dc2e1b7a66cd0df7
     public DbSet<NutritionPlan> NutritionPlans { get; set; } = default!;
     public DbSet<Meal> Meals { get; set; } = default!;
     public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
     public DbSet<DailyLog> DailyLogs { get; set; } = default!;
     public DbSet<Conversation> Conversations { get; set; } = default!;
     public DbSet<Message> Messages { get; set; } = default!;
-    public DbSet<Reminder> Reminders { get; set; } = default!;
-
     public DbSet<ShoppingItem> ShoppingItems { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -51,45 +42,45 @@ public sealed class AppDbContext : DbContext
 
         modelBuilder.Entity<Favorite>(entity =>
         {
-            entity.HasOne(favorite => favorite.User)
+            entity.HasOne(f => f.User)
                 .WithMany()
                 .HasForeignKey("UserId")
                 .IsRequired();
 
-            entity.HasOne(favorite => favorite.FoodItem)
+            entity.HasOne(f => f.FoodItem)
                 .WithMany()
                 .HasForeignKey("FoodItemId")
                 .IsRequired();
 
-            entity.HasIndex(favorite => new
+            entity.HasIndex(f => new
             {
-                UserId = EF.Property<int>(favorite, "UserId"),
-                FoodItemId = EF.Property<int>(favorite, "FoodItemId"),
+                UserId = EF.Property<int>(f, "UserId"),
+                FoodItemId = EF.Property<int>(f, "FoodItemId"),
             }).IsUnique();
         });
 
         modelBuilder.Entity<FoodItemIngredient>(entity =>
         {
-            entity.HasOne(foodItemIngredient => foodItemIngredient.FoodItem)
+            entity.HasOne(f => f.FoodItem)
                 .WithMany()
                 .HasForeignKey("FoodItemId")
                 .IsRequired();
 
-            entity.HasOne(foodItemIngredient => foodItemIngredient.Ingredient)
+            entity.HasOne(f => f.Ingredient)
                 .WithMany()
                 .HasForeignKey("IngredientId")
                 .IsRequired();
 
-            entity.HasIndex(foodItemIngredient => new
+            entity.HasIndex(f => new
             {
-                FoodItemId = EF.Property<int>(foodItemIngredient, "FoodItemId"),
-                IngredientId = EF.Property<int>(foodItemIngredient, "IngredientId"),
+                FoodItemId = EF.Property<int>(f, "FoodItemId"),
+                IngredientId = EF.Property<int>(f, "IngredientId"),
             }).IsUnique();
         });
 
         modelBuilder.Entity<MealPlan>(entity =>
         {
-            entity.HasOne(mealPlan => mealPlan.User)
+            entity.HasOne(m => m.User)
                 .WithMany()
                 .HasForeignKey("UserId")
                 .IsRequired();
@@ -97,20 +88,20 @@ public sealed class AppDbContext : DbContext
 
         modelBuilder.Entity<MealPlanFoodItem>(entity =>
         {
-            entity.HasOne(mealPlanFoodItem => mealPlanFoodItem.MealPlan)
+            entity.HasOne(m => m.MealPlan)
                 .WithMany()
                 .HasForeignKey("MealPlanId")
                 .IsRequired();
 
-            entity.HasOne(mealPlanFoodItem => mealPlanFoodItem.FoodItem)
+            entity.HasOne(m => m.FoodItem)
                 .WithMany()
                 .HasForeignKey("FoodItemId")
                 .IsRequired();
 
-            entity.HasIndex(mealPlanFoodItem => new
+            entity.HasIndex(m => new
             {
-                MealPlanId = EF.Property<int>(mealPlanFoodItem, "MealPlanId"),
-                FoodItemId = EF.Property<int>(mealPlanFoodItem, "FoodItemId"),
+                MealPlanId = EF.Property<int>(m, "MealPlanId"),
+                FoodItemId = EF.Property<int>(m, "FoodItemId"),
             }).IsUnique();
         });
 
@@ -118,55 +109,55 @@ public sealed class AppDbContext : DbContext
             .HasKey("ClientId", "NutritionPlanId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasOne(clientNutritionPlan => clientNutritionPlan.Client)
-            .WithMany(client => client.ClientNutritionPlans)
+            .HasOne(c => c.Client)
+            .WithMany(c => c.ClientNutritionPlans)
             .HasForeignKey("ClientId");
 
         modelBuilder.Entity<ClientNutritionPlan>()
-            .HasOne(clientNutritionPlan => clientNutritionPlan.NutritionPlan)
+            .HasOne(c => c.NutritionPlan)
             .WithMany()
             .HasForeignKey("NutritionPlanId");
 
         modelBuilder.Entity<Meal>()
-            .Property(meal => meal.Ingredients)
+            .Property(m => m.Ingredients)
             .HasConversion(
-                ingredientList => JsonSerializer.Serialize(ingredientList, (JsonSerializerOptions?)null),
-                serializedIngredientList => JsonSerializer.Deserialize<List<string>>(serializedIngredientList, (JsonSerializerOptions?)null) ?? new List<string>())
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>())
             .Metadata.SetValueComparer(new ValueComparer<List<string>>(
-                (firstIngredientList, secondIngredientList) => (firstIngredientList ?? new List<string>()).SequenceEqual(secondIngredientList ?? new List<string>()),
-                ingredientList => ingredientList.Aggregate(0, (combinedHash, ingredient) => HashCode.Combine(combinedHash, ingredient.GetHashCode())),
-                ingredientList => ingredientList.ToList()));
+                (a, b) => (a ?? new List<string>()).SequenceEqual(b ?? new List<string>()),
+                a => a.Aggregate(0, (h, x) => HashCode.Combine(h, x.GetHashCode())),
+                a => a.ToList()));
 
         modelBuilder.Entity<DailyLog>(entity =>
         {
-            entity.HasOne(dailyLog => dailyLog.User)
+            entity.HasOne(d => d.User)
                 .WithMany()
-                .HasForeignKey("UserId")
+                .HasForeignKey(d => d.UserId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(dailyLog => dailyLog.Meal)
+            entity.HasOne(d => d.Meal)
                 .WithMany()
-                .HasForeignKey("MealId")
+                .HasForeignKey(d => d.MealId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.Property(dailyLog => dailyLog.LoggedAt).IsRequired();
+            entity.Property(d => d.LoggedAt).IsRequired();
         });
 
         modelBuilder.Entity<Ingredient>(entity =>
         {
-            entity.Property(ingredient => ingredient.Name).IsRequired().HasMaxLength(200);
+            entity.Property(i => i.Name).IsRequired().HasMaxLength(200);
         });
 
         modelBuilder.Entity<Inventory>(entity =>
         {
-            entity.HasOne(inventory => inventory.User)
+            entity.HasOne(i => i.User)
                 .WithMany()
                 .HasForeignKey("UserId")
                 .IsRequired();
 
-            entity.HasOne(inventory => inventory.Ingredient)
+            entity.HasOne(i => i.Ingredient)
                 .WithMany()
                 .HasForeignKey("IngredientId")
                 .IsRequired();
@@ -174,54 +165,54 @@ public sealed class AppDbContext : DbContext
 
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasOne(notification => notification.Client)
-                .WithMany(client => client.Notifications)
+            entity.HasOne(n => n.Client)
+                .WithMany(c => c.Notifications)
                 .HasForeignKey("ClientId")
                 .IsRequired();
         });
 
         modelBuilder.Entity<ShoppingItem>(entity =>
         {
-            entity.HasOne(shoppingItem => shoppingItem.User)
+            entity.HasOne(s => s.User)
                 .WithMany()
                 .HasForeignKey("UserId")
                 .IsRequired();
 
-            entity.HasOne(shoppingItem => shoppingItem.Ingredient)
+            entity.HasOne(s => s.Ingredient)
                 .WithMany()
                 .HasForeignKey("IngredientId")
                 .IsRequired();
         });
 
         modelBuilder.Entity<Conversation>()
-            .HasOne(conversation => conversation.User)
+            .HasOne(c => c.User)
             .WithMany()
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Conversation>()
-            .HasMany(conversation => conversation.Messages)
-            .WithOne(message => message.Conversation)
+            .HasMany(c => c.Messages)
+            .WithOne(m => m.Conversation)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Message>()
-            .HasOne(message => message.Sender)
+            .HasOne(m => m.Sender)
             .WithMany()
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<TemplateExercise>(entity =>
         {
-            entity.HasOne(templateExercise => templateExercise.WorkoutTemplate)
-                .WithMany(workoutTemplate => workoutTemplate.Exercises)
+            entity.HasOne(t => t.WorkoutTemplate)
+                .WithMany(w => w.Exercises)
                 .HasForeignKey("WorkoutTemplateId")
                 .IsRequired();
         });
 
         modelBuilder.Entity<UserData>(entity =>
         {
-            entity.HasOne(userData => userData.User)
+            entity.HasOne(u => u.User)
                 .WithMany()
                 .HasForeignKey("UserId")
                 .IsRequired();
@@ -229,35 +220,29 @@ public sealed class AppDbContext : DbContext
 
         modelBuilder.Entity<WorkoutLog>(entity =>
         {
-            entity.HasOne(workoutLog => workoutLog.Client)
-                .WithMany(client => client.WorkoutLogs)
+            entity.HasOne(w => w.Client)
+                .WithMany(c => c.WorkoutLogs)
                 .HasForeignKey("ClientId")
                 .IsRequired();
         });
 
         modelBuilder.Entity<WorkoutTemplate>(entity =>
         {
-            entity.HasOne(workoutTemplate => workoutTemplate.Client)
+            entity.HasOne(w => w.Client)
                 .WithMany()
                 .HasForeignKey("ClientId")
                 .IsRequired();
         });
 
-        modelBuilder.Entity<Reminder>()
-            .Property(reminder => reminder.Name)
-            .IsRequired()
-            .HasMaxLength(255);
+       
+        modelBuilder.Entity<Reminder>(entity =>
+        {
+            entity.Property(r => r.Name)
+                .IsRequired()
+                .HasMaxLength(255);
 
-        modelBuilder.Entity<Reminder>()
-            .Property(reminder => reminder.Frequency)
-            .HasMaxLength(50);
-
-        modelBuilder.Entity<Reminder>()
-            .Ignore(reminder => reminder.FullDateTimeDisplay);
-
-        modelBuilder.Entity<Reminder>()
-            .HasOne(reminder => reminder.User)
-            .WithMany(user => user.Reminders)
-            .IsRequired();
+            entity.Property(r => r.Frequency)
+                .HasMaxLength(50);
+        });
     }
 }

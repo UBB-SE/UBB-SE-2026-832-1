@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IReminderService, ReminderService>();
 
         
-        services.AddScoped<IRepositoryTrainer, RepositoryTrainer>();
+        
 
         return services;
     }

@@ -1,11 +1,11 @@
 ﻿using ClassLibrary.Models;
 
-namespace ClassLibrary.Repositories.Interfaces
+namespace ClassLibrary.IRepositories
 {
     public interface IRepositoryTrainer
     {
         Task<List<Client>> GetTrainerClientsAsync(int trainerId);
-        Task<bool> SaveTrainerWorkoutAsync(WorkoutTemplate template);
-        Task<bool> DeleteWorkoutTemplateAsync(int templateId);
+        Task<bool> SaveTrainerWorkoutAsync(WorkoutTemplate workoutTemplate);
+        Task<bool> DeleteWorkoutTemplateAsync(int workoutTemplateId);
     }
 }
