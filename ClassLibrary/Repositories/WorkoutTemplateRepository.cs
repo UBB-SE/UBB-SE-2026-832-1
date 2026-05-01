@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
 
-public sealed class RepositoryWorkoutTemplate : IRepositoryWorkoutTemplate
+public sealed class WorkoutTemplateRepository : IWorkoutTemplateRepository
 {
     private readonly AppDbContext databaseContext;
 
-    public RepositoryWorkoutTemplate(AppDbContext databaseContext)
+    public WorkoutTemplateRepository(AppDbContext databaseContext)
     {
         this.databaseContext = databaseContext;
     }

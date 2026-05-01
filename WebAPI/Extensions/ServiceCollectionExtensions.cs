@@ -1,3 +1,5 @@
+using ClassLibrary.Repositories;
+using ClassLibrary.Repositories.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using WebAPI.Services;
 using WebAPI.Services.Interfaces;
