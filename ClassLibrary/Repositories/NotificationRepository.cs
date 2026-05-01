@@ -31,10 +31,6 @@ public sealed class NotificationRepository : INotificationRepository
             notification.DateCreated = DateTime.Now;
         }
         await this.databaseContext.Notifications.AddAsync(notification, cancellationToken);
-        var rowsAffected = await this.databaseContext.SaveChangesAsync(cancellationToken);
-        if (rowsAffected == 0)
-        {
-            throw new InvalidOperationException("Notification could not be saved.");
-        }
+        await this.databaseContext.SaveChangesAsync(cancellationToken);
     }
 }
