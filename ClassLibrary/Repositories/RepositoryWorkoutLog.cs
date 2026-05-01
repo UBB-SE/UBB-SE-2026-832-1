@@ -1,66 +1,73 @@
 ﻿using ClassLibrary.Data;
+using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 using ClassLibrary.IRepositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClassLibrary.Repositories
+namespace ClassLibrary.Repositories;
+
+public sealed class RepositoryWorkoutLog : IRepositoryWorkoutLog
 {
-    
-    
-    
+    private readonly AppDbContext databaseContext;
 
-    public class RepositoryWorkoutLog : IRepositoryWorkoutLog
+    public RepositoryWorkoutLog(AppDbContext databaseContext)
     {
-        private readonly AppDbContext _context;
+        this.databaseContext = databaseContext;
+    }
 
-        public RepositoryWorkoutLog(AppDbContext context)
+    public async Task<IReadOnlyList<WorkoutLog>> GetWorkoutHistoryAsync(int clientId, CancellationToken cancellationToken = default)
+    {
+        return await this.databaseContext.WorkoutLogs
+            .AsNoTracking()
+            .Where(workoutLog => workoutLog.Client.ClientId == clientId)
+            .Include(workoutLog => workoutLog.Client)
+            .Include(workoutLog => workoutLog.Exercises)
+                .ThenInclude(loggedExercise => loggedExercise.Sets)
+            .OrderByDescending(workoutLog => workoutLog.Date)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<bool> SaveWorkoutLogAsync(WorkoutLog log, CancellationToken cancellationToken = default)
+    {
+        if (log == null)
         {
-            _context = context;
+            return false;
+        }
         }
 
-        public async Task<double> GetClientWeightAsync(int clientId)
-        {
-            var client = await _context.Clients
-                .FirstOrDefaultAsync(c => c.ClientId == clientId);
+        await this.databaseContext.WorkoutLogs.AddAsync(log, cancellationToken);
+        return await this.databaseContext.SaveChangesAsync(cancellationToken) > 0;
+    }
 
-            return client?.Weight ?? 75.0;
-        }
-
-        public async Task<bool> SaveWorkoutLogAsync(WorkoutLog log)
-        {
-            try
-            {
-                await _context.WorkoutLogs.AddAsync(log);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public async Task<List<WorkoutLog>> GetWorkoutHistoryAsync(int clientId)
-        {
-            return await _context.WorkoutLogs
-                .Where(w => w.Client.ClientId == clientId)
-                .OrderByDescending(w => w.Date)
-                .ToListAsync();
-        }
-
-        public async Task<bool> UpdateWorkoutLogFeedbackAsync(int workoutLogId, double rating, string notes)
-        {
+    public async Task<bool> UpdateWorkoutLogAsync(WorkoutLog log, CancellationToken cancellationToken = default)
+    {
             var log = await _context.WorkoutLogs
                 .FirstOrDefaultAsync(w => w.WorkoutLogId == workoutLogId);
 
-            if (log == null)
-                return false;
-
-            log.Rating = rating;
-            log.TrainerNotes = notes;
-
-            await _context.SaveChangesAsync();
-            return true;
+        if (log == null)
+        {
+            return false;
         }
+
+        var existing = await this.databaseContext.WorkoutLogs
+            .FirstOrDefaultAsync(workoutLog => workoutLog.WorkoutLogId == log.WorkoutLogId, cancellationToken);
+
+        if (existing == null)
+        {
+            return false;
+        }
+
+        this.databaseContext.Entry(existing).CurrentValues.SetValues(log);
+        await this.databaseContext.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    public async Task<double> GetClientWeightAsync(int clientId, CancellationToken cancellationToken = default)
+    {
+        var client = await this.databaseContext.Clients
+            .AsNoTracking()
+            .FirstOrDefaultAsync(client => client.ClientId == clientId, cancellationToken);
+
+        return client?.Weight ?? 0;
     }
 }

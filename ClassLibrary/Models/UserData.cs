@@ -44,8 +44,6 @@ public sealed class UserData
 
     public int UserDataId { get; set; }
 
-    public int UserId { get; set; }
-
     public User User { get; set; } = default!;
 
     [Range(MIN_WEIGHT_KG, MAX_WEIGHT_KG, ErrorMessage = ERROR_WEIGHT_RANGE)]

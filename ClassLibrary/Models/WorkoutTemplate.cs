@@ -7,9 +7,6 @@ public class WorkoutTemplate
     public int WorkoutTemplateId { get; set; }
 
     [Required]
-    public int ClientId { get; set; }
-
-    [Required]
     public Client Client { get; set; } = null!;
 
     [Required]
