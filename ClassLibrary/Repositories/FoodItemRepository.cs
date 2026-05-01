@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ClassLibrary.Data;
+using ClassLibrary.Filters;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
