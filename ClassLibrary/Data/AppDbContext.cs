@@ -130,19 +130,17 @@ public sealed class AppDbContext : DbContext
 
         modelBuilder.Entity<DailyLog>(entity =>
         {
-            entity.HasOne(d => d.User)
+            entity.HasOne(dailyLog => dailyLog.User)
                 .WithMany()
-                .HasForeignKey(d => d.UserId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(d => d.Meal)
+            entity.HasOne(dailyLog => dailyLog.Meal)
                 .WithMany()
-                .HasForeignKey(d => d.MealId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.Property(d => d.LoggedAt).IsRequired();
+            entity.Property(dailyLog => dailyLog.LoggedAt).IsRequired();
         });
 
         modelBuilder.Entity<Ingredient>(entity =>
@@ -234,15 +232,19 @@ public sealed class AppDbContext : DbContext
                 .IsRequired();
         });
 
-       
+
         modelBuilder.Entity<Reminder>(entity =>
         {
-            entity.Property(r => r.Name)
+            entity.Property(reminder => reminder.Name)
                 .IsRequired()
                 .HasMaxLength(255);
 
-            entity.Property(r => r.Frequency)
+            entity.Property(reminder => reminder.Frequency)
                 .HasMaxLength(50);
+
+            entity.HasOne(reminder => reminder.User)
+                .WithMany(user => user.Reminders)
+                .IsRequired();
         });
     }
 }

@@ -1,26 +1,20 @@
-using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace ClassLibrary.Models;
 
 public class Reminder
 {
-    [Key]
-    public int Id { get; set; }
+    public int ReminderId { get; set; }
 
-    [Required]
-    public int UserId { get; set; }
+    public virtual User User { get; set; } = null!;
 
-    [Required]
-    [MaxLength(100)]
     public string Name { get; set; } = string.Empty;
 
     public bool HasSound { get; set; }
 
-    [Required]
     public TimeSpan Time { get; set; }
 
-    public string? ReminderDate { get; set; }
+    public string ReminderDate { get; set; } = string.Empty;
 
-    [MaxLength(50)]
     public string Frequency { get; set; } = "Once";
 }

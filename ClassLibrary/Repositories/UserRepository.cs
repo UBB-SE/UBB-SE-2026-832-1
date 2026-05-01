@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using ClassLibrary.Data;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
@@ -18,65 +14,65 @@ public sealed class UserRepository : IUserRepository
         this.databaseContext = databaseContext;
     }
 
-    public async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<User>> GetAllAsync()
     {
-        return await this.databaseContext.Users
+        return await databaseContext.Users
             .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<User?> GetByIdAsync(int id)
     {
-        return await this.databaseContext.Users
+        return await databaseContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(user => user.UserId == id, cancellationToken);
+            .FirstOrDefaultAsync(user => user.UserId == id);
     }
 
-    public async Task AddAsync(User entity, CancellationToken cancellationToken = default)
+    public async Task AddAsync(User entity)
     {
-        this.databaseContext.Users.Add(entity);
-        await this.databaseContext.SaveChangesAsync(cancellationToken);
+        databaseContext.Users.Add(entity);
+        await databaseContext.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(User entity, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(User entity)
     {
-        this.databaseContext.Users.Update(entity);
-        await this.databaseContext.SaveChangesAsync(cancellationToken);
+        databaseContext.Users.Update(entity);
+        await databaseContext.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(int id)
     {
-        var entity = await this.databaseContext.Users.FindAsync([id], cancellationToken);
+        var entity = await databaseContext.Users.FindAsync(id);
         if (entity is not null)
         {
-            this.databaseContext.Users.Remove(entity);
-            await this.databaseContext.SaveChangesAsync(cancellationToken);
+            databaseContext.Users.Remove(entity);
+            await databaseContext.SaveChangesAsync();
         }
     }
 
-    public async Task<User?> GetByUsernameAndPasswordAsync(string username, string password, CancellationToken cancellationToken = default)
+    public async Task<User?> GetByUsernameAndPasswordAsync(string username, string password)
     {
-        return await this.databaseContext.Users
+        return await databaseContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(user => user.Username == username && user.Password == password, cancellationToken);
+            .FirstOrDefaultAsync(user => user.Username == username && user.Password == password);
     }
 
-    public async Task AddUserDataAsync(UserData data, CancellationToken cancellationToken = default)
+    public async Task AddUserDataAsync(UserData data)
     {
-        this.databaseContext.UserData.Add(data);
-        await this.databaseContext.SaveChangesAsync(cancellationToken);
+        databaseContext.UserData.Add(data);
+        await databaseContext.SaveChangesAsync();
     }
 
-    public async Task<UserData?> GetUserDataByUserIdAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<UserData?> GetUserDataByUserIdAsync(int userId)
     {
-        return await this.databaseContext.UserData
+        return await databaseContext.UserData
             .AsNoTracking()
-            .FirstOrDefaultAsync(userData => userData.User.UserId == userId, cancellationToken);
+            .FirstOrDefaultAsync(userData => userData.User.UserId == userId);
     }
 
-    public async Task UpdateUserDataAsync(UserData data, CancellationToken cancellationToken = default)
+    public async Task UpdateUserDataAsync(UserData data)
     {
-        this.databaseContext.UserData.Update(data);
-        await this.databaseContext.SaveChangesAsync(cancellationToken);
+        databaseContext.UserData.Update(data);
+        await databaseContext.SaveChangesAsync();
     }
 }

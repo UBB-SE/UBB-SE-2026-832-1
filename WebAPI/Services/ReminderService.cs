@@ -34,7 +34,7 @@ namespace WebAPI.Services
             if (string.IsNullOrWhiteSpace(reminder.Name) || reminder.Name.Length > 50)
                 return false;
 
-            if (reminder.Id == 0)
+            if (reminder.ReminderId == 0)
                 await reminderRepository.AddAsync(reminder);
             else
                 await reminderRepository.UpdateAsync(reminder);

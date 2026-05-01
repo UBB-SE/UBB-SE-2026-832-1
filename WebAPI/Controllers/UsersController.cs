@@ -15,10 +15,9 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll()
     {
-        var users = await this.userService.GetUsersAsync(cancellationToken);
-        return this.Ok(users);
+        var users = await userService.GetUsersAsync();
+        return Ok(users);
     }
 }
-
