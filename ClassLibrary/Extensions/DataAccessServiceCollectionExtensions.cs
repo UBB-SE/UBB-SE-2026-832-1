@@ -1,7 +1,6 @@
 using ClassLibrary.Data;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Repositories;
-using ClassLibrary.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,6 +1,6 @@
 ﻿using ClassLibrary.Models;
 using ClassLibrary.IRepositories;
-using WebAPI.Services.Interfaces;
+using WebAPI.IServices;
 
 namespace WebAPI.Services
 {
