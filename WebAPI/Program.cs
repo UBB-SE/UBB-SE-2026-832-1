@@ -2,6 +2,7 @@ using ClassLibrary.Extensions;
 using WebAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+var apiBaseUrl = builder.Configuration["Api:BaseUrl"];
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

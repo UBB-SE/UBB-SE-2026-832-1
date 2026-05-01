@@ -1,21 +1,17 @@
-﻿using ClassLibrary.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using ClassLibrary.Models;
 
-namespace ClassLibrary.IRepositories
+namespace ClassLibrary.IRepositories;
+
+public interface IShoppingListRepository
 {
-    public interface IShoppingListRepository
-    {
-        Task AddAsync(ShoppingItem item);
-        Task<IEnumerable<ShoppingItem>> GetAllAsync();
-        Task<ShoppingItem?> GetByIdAsync(int id);
-        Task<ShoppingItem?> GetByUserAndIngredientAsync(int userId, int ingredientId);
-        Task<IEnumerable<ShoppingItem>> GetAllByUserIdAsync(int userId);
-        Task UpdateAsync(ShoppingItem item);
-        Task DeleteAsync(int id);
-        Task<List<ShoppingItem>> GetIngredientsNeededFromMealPlanAsync(int userId);
-    }
+    Task AddAsync(ShoppingItem item, CancellationToken cancellationToken = default);
+    Task DeleteAsync(int shoppingItemId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ShoppingItem>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ShoppingItem>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken = default);
+    Task<ShoppingItem?> GetByIdAsync(int shoppingItemId, CancellationToken cancellationToken = default);
+    Task<ShoppingItem?> GetByUserAndIngredientAsync(int userId, int ingredientId, CancellationToken cancellationToken = default);
+    Task UpdateAsync(ShoppingItem item, CancellationToken cancellationToken = default);
 }

@@ -1,71 +1,81 @@
-﻿using ClassLibrary.Data;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using ClassLibrary.Data;
+using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ClassLibrary.IRepositories;
 
-namespace ClassLibrary.Repositories
+namespace ClassLibrary.Repositories;
+
+public sealed class InventoryRepository : IInventoryRepository
 {
-    public class InventoryRepository : IInventoryRepository
+    private readonly AppDbContext databaseContext;
+
+    public InventoryRepository(AppDbContext databaseContext)
     {
-        private readonly AppDbContext _context;
+        this.databaseContext = databaseContext;
+    }
 
-        public InventoryRepository(AppDbContext context)
+    public async Task<IReadOnlyList<Inventory>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        return await this.databaseContext.Inventories
+            .AsNoTracking()
+            .Include(inventory => inventory.Ingredient)
+            .Where(inventory => EF.Property<int>(inventory, "UserId") == userId)
+            .ToListAsync(cancellationToken);
+    }
+
+    private async Task<Inventory?> GetByUserIdAndIngredientIdAsync(int userId, int ingredientId, CancellationToken cancellationToken)
+    {
+        return await this.databaseContext.Inventories
+            .FirstOrDefaultAsync(
+                existingInventory =>
+                    EF.Property<int>(existingInventory, "UserId") == userId &&
+                    EF.Property<int>(existingInventory, "IngredientId") == ingredientId,
+                cancellationToken);
+    }
+
+    public async Task AddAsync(Inventory inventory, CancellationToken cancellationToken = default)
+    {
+        var userId = inventory.User?.UserId ?? 0;
+        var ingredientId = inventory.Ingredient?.IngredientId ?? 0;
+
+        if (userId <= 0 || ingredientId <= 0)
         {
-            _context = context;
+            throw new ArgumentException("Inventory must include User and Ingredient navigation stubs with valid key values.");
         }
 
-        public async Task<Inventory?> GetByIdAsync(int id)
+        var existing = await this.GetByUserIdAndIngredientIdAsync(userId, ingredientId, cancellationToken);
+        if (existing is not null)
         {
-            return await _context.Inventories.FindAsync(id);
+            existing.QuantityGrams += inventory.QuantityGrams;
+        }
+        else
+        {
+            this.databaseContext.Inventories.Add(inventory);
         }
 
-        public async Task<IEnumerable<Inventory>> GetAllByUserIdAsync(int userId)
+        await this.databaseContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateAsync(Inventory inventory, CancellationToken cancellationToken = default)
+    {
+        var existing = await this.databaseContext.Inventories.FindAsync([inventory.InventoryId], cancellationToken);
+        if (existing is not null)
         {
-            
-            return await _context.Inventories
-                .Include(i => i.Ingredient)
-                .Where(i => i.UserId == userId)
-                .ToListAsync();
+            existing.QuantityGrams = inventory.QuantityGrams;
+            await this.databaseContext.SaveChangesAsync(cancellationToken);
         }
+    }
 
-        public async Task AddAsync(Inventory entity)
+    public async Task DeleteAsync(int inventoryId, CancellationToken cancellationToken = default)
+    {
+        var entity = await this.databaseContext.Inventories.FindAsync([inventoryId], cancellationToken);
+        if (entity is not null)
         {
-            
-            var existing = await _context.Inventories
-                .FirstOrDefaultAsync(i => i.UserId == entity.UserId && i.IngredientId == entity.IngredientId);
-
-            if (existing != null)
-            {
-                existing.QuantityGrams += entity.QuantityGrams;
-                _context.Inventories.Update(existing);
-            }
-            else
-            {
-                await _context.Inventories.AddAsync(entity);
-            }
-
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(Inventory entity)
-        {
-            _context.Inventories.Update(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            var item = await _context.Inventories.FindAsync(id);
-            if (item != null)
-            {
-                _context.Inventories.Remove(item);
-                await _context.SaveChangesAsync();
-            }
+            this.databaseContext.Inventories.Remove(entity);
+            await this.databaseContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

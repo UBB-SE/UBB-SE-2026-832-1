@@ -1,52 +1,48 @@
-﻿using ClassLibrary.Models;
+using ClassLibrary.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using WebApi.Services;
+using WebAPI.Services;
 using ClassLibrary.DTOs;
 
-namespace WebApi.Controllers
+namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class ShoppingListController : ControllerBase
     {
-        private readonly IShoppingListService _shoppingListService;
+        private readonly IShoppingListService shoppingListService;
 
         public ShoppingListController(IShoppingListService shoppingListService)
         {
-            _shoppingListService = shoppingListService;
+            this.shoppingListService = shoppingListService;
         }
 
         [HttpPost("user/{userId}")] 
         public async Task<IActionResult> AddItem(int userId, [FromBody] AddShoppingItemRequest request)
         {
-            await _shoppingListService.AddItemAsync(userId, request);
+            await shoppingListService.AddItemAsync(userId, request);
             return Ok();
         }
 
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<IEnumerable<ShoppingItemDto>>> GetByUserId(int userId)
         {
-            var items = await _shoppingListService.GetAllByUserIdAsync(userId);
+            var items = await shoppingListService.GetShoppingItemsAsync(userId);
             return Ok(items);
         }
 
         [HttpPost("generate/{userId}")]
         public async Task<IActionResult> GenerateFromMealPlan(int userId)
         {
-            
-            await _shoppingListService.GenerateShoppingListFromMealPlanAsync(userId);
+            await shoppingListService.GenerateShoppingListFromMealPlanAsync(userId);
             return Ok();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _shoppingListService.DeleteAsync(id);
+            await shoppingListService.DeleteAsync(id);
             return NoContent();
         }
     }

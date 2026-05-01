@@ -1,6 +1,6 @@
 using ClassLibrary.DTOs;
 
-namespace WebApi.Services;
+namespace WebAPI.Services;
 
 public interface IUserService
 {

@@ -1,16 +1,12 @@
-﻿using ClassLibrary.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using ClassLibrary.Models;
 
-namespace ClassLibrary.IRepositories
+namespace ClassLibrary.IRepositories;
+
+public interface IIngredientRepository
 {
-    public interface IIngredientRepository
-    {
-        Task<int> GetOrCreateIngredientIdByNameAsync(string name);
-        Task<List<KeyValuePair<int, string>>> SearchIngredientsAsync(string search);
-        Task<List<Ingredient>> GetAllAsync();
-    }
+    Task<int> GetOrCreateIngredientIdByNameAsync(string name);
+    Task<List<KeyValuePair<int, string>>> SearchIngredientsAsync(string search);
+    Task<List<Ingredient>> GetAllAsync();
 }

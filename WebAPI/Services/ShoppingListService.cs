@@ -1,86 +1,86 @@
 ﻿using ClassLibrary.DTOs;
+using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using ClassLibrary.IRepositories;
-using ClassLibrary.Repositories;
 
-namespace WebApi.Services
+namespace WebAPI.Services
 {
     public class ShoppingListService : IShoppingListService
     {
-        private readonly IShoppingListRepository _shoppingRepository;
-        private readonly IIngredientRepository _ingredientRepository;
-        private readonly IInventoryRepository _inventoryRepository;
+        private readonly IShoppingListRepository shoppingRepository;
+        private readonly IIngredientRepository ingredientRepository;
+        private readonly IInventoryRepository inventoryRepository;
+        private readonly IMealPlanRepository mealPlanRepository;
 
         public ShoppingListService(
             IShoppingListRepository shoppingRepository,
             IIngredientRepository ingredientRepository,
-            IInventoryRepository inventoryRepository)
+            IInventoryRepository inventoryRepository,
+            IMealPlanRepository mealPlanRepository)
         {
-            _shoppingRepository = shoppingRepository;
-            _ingredientRepository = ingredientRepository;
-            _inventoryRepository = inventoryRepository;
+            this.shoppingRepository = shoppingRepository;
+            this.ingredientRepository = ingredientRepository;
+            this.inventoryRepository = inventoryRepository;
+            this.mealPlanRepository = mealPlanRepository;
         }
+
         public async Task GenerateShoppingListFromMealPlanAsync(int userId)
         {
-            // Use the repository method we refactored earlier
-            var itemsNeeded = await _shoppingRepository.GetIngredientsNeededFromMealPlanAsync(userId);
-            await AddShoppingItemsAsync(itemsNeeded);
-        }
+            var mealPlans = await mealPlanRepository.GetByUserIdAsync(userId);
+            var latestMealPlan = mealPlans
+                .OrderByDescending(mp => mp.MealPlanId)
+                .FirstOrDefault();
 
-        private async Task AddShoppingItemsAsync(IEnumerable<ShoppingItem> itemsNeeded)
-        {
-            var items = itemsNeeded?.ToList() ?? new List<ShoppingItem>();
-            if (items.Count == 0)
+            if (latestMealPlan == null) return;
+
+            var ingredientIds = await mealPlanRepository.GetIngredientIdsForMealPlanAsync(latestMealPlan.MealPlanId);
+            var inventoryItems = await inventoryRepository.GetAllByUserIdAsync(userId);
+            var existingShoppingItems = await shoppingRepository.GetAllByUserIdAsync(userId);
+
+            var inventoryByIngredientId = inventoryItems
+                .GroupBy(inv => inv.Ingredient.IngredientId)
+                .ToDictionary(g => g.Key, g => g.Sum(inv => (double)inv.QuantityGrams));
+
+            var shoppingByIngredientId = existingShoppingItems
+                .GroupBy(si => si.Ingredient.IngredientId)
+                .ToDictionary(g => g.Key, g => g.Sum(si => si.QuantityGrams));
+
+            const double requiredQty = 100.0;
+
+            foreach (var ingredientId in ingredientIds.Distinct())
             {
-                return;
-            }
+                var existingInventoryQty = inventoryByIngredientId.GetValueOrDefault(ingredientId, 0);
+                var existingShoppingQty = shoppingByIngredientId.GetValueOrDefault(ingredientId, 0);
+                var totalNeeded = requiredQty - (existingInventoryQty + existingShoppingQty);
 
-            var repositoryType = _shoppingRepository.GetType();
-            var bulkAddMethod = repositoryType
-                .GetMethods()
-                .FirstOrDefault(m =>
-                    (m.Name == "AddRangeAsync" || m.Name == "BulkAddAsync") &&
-                    m.GetParameters().Length == 1 &&
-                    typeof(Task).IsAssignableFrom(m.ReturnType) &&
-                    m.GetParameters()[0].ParameterType.IsAssignableFrom(items.GetType()));
-
-            if (bulkAddMethod != null)
-            {
-                var bulkAddTask = bulkAddMethod.Invoke(_shoppingRepository, new object[] { items }) as Task;
-                if (bulkAddTask != null)
+                if (totalNeeded > 0)
                 {
-                    await bulkAddTask;
-                    return;
+                    var item = new ShoppingItem
+                    {
+                        User = new User { UserId = userId },
+                        Ingredient = new Ingredient { IngredientId = ingredientId },
+                        QuantityGrams = totalNeeded,
+                        IsChecked = false
+                    };
+                    await shoppingRepository.AddAsync(item);
                 }
-            }
-
-            foreach (var item in items)
-            {
-                await _shoppingRepository.AddAsync(item);
             }
         }
 
         public async Task DeleteAsync(int id)
         {
-            await _shoppingRepository.DeleteAsync(id);
+            await shoppingRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<ShoppingItem>> GetAllByUserIdAsync(int userId)
-        {
-            return await _shoppingRepository.GetAllByUserIdAsync(userId);
-        }
         public async Task<IEnumerable<ShoppingItemDto>> GetShoppingItemsAsync(int userId)
         {
-            var items = await _shoppingRepository.GetAllByUserIdAsync(userId);
+            var items = await shoppingRepository.GetAllByUserIdAsync(userId);
             return items.Select(i => new ShoppingItemDto
             {
-                Id = i.Id,
-                IngredientName = i.IngredientName,
+                Id = i.ShoppingItemId,
+                IngredientName = i.Ingredient?.Name ?? string.Empty,
                 QuantityGrams = i.QuantityGrams,
                 IsChecked = i.IsChecked
             });
@@ -88,22 +88,20 @@ namespace WebApi.Services
 
         public async Task<ShoppingItemDto?> AddItemAsync(int userId, AddShoppingItemRequest request)
         {
-            
-            int ingredientId = await _ingredientRepository.GetOrCreateIngredientIdByNameAsync(request.ItemName);
+            int ingredientId = await ingredientRepository.GetOrCreateIngredientIdByNameAsync(request.ItemName);
 
             var item = new ShoppingItem
             {
-                UserId = userId,
-                IngredientId = ingredientId,
-                IngredientName = request.ItemName,
+                User = new User { UserId = userId },
+                Ingredient = new Ingredient { IngredientId = ingredientId },
                 QuantityGrams = request.Quantity
             };
 
-            await _shoppingRepository.AddAsync(item);
+            await shoppingRepository.AddAsync(item);
 
             return new ShoppingItemDto
             {
-                Id = item.Id,
+                Id = item.ShoppingItemId,
                 IngredientName = request.ItemName,
                 QuantityGrams = item.QuantityGrams
             };
@@ -111,26 +109,28 @@ namespace WebApi.Services
 
         public async Task<bool> MoveToPantryAsync(int itemId)
         {
-            var item = await _shoppingRepository.GetByIdAsync(itemId);
+            var item = await shoppingRepository.GetByIdAsync(itemId);
             if (item == null) return false;
 
-            await _inventoryRepository.AddAsync(new Inventory
+            var userId = item.User?.UserId ?? 0;
+            if (userId <= 0) return false;
+
+            await inventoryRepository.AddAsync(new Inventory
             {
-                UserId = item.UserId,
-                IngredientId = item.IngredientId,
+                User = new User { UserId = userId },
+                Ingredient = new Ingredient { IngredientId = item.Ingredient.IngredientId },
                 QuantityGrams = item.QuantityGrams > 0 ? (int)item.QuantityGrams : 100
             });
 
-            await _shoppingRepository.DeleteAsync(item.Id);
+            await shoppingRepository.DeleteAsync(item.ShoppingItemId);
             return true;
         }
 
-        public async Task<bool> RemoveItemAsync(int itemId) 
+        public async Task<bool> RemoveItemAsync(int itemId)
         {
             try
             {
-                
-                await _shoppingRepository.DeleteAsync(itemId);
+                await shoppingRepository.DeleteAsync(itemId);
                 return true;
             }
             catch

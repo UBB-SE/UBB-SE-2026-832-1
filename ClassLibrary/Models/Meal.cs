@@ -6,7 +6,6 @@ public class Meal
 {
     public int MealId { get; set; }
 
-    [Required]
     public NutritionPlan NutritionPlan { get; set; } = null!;
 
     [Required]

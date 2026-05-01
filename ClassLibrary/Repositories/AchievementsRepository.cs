@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 namespace ClassLibrary.Repositories;
 
 
-public sealed class RepositoryAchievements : IRepositoryAchievements
+public sealed class AchievementsRepository : IAchievementsRepository
 {
     private readonly AppDbContext databaseContext;
 
-    public RepositoryAchievements(AppDbContext databaseContext)
+    public AchievementsRepository(AppDbContext databaseContext)
     {
         this.databaseContext = databaseContext;
     }
