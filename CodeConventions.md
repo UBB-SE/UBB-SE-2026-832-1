@@ -14,8 +14,9 @@
   - public member variables must use `camelCase` naming convention
   - private member variables must use `camelCase` naming convention
   - local variables, parameters must use `camelCase` naming convention
-  - avoid abbreviations
+  - avoid abbreviations, even inside lambdas.
   - accepted short forms are only standard technical identifiers such as `id`, `url`, `api`, `dto`, `db` ...
+  - names should be very explicit, avoid vague names like `command`, `item` ...
 5. Constants
   - whenever possible to use `const` keyword before a variable, it must be used
   - constants must use `UPPER_CASE_WITH_UNDERSCORES` naming convention
@@ -42,7 +43,7 @@
     - `private`
     - `protected`
     - `public`
-
+- Cancellation token shouldn't exist as a parameter anywhere. We use basic authentification
 ## Whitespace rules
 
 - a maximum of one statement per line
