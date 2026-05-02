@@ -1,52 +1,140 @@
+using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
-using ClassLibrary.Repositories.Interfaces;
-using WebAPI.Services.Interfaces;
+using ClassLibrary.Services;
+using WebAPI.IServices;
 
-namespace WebAPI.Services
+namespace WebAPI.Services;
+
+public class UserService : IUserService
 {
-    public class UserService : IUserService
+    private readonly IUserRepository userRepository;
+
+    public UserService(IUserRepository userRepository)
     {
-        private readonly IUserRepository _userRepository;
+        this.userRepository = userRepository;
+    }
 
-        public UserService(IUserRepository userRepository)
+    public async Task<IReadOnlyList<UserDto>> GetUsersAsync()
+    {
+        var users = await this.userRepository.GetAllAsync();
+
+        return users
+            .Select(user => new UserDto
+            {
+                Id = user.UserId,
+                Username = user.Username,
+                Role = user.Role,
+            })
+            .ToList();
+    }
+
+    public async Task<UserDto?> LoginAsync(string username, string password)
+    {
+        var user = await this.userRepository.GetByUsernameAndPasswordAsync(username, password);
+        if (user == null)
         {
-            _userRepository = userRepository;
+            return null;
         }
 
-        public async Task<List<User>> GetUsersAsync(CancellationToken cancellationToken)
+        return new UserDto
         {
-            return (await _userRepository.GetAllAsync()).ToList();
+            Id = user.UserId,
+            Username = user.Username,
+            Role = user.Role,
+        };
+    }
+
+    public async Task<UserDto?> RegisterAsync(string username, string password, string role)
+    {
+        var existing = await this.userRepository.GetByUsernameAndPasswordAsync(username, password);
+        if (existing != null)
+        {
+            return null;
         }
 
-        public async Task<bool> CheckIfUsernameExistsAsync(string username)
+        var user = new User
         {
-            var users = await _userRepository.GetAllAsync();
-            return users.Any(u => u.Username.ToLower() == username.ToLower());
+            Username = username,
+            Password = password,
+            Role = role,
+        };
+
+        await this.userRepository.AddAsync(user);
+
+        return new UserDto
+        {
+            Id = user.UserId,
+            Username = user.Username,
+            Role = user.Role,
+        };
+    }
+
+    public async Task<bool> CheckIfUsernameExistsAsync(string username)
+    {
+        var users = await this.userRepository.GetAllAsync();
+        return users.Any(u => string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public async Task<UserDataDto?> GetUserDataAsync(int userId)
+    {
+        var userData = await this.userRepository.GetUserDataByUserIdAsync(userId);
+        if (userData == null)
+        {
+            return null;
         }
 
-        public async Task<User?> LoginAsync(string username, string password)
-        {
-            return await _userRepository.GetByUsernameAndPasswordAsync(username, password);
-        }
+        return MapToUserDataDto(userData, userId);
+    }
 
-        public async Task<User?> RegisterUserAsync(User user)
-        {
-            if (await CheckIfUsernameExistsAsync(user.Username))
-                return null;
+    public async Task AddUserDataAsync(UserDataDto userDataDto)
+    {
+        var userData = MapToUserData(userDataDto);
+        await this.userRepository.AddUserDataAsync(userData);
+    }
 
-            await _userRepository.AddAsync(user);
-            return user;
-        }
+    public async Task UpdateUserDataAsync(UserDataDto userDataDto)
+    {
+        var userData = MapToUserData(userDataDto);
+        var computedData = NutritionCalculator.ComputeAllNutritionValues(userData);
+        await this.userRepository.UpdateUserDataAsync(computedData);
+    }
 
-        public async Task<UserData?> GetUserDataAsync(int userId)
+    private static UserDataDto MapToUserDataDto(UserData userData, int userId)
+    {
+        return new UserDataDto
         {
-            return await _userRepository.GetUserDataByUserIdAsync(userId);
-        }
+            UserDataId = userData.UserDataId,
+            UserId = userId,
+            Weight = userData.Weight,
+            Height = userData.Height,
+            Age = userData.Age,
+            Gender = userData.Gender,
+            Goal = userData.Goal,
+            BodyMassIndex = userData.BodyMassIndex,
+            CalorieNeeds = userData.CalorieNeeds,
+            ProteinNeeds = userData.ProteinNeeds,
+            CarbohydrateNeeds = userData.CarbohydrateNeeds,
+            FatNeeds = userData.FatNeeds,
+        };
+    }
 
-        public async Task UpdateUserDataAsync(UserData data)
+    private static UserData MapToUserData(UserDataDto dto)
+    {
+        return new UserData
         {
-            await _userRepository.UpdateUserDataAsync(data);
-        }
+            UserDataId = dto.UserDataId,
+            User = new User { UserId = dto.UserId },
+            Weight = dto.Weight,
+            Height = dto.Height,
+            Age = dto.Age,
+            Gender = dto.Gender,
+            Goal = dto.Goal,
+            BodyMassIndex = dto.BodyMassIndex,
+            CalorieNeeds = dto.CalorieNeeds,
+            ProteinNeeds = dto.ProteinNeeds,
+            CarbohydrateNeeds = dto.CarbohydrateNeeds,
+            FatNeeds = dto.FatNeeds,
+        };
     }
 }

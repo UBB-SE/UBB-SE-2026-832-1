@@ -15,30 +15,30 @@ public sealed class AchievementsRepository : IAchievementsRepository
         this.databaseContext = databaseContext;
     }
 
-    public async Task<IReadOnlyList<Achievement>> GetAllAchievementsAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Achievement>> GetAllAchievementsAsync()
     {
         return await this.databaseContext.Achievements
             .AsNoTracking()
             .OrderBy(achievement => achievement.AchievementId)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<int> GetWorkoutCountAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<int> GetWorkoutCountAsync(int clientId)
     {
         return await this.databaseContext.WorkoutLogs
-            .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId, cancellationToken);
+            .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId);
     }
 
-    public async Task<int> GetDistinctWorkoutDayCountAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<int> GetDistinctWorkoutDayCountAsync(int clientId)
     {
         return await this.databaseContext.WorkoutLogs
             .Where(workoutLog => workoutLog.Client.ClientId == clientId)
             .Select(workoutLog => workoutLog.Date.Date)
             .Distinct()
-            .CountAsync(cancellationToken);
+            .CountAsync();
     }
 
-    public async Task<int> GetWorkoutsInLastSevenDaysAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<int> GetWorkoutsInLastSevenDaysAsync(int clientId)
     {
         var today = DateTime.Today;
         var cutoff = today.AddDays(-6);
@@ -46,18 +46,17 @@ public sealed class AchievementsRepository : IAchievementsRepository
 
         return await this.databaseContext.WorkoutLogs
             .CountAsync(
-                workoutLog => workoutLog.Client.ClientId == clientId && workoutLog.Date >= cutoff && workoutLog.Date < tomorrow,
-                cancellationToken);
+                workoutLog => workoutLog.Client.ClientId == clientId && workoutLog.Date >= cutoff && workoutLog.Date < tomorrow);
     }
 
-    public async Task<int> GetConsecutiveWorkoutDayStreakAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<int> GetConsecutiveWorkoutDayStreakAsync(int clientId)
     {
         var dates = await this.databaseContext.WorkoutLogs
             .Where(workoutLog => workoutLog.Client.ClientId == clientId)
             .Select(workoutLog => workoutLog.Date.Date)
             .Distinct()
             .OrderByDescending(date => date)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
 
         if (dates.Count == 0)
         {
@@ -86,7 +85,7 @@ public sealed class AchievementsRepository : IAchievementsRepository
         return maxStreak;
     }
 
-    public async Task<IReadOnlyList<AchievementShowcaseItem>> GetAchievementShowcaseForClientAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<AchievementShowcaseItem>> GetAchievementShowcaseForClientAsync(int clientId)
     {
         var items = await this.databaseContext.Achievements
             .AsNoTracking()
@@ -98,7 +97,7 @@ public sealed class AchievementsRepository : IAchievementsRepository
                 Criteria = achievement.Criteria,
                 IsUnlocked = achievement.Clients.Any(client => client.ClientId == clientId),
             })
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
 
         return items
             .GroupBy(item => item.Title, StringComparer.OrdinalIgnoreCase)
@@ -108,7 +107,7 @@ public sealed class AchievementsRepository : IAchievementsRepository
             .ToList();
     }
 
-    public async Task<AchievementShowcaseItem?> GetAchievementForClientAsync(int achievementId, int clientId, CancellationToken cancellationToken = default)
+    public async Task<AchievementShowcaseItem?> GetAchievementForClientAsync(int achievementId, int clientId)
     {
         return await this.databaseContext.Achievements
             .AsNoTracking()
@@ -121,14 +120,14 @@ public sealed class AchievementsRepository : IAchievementsRepository
                 Criteria = achievement.Criteria,
                 IsUnlocked = achievement.Clients.Any(client => client.ClientId == clientId),
             })
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync();
     }
 
-    public async Task<bool> AwardAchievementAsync(int clientId, int achievementId, CancellationToken cancellationToken = default)
+    public async Task<bool> AwardAchievementAsync(int clientId, int achievementId)
     {
         var client = await this.databaseContext.Clients
             .Include(client => client.UnlockedAchievements)
-            .FirstOrDefaultAsync(client => client.ClientId == clientId, cancellationToken);
+            .FirstOrDefaultAsync(client => client.ClientId == clientId);
 
         if (client is null)
         {
@@ -142,7 +141,7 @@ public sealed class AchievementsRepository : IAchievementsRepository
         }
 
         var achievement = await this.databaseContext.Achievements
-            .FirstOrDefaultAsync(achievement => achievement.AchievementId == achievementId, cancellationToken);
+            .FirstOrDefaultAsync(achievement => achievement.AchievementId == achievementId);
 
         if (achievement is null)
         {
@@ -150,7 +149,7 @@ public sealed class AchievementsRepository : IAchievementsRepository
         }
 
         client.UnlockedAchievements.Add(achievement);
-        await this.databaseContext.SaveChangesAsync(cancellationToken);
+        await this.databaseContext.SaveChangesAsync();
         return true;
     }
 }

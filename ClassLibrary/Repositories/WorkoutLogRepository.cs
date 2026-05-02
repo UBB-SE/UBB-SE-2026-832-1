@@ -14,7 +14,7 @@ public sealed class WorkoutLogRepository : IWorkoutLogRepository
         this.databaseContext = databaseContext;
     }
 
-    public async Task<IReadOnlyList<WorkoutLog>> GetWorkoutHistoryAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<WorkoutLog>> GetWorkoutHistoryAsync(int clientId)
     {
         return await this.databaseContext.WorkoutLogs
             .AsNoTracking()
@@ -23,21 +23,21 @@ public sealed class WorkoutLogRepository : IWorkoutLogRepository
             .Include(workoutLog => workoutLog.Exercises)
                 .ThenInclude(loggedExercise => loggedExercise.Sets)
             .OrderByDescending(workoutLog => workoutLog.Date)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task SaveWorkoutLogAsync(WorkoutLog log, CancellationToken cancellationToken = default)
+    public async Task SaveWorkoutLogAsync(WorkoutLog log)
     {
         if (log == null)
         {
             throw new ArgumentNullException(nameof(log));
         }
 
-        await this.databaseContext.WorkoutLogs.AddAsync(log, cancellationToken);
-        await this.databaseContext.SaveChangesAsync(cancellationToken);
+        await this.databaseContext.WorkoutLogs.AddAsync(log);
+        await this.databaseContext.SaveChangesAsync();
     }
 
-    public async Task UpdateWorkoutLogAsync(WorkoutLog log, CancellationToken cancellationToken = default)
+    public async Task UpdateWorkoutLogAsync(WorkoutLog log)
     {
         if (log == null)
         {
@@ -45,7 +45,7 @@ public sealed class WorkoutLogRepository : IWorkoutLogRepository
         }
 
         var existing = await this.databaseContext.WorkoutLogs
-            .FirstOrDefaultAsync(workoutLog => workoutLog.WorkoutLogId == log.WorkoutLogId, cancellationToken);
+            .FirstOrDefaultAsync(workoutLog => workoutLog.WorkoutLogId == log.WorkoutLogId);
 
         if (existing == null)
         {
@@ -53,14 +53,14 @@ public sealed class WorkoutLogRepository : IWorkoutLogRepository
         }
 
         this.databaseContext.Entry(existing).CurrentValues.SetValues(log);
-        await this.databaseContext.SaveChangesAsync(cancellationToken);
+        await this.databaseContext.SaveChangesAsync();
     }
 
-    public async Task<double> GetClientWeightAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<double> GetClientWeightAsync(int clientId)
     {
         var client = await this.databaseContext.Clients
             .AsNoTracking()
-            .FirstOrDefaultAsync(client => client.ClientId == clientId, cancellationToken);
+            .FirstOrDefaultAsync(client => client.ClientId == clientId);
 
         return client?.Weight ?? 0;
     }
