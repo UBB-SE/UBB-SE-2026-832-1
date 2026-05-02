@@ -10,6 +10,7 @@
     <UseWinUI>true</UseWinUI>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <CodeAnalysisRuleSet>SE.ruleset</CodeAnalysisRuleSet>
+    <WindowsPackageType>None</WindowsPackageType>
   </PropertyGroup>
 
   <ItemGroup>
