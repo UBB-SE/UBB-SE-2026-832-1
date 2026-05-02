@@ -50,10 +50,10 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-}
 
-public sealed class TabItemModel
-{
-    public string Title { get; set; } = string.Empty;
-    public object Content { get; set; } = new object();
+    public sealed class TabItemModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public object Content { get; set; } = new object();
+    }
 }
