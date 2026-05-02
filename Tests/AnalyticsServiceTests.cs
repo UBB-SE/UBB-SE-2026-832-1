@@ -60,7 +60,7 @@ public sealed class AnalyticsServiceTests
     public async Task GetConsistencyLastFourWeeks_ReturnsExactlyFourBuckets()
     {
         this.analyticsRepo
-            .Setup(r => r.GetWorkoutsInRangeAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(repository => repository.GetWorkoutsInRangeAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsync(new List<WorkoutLog>());
 
         var service = this.CreateService();
@@ -73,7 +73,7 @@ public sealed class AnalyticsServiceTests
     public async Task GetConsistencyLastFourWeeks_AllBucketsStartOnMonday()
     {
         this.analyticsRepo
-            .Setup(r => r.GetWorkoutsInRangeAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(repository => repository.GetWorkoutsInRangeAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsync(new List<WorkoutLog>());
 
         var service = this.CreateService();
@@ -89,7 +89,7 @@ public sealed class AnalyticsServiceTests
     public async Task GetConsistencyLastFourWeeks_BucketsAreConsecutiveWeeks()
     {
         this.analyticsRepo
-            .Setup(r => r.GetWorkoutsInRangeAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(repository => repository.GetWorkoutsInRangeAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsync(new List<WorkoutLog>());
 
         var service = this.CreateService();
