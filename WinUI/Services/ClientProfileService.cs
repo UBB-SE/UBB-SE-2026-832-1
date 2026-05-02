@@ -16,9 +16,12 @@ public sealed class ClientProfileService : IClientProfileService
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task SyncNutritionAsync(int clientId)
+    public async Task SyncNutritionAsync(NutritionSyncRequestDataTransferObject request)
     {
-        var response = await httpClient.PostAsync($"{ROUTE}/{clientId}/sync-nutrition", content: null);
+        var response = await System.Net.Http.Json.HttpClientJsonExtensions.PostAsJsonAsync(
+            httpClient,
+            "api/client/sync-nutrition",
+            request);
         response.EnsureSuccessStatusCode();
     }
 }
