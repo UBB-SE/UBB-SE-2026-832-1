@@ -17,6 +17,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMealPlanService, MealPlanService>();
         services.AddScoped<IInventoryService, InventoryService>();
         services.AddScoped<IShoppingListService, ShoppingListService>();
+        // Register database schema manager so the WebAPI can ensure schema
+        // creation and minimal compatibility migrations at startup.
+        services.AddScoped<ClassLibrary.IRepositories.IDatabaseSchemaManager, ClassLibrary.Repositories.DatabaseSchemaManager>();
         return services;
     }
 }
