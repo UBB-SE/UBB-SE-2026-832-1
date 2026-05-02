@@ -18,9 +18,7 @@
 
             <TabView.TabItemTemplate>
                 <DataTemplate>
-                    <TabViewItem Header="{Binding Title}" IsClosable="False">
-                        <Frame Content="{Binding Content}" />
-                    </TabViewItem>
+                    <TabViewItem Header="{Binding Title}" IsClosable="False" Content="{Binding Content}" />
                 </DataTemplate>
             </TabView.TabItemTemplate>
 
