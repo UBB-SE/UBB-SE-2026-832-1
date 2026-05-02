@@ -26,7 +26,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     public MainWindowViewModel()
     {
         Tabs = new ObservableCollection<TabItemModel>();
-        PropertyChanged = null;
         InitializeTabs();
     }
 
