@@ -7,21 +7,11 @@
     mc:Ignorable="d">
 
     <Grid>
-        <TabView 
+        <TabView
             x:Name="mainTabView"
             TabWidthMode="Equal"
             CanDragTabs="True"
             CanReorderTabs="True"
-            IsAddTabButtonVisible="False"
-            TabItemsSource="{x:Bind ViewModel.Tabs, Mode=OneWay}"
-            SelectedIndex="{x:Bind ViewModel.SelectedTabIndex, Mode=TwoWay}">
-
-            <TabView.TabItemTemplate>
-                <DataTemplate>
-                    <TabViewItem Header="{Binding Title}" IsClosable="False" Content="{Binding Content}" />
-                </DataTemplate>
-            </TabView.TabItemTemplate>
-
-        </TabView>
+            IsAddTabButtonVisible="False" />
     </Grid>
 </Page>

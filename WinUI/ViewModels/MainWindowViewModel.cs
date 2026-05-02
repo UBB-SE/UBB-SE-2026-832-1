@@ -26,20 +26,13 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     public MainWindowViewModel()
     {
         Tabs = new ObservableCollection<TabItemModel>();
-        InitializeTabs();
     }
 
-    private void InitializeTabs()
+    public void AddTab(string title, Type pageType)
     {
-        AddTab("Home", new Views.MainView());
-    }
-
-    public void AddTab(string title, object content)
-    {
-        Tabs.Add(new TabItemModel
+        Tabs.Add(new TabItemModel(pageType)
         {
-            Title = title,
-            Content = content
+            Title = title
         });
     }
 
@@ -48,11 +41,5 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    public sealed class TabItemModel
-    {
-        public string Title { get; set; } = string.Empty;
-        public object Content { get; set; } = new object();
     }
 }
