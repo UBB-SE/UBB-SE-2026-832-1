@@ -254,7 +254,7 @@ public sealed class ClientService : IClientService
             TotalCaloriesBurned = log.TotalCaloriesBurned,
             AverageMetabolicEquivalent = log.AverageMetabolicEquivalent,
             IntensityTag = log.IntensityTag,
-            Rating = log.Rating,
+            Rating = log.Rating <= 0 ? null : log.Rating,
             TrainerNotes = log.TrainerNotes,
         };
     }
@@ -373,7 +373,7 @@ public sealed class ClientService : IClientService
             TotalCaloriesBurned = workoutLogDataTransferObject.TotalCaloriesBurned,
             AverageMetabolicEquivalent = workoutLogDataTransferObject.AverageMetabolicEquivalent,
             IntensityTag = workoutLogDataTransferObject.IntensityTag,
-            Rating = workoutLogDataTransferObject.Rating,
+            Rating = workoutLogDataTransferObject.Rating ?? 0,
             TrainerNotes = workoutLogDataTransferObject.TrainerNotes,
         };
 
