@@ -118,15 +118,19 @@ public sealed class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey("NutritionPlanId");
 
+        // ✅ TRECHO CORRIGIDO (EXATAMENTE O QUE O REVIEWER PEDIU)
         modelBuilder.Entity<Meal>()
             .Property(meal => meal.Ingredients)
             .HasConversion(
-                value => JsonSerializer.Serialize(value, (JsonSerializerOptions?)null),
-                value => JsonSerializer.Deserialize<List<string>>(value, (JsonSerializerOptions?)null) ?? new List<string>())
+                ingredientList => JsonSerializer.Serialize(ingredientList, (JsonSerializerOptions?)null),
+                serializedIngredientList => JsonSerializer.Deserialize<List<string>>(serializedIngredientList, (JsonSerializerOptions?)null) ?? new List<string>())
             .Metadata.SetValueComparer(new ValueComparer<List<string>>(
-                (left, right) => (left ?? new List<string>()).SequenceEqual(right ?? new List<string>()),
-                value => value.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode())),
-                value => value.ToList()));
+                (firstIngredientList, secondIngredientList) =>
+                    (firstIngredientList ?? new List<string>()).SequenceEqual(secondIngredientList ?? new List<string>()),
+                ingredientList =>
+                    ingredientList.Aggregate(0, (combinedHash, ingredient) =>
+                        HashCode.Combine(combinedHash, ingredient.GetHashCode())),
+                ingredientList => ingredientList.ToList()));
 
         modelBuilder.Entity<DailyLog>(entity =>
         {
