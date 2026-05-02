@@ -2,7 +2,7 @@ namespace WinUI.Services;
 
 public interface IClientProfileService
 {
-    Task GetClientProfile(int clientId);
+    Task GetClientProfileAsync(int clientId);
 
-    Task SyncNutrition(int clientId);
+    Task SyncNutritionAsync(int clientId);
 }
