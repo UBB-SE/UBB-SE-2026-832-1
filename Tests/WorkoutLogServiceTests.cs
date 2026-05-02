@@ -20,7 +20,7 @@ public sealed class WorkoutLogServiceTests
         };
 
         this.workoutLogRepository
-            .Setup(r => r.GetWorkoutHistoryAsync(1))
+            .Setup(repository => repository.GetWorkoutHistoryAsync(1))
             .ReturnsAsync(logs);
 
         var service = this.CreateService();
@@ -39,7 +39,7 @@ public sealed class WorkoutLogServiceTests
         };
 
         this.workoutLogRepository
-            .Setup(r => r.GetWorkoutHistoryAsync(1))
+            .Setup(repository => repository.GetWorkoutHistoryAsync(1))
             .ReturnsAsync(logs);
 
         var service = this.CreateService();
@@ -57,7 +57,7 @@ public sealed class WorkoutLogServiceTests
         };
 
         this.workoutLogRepository
-            .Setup(r => r.GetWorkoutHistoryAsync(1))
+            .Setup(repository => repository.GetWorkoutHistoryAsync(1))
             .ReturnsAsync(logs);
 
         var service = this.CreateService();
@@ -70,7 +70,7 @@ public sealed class WorkoutLogServiceTests
     public async Task GetWorkoutHistory_NoLogs_ReturnsEmptyList()
     {
         this.workoutLogRepository
-            .Setup(r => r.GetWorkoutHistoryAsync(999))
+            .Setup(repository => repository.GetWorkoutHistoryAsync(999))
             .ReturnsAsync(new List<WorkoutLog>());
 
         var service = this.CreateService();

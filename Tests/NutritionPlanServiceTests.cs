@@ -15,7 +15,7 @@ public sealed class NutritionPlanServiceTests
     public async Task CreatePlan_SetsStartDateToToday()
     {
         this.nutritionRepository
-            .Setup(r => r.InsertNutritionPlanAsync(It.IsAny<NutritionPlan>()))
+            .Setup(repository => repository.InsertNutritionPlanAsync(It.IsAny<NutritionPlan>()))
             .ReturnsAsync(1);
 
         var service = this.CreateService();
@@ -28,7 +28,7 @@ public sealed class NutritionPlanServiceTests
     public async Task CreatePlan_SetsEndDateToThirtyDaysFromToday()
     {
         this.nutritionRepository
-            .Setup(r => r.InsertNutritionPlanAsync(It.IsAny<NutritionPlan>()))
+            .Setup(repository => repository.InsertNutritionPlanAsync(It.IsAny<NutritionPlan>()))
             .ReturnsAsync(1);
 
         var service = this.CreateService();
@@ -42,7 +42,7 @@ public sealed class NutritionPlanServiceTests
     {
         NutritionPlan? capturedPlan = null;
         this.nutritionRepository
-            .Setup(r => r.InsertNutritionPlanAsync(It.IsAny<NutritionPlan>()))
+            .Setup(repository => repository.InsertNutritionPlanAsync(It.IsAny<NutritionPlan>()))
             .Callback<NutritionPlan>(plan => capturedPlan = plan)
             .ReturnsAsync(7);
 
@@ -52,7 +52,7 @@ public sealed class NutritionPlanServiceTests
         Assert.NotNull(capturedPlan);
         Assert.Equal(DateTime.Today, capturedPlan.StartDate);
         Assert.Equal(DateTime.Today.AddDays(30), capturedPlan.EndDate);
-        this.nutritionRepository.Verify(r => r.AssignNutritionPlanToClientAsync(42, 7), Times.Once);
+        this.nutritionRepository.Verify(repository => repository.AssignNutritionPlanToClientAsync(42, 7), Times.Once);
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public sealed class NutritionPlanServiceTests
         };
 
         this.nutritionRepository
-            .Setup(r => r.GetNutritionPlansForClientAsync(5))
+            .Setup(repository => repository.GetNutritionPlansForClientAsync(5))
             .ReturnsAsync(plans);
 
         var service = this.CreateService();
@@ -90,7 +90,7 @@ public sealed class NutritionPlanServiceTests
     public async Task GetPlansForClient_WithNoPlans_ReturnsEmptyList()
     {
         this.nutritionRepository
-            .Setup(r => r.GetNutritionPlansForClientAsync(99))
+            .Setup(repository => repository.GetNutritionPlansForClientAsync(99))
             .ReturnsAsync(new List<NutritionPlan>());
 
         var service = this.CreateService();
