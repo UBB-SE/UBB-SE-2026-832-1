@@ -1,12 +1,15 @@
+using ClassLibrary.DTOs;
+using ClassLibrary.DTOs.Analytics;
+
 namespace WinUI.Services;
 
 public interface IClientDashboardService
 {
-    Task GetDashboardSummaryAsync(int clientId);
+    Task<DashboardSummary> GetDashboardSummaryAsync(int clientId);
 
-    Task GetConsistencyLastFourWeeksAsync(int clientId);
+    Task<IReadOnlyList<ConsistencyWeekBucket>> GetConsistencyLastFourWeeksAsync(int clientId);
 
-    Task GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize);
+    Task<WorkoutHistoryPageResult> GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize);
 
-    Task GetRecentAchievementsAsync(int clientId);
+    Task<IReadOnlyList<AchievementDataTransferObject>> GetRecentAchievementsAsync(int clientId);
 }

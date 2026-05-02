@@ -1,8 +1,13 @@
+using System.Net.Http.Json;
+using ClassLibrary.DTOs;
+using ClassLibrary.DTOs.Analytics;
+
 namespace WinUI.Services;
 
 public sealed class ClientDashboardService : IClientDashboardService
 {
-    private const string ROUTE = "api/client-dashboard";
+    private const string API_BASE_ADDRESS = "https://localhost:7197";
+    private const string ROUTE = "api/client";
     private readonly HttpClient httpClient;
 
     public ClientDashboardService(HttpClient httpClient)
@@ -10,27 +15,27 @@ public sealed class ClientDashboardService : IClientDashboardService
         this.httpClient = httpClient;
     }
 
-    public async Task GetDashboardSummaryAsync(int clientId)
+    public Task<DashboardSummary> GetDashboardSummaryAsync(int clientId)
     {
-        var response = await httpClient.GetAsync($"{ROUTE}/summary/{clientId}");
-        response.EnsureSuccessStatusCode();
+        return Task.FromResult(new DashboardSummary());
     }
 
-    public async Task GetConsistencyLastFourWeeksAsync(int clientId)
+    public Task<IReadOnlyList<ConsistencyWeekBucket>> GetConsistencyLastFourWeeksAsync(int clientId)
     {
-        var response = await httpClient.GetAsync($"{ROUTE}/consistency/{clientId}");
-        response.EnsureSuccessStatusCode();
+        return Task.FromResult<IReadOnlyList<ConsistencyWeekBucket>>([]);
     }
 
-    public async Task GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize)
+    public async Task<WorkoutHistoryPageResult> GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize)
     {
-        var response = await httpClient.GetAsync($"{ROUTE}/history/{clientId}?page={page}&pageSize={pageSize}");
-        response.EnsureSuccessStatusCode();
+        var items = await httpClient.GetFromJsonAsync<List<WorkoutHistoryRow>>(
+            $"{API_BASE_ADDRESS}/{ROUTE}/{clientId}/workout-history");
+        return new WorkoutHistoryPageResult { TotalCount = items?.Count ?? 0, Items = items ?? [] };
     }
 
-    public async Task GetRecentAchievementsAsync(int clientId)
+    public async Task<IReadOnlyList<AchievementDataTransferObject>> GetRecentAchievementsAsync(int clientId)
     {
-        var response = await httpClient.GetAsync($"{ROUTE}/achievements/{clientId}");
-        response.EnsureSuccessStatusCode();
+        var achievements = await httpClient.GetFromJsonAsync<List<AchievementDataTransferObject>>(
+            $"{API_BASE_ADDRESS}/{ROUTE}/{clientId}/achievements");
+        return achievements ?? [];
     }
 }
