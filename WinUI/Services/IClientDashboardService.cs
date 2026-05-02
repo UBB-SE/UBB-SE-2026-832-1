@@ -2,11 +2,11 @@ namespace WinUI.Services;
 
 public interface IClientDashboardService
 {
-    Task GetDashboardSummary(int clientId);
+    Task GetDashboardSummaryAsync(int clientId);
 
-    Task GetConsistencyLastFourWeeks(int clientId);
+    Task GetConsistencyLastFourWeeksAsync(int clientId);
 
-    Task GetWorkoutHistoryPage(int clientId, int page, int pageSize);
+    Task GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize);
 
-    Task GetRecentAchievements(int clientId);
+    Task GetRecentAchievementsAsync(int clientId);
 }
