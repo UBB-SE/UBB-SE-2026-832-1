@@ -30,6 +30,16 @@ public static class NutritionCalculator
     private const int CALORIES_PER_GRAM_CARBOHYDRATES = 4;
     private const int CALORIES_PER_GRAM_FAT = 9;
 
+    public static UserData ComputeAllNutritionValues(UserData userData)
+    {
+        userData.BodyMassIndex = CalculateBodyMassIndex(userData);
+        userData.CalorieNeeds = CalculateCalorieNeeds(userData);
+        userData.ProteinNeeds = CalculateProteinNeeds(userData);
+        userData.FatNeeds = CalculateFatNeeds(userData);
+        userData.CarbohydrateNeeds = CalculateCarbohydrateNeeds(userData);
+        return userData;
+    }
+
     public static int CalculateAge(DateTimeOffset? birthDate)
     {
         if (birthDate == null)
