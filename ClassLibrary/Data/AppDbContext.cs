@@ -25,18 +25,15 @@ public sealed class AppDbContext : DbContext
     public DbSet<Client> Clients { get; set; } = default!;
     public DbSet<Achievement> Achievements { get; set; } = default!;
     public DbSet<WorkoutLog> WorkoutLogs { get; set; } = default!;
-
     public DbSet<WorkoutTemplate> WorkoutTemplates { get; set; } = default!;
-
     public DbSet<Notification> Notifications { get; set; } = default!;
+    public DbSet<Reminder> Reminders { get; set; } = default!;
     public DbSet<NutritionPlan> NutritionPlans { get; set; } = default!;
     public DbSet<Meal> Meals { get; set; } = default!;
     public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
     public DbSet<DailyLog> DailyLogs { get; set; } = default!;
     public DbSet<Conversation> Conversations { get; set; } = default!;
     public DbSet<Message> Messages { get; set; } = default!;
-    public DbSet<Reminder> Reminders { get; set; } = default!;
-
     public DbSet<ShoppingItem> ShoppingItems { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -121,27 +118,29 @@ public sealed class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey("NutritionPlanId");
 
+        // ✅ TRECHO CORRIGIDO (EXATAMENTE O QUE O REVIEWER PEDIU)
         modelBuilder.Entity<Meal>()
             .Property(meal => meal.Ingredients)
             .HasConversion(
                 ingredientList => JsonSerializer.Serialize(ingredientList, (JsonSerializerOptions?)null),
                 serializedIngredientList => JsonSerializer.Deserialize<List<string>>(serializedIngredientList, (JsonSerializerOptions?)null) ?? new List<string>())
             .Metadata.SetValueComparer(new ValueComparer<List<string>>(
-                (firstIngredientList, secondIngredientList) => (firstIngredientList ?? new List<string>()).SequenceEqual(secondIngredientList ?? new List<string>()),
-                ingredientList => ingredientList.Aggregate(0, (combinedHash, ingredient) => HashCode.Combine(combinedHash, ingredient.GetHashCode())),
+                (firstIngredientList, secondIngredientList) =>
+                    (firstIngredientList ?? new List<string>()).SequenceEqual(secondIngredientList ?? new List<string>()),
+                ingredientList =>
+                    ingredientList.Aggregate(0, (combinedHash, ingredient) =>
+                        HashCode.Combine(combinedHash, ingredient.GetHashCode())),
                 ingredientList => ingredientList.ToList()));
 
         modelBuilder.Entity<DailyLog>(entity =>
         {
             entity.HasOne(dailyLog => dailyLog.User)
                 .WithMany()
-                .HasForeignKey("UserId")
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(dailyLog => dailyLog.Meal)
                 .WithMany()
-                .HasForeignKey("MealId")
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -150,7 +149,9 @@ public sealed class AppDbContext : DbContext
 
         modelBuilder.Entity<Ingredient>(entity =>
         {
-            entity.Property(ingredient => ingredient.Name).IsRequired().HasMaxLength(200);
+            entity.Property(ingredient => ingredient.Name)
+                .IsRequired()
+                .HasMaxLength(200);
         });
 
         modelBuilder.Entity<Inventory>(entity =>
@@ -237,21 +238,18 @@ public sealed class AppDbContext : DbContext
                 .IsRequired();
         });
 
-        modelBuilder.Entity<Reminder>()
-            .Property(reminder => reminder.Name)
-            .IsRequired()
-            .HasMaxLength(255);
+        modelBuilder.Entity<Reminder>(entity =>
+        {
+            entity.Property(reminder => reminder.Name)
+                .IsRequired()
+                .HasMaxLength(255);
 
-        modelBuilder.Entity<Reminder>()
-            .Property(reminder => reminder.Frequency)
-            .HasMaxLength(50);
+            entity.Property(reminder => reminder.Frequency)
+                .HasMaxLength(50);
 
-        modelBuilder.Entity<Reminder>()
-            .Ignore(reminder => reminder.FullDateTimeDisplay);
-
-        modelBuilder.Entity<Reminder>()
-            .HasOne(reminder => reminder.User)
-            .WithMany(user => user.Reminders)
-            .IsRequired();
+            entity.HasOne(reminder => reminder.User)
+                .WithMany(user => user.Reminders)
+                .IsRequired();
+        });
     }
 }
