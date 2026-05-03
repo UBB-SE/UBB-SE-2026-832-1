@@ -3,6 +3,7 @@ using ClassLibrary.IRepositories;
 using Microsoft.Extensions.DependencyInjection;
 using WebAPI.IServices;
 using WebAPI.Services;
+using WebApi.Services;
 using WebApi.IServices;
 
 namespace WebAPI.Extensions;
@@ -25,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INutritionPlanService, NutritionPlanService>();
         services.AddScoped<IWorkoutLogService, WorkoutLogService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
+        services.AddScoped<IChatService, ChatService>();
 
         return services;
     }
