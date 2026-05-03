@@ -1,5 +1,8 @@
 namespace WinUI.Services;
 
+using ClassLibrary.DTOs;
+using System.Net.Http.Json;
+
 public sealed class ClientProfileService : IClientProfileService
 {
     private const string ROUTE = "api/client-profile";
@@ -10,18 +13,18 @@ public sealed class ClientProfileService : IClientProfileService
         this.httpClient = httpClient;
     }
 
-    public async Task GetClientProfileAsync(int clientId)
+    public async Task<ClientProfileSnapshotDataTransferObject> GetClientProfileAsync(int clientId)
     {
-        var response = await httpClient.GetAsync($"{ROUTE}/{clientId}");
-        response.EnsureSuccessStatusCode();
+        return await httpClient.GetFromJsonAsync<ClientProfileSnapshotDataTransferObject>($"{ROUTE}/{clientId}")
+            ?? throw new InvalidOperationException("Empty response from client profile endpoint.");
     }
 
-    public async Task SyncNutritionAsync(NutritionSyncRequestDataTransferObject request)
+    public async Task<ClientProfileSnapshotDataTransferObject> SyncNutritionAsync(int clientId, NutritionSyncRequestDataTransferObject request)
     {
-        var response = await System.Net.Http.Json.HttpClientJsonExtensions.PostAsJsonAsync(
-            httpClient,
-            "api/client/sync-nutrition",
-            request);
+        var response = await httpClient.PostAsJsonAsync($"{ROUTE}/{clientId}/sync-nutrition", request);
         response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<ClientProfileSnapshotDataTransferObject>()
+            ?? throw new InvalidOperationException("Empty response from nutrition sync endpoint.");
     }
 }
