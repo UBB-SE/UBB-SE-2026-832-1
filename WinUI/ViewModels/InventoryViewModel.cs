@@ -49,6 +49,7 @@ public partial class InventoryViewModel : ObservableObject
         {
             IsLoading = true;
             ErrorMessage = string.Empty;
+            StatusMessage = string.Empty;
 
             var items = await this.inventoryService.GetUserInventoryAsync(userId);
 
