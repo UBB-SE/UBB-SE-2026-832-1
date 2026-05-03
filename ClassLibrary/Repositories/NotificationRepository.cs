@@ -14,19 +14,21 @@ public sealed class NotificationRepository : INotificationRepository
         this.databaseContext = databaseContext;
     }
 
-    public async Task<IReadOnlyList<Notification>> GetNotificationsAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Notification>> GetNotificationsAsync(int clientId)
     {
         return await this.databaseContext.Notifications
             .AsNoTracking()
             .Where(notification => notification.Client.ClientId == clientId)
             .Include(notification => notification.Client)
             .OrderByDescending(notification => notification.DateCreated)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<bool> SaveNotificationAsync(Notification notification, CancellationToken cancellationToken = default)
+    public async Task SaveNotificationAsync(Notification notification)
     {
-        await this.databaseContext.Notifications.AddAsync(notification, cancellationToken);
-        return await this.databaseContext.SaveChangesAsync(cancellationToken) > 0;
+        notification.DateCreated = DateTime.Now;
+        notification.IsRead = false;
+        await this.databaseContext.Notifications.AddAsync(notification);
+        await this.databaseContext.SaveChangesAsync();
     }
 }

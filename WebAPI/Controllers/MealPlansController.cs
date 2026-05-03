@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Services;
+using WebAPI.IServices;
 
 namespace WebAPI.Controllers;
 
@@ -15,9 +15,9 @@ public sealed class MealPlansController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById(int id)
     {
-        var mealPlan = await this.mealPlanService.GetByIdAsync(id, cancellationToken);
+        var mealPlan = await this.mealPlanService.GetByIdAsync(id);
 
         if (mealPlan is null)
         {
@@ -28,30 +28,30 @@ public sealed class MealPlansController : ControllerBase
     }
 
     [HttpGet("user/{userId:int}")]
-    public async Task<IActionResult> GetByUserId(int userId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetByUserId(int userId)
     {
-        var mealPlans = await this.mealPlanService.GetByUserIdAsync(userId, cancellationToken);
+        var mealPlans = await this.mealPlanService.GetByUserIdAsync(userId);
         return this.Ok(mealPlans);
     }
 
     [HttpPost("{mealPlanId:int}/fooditems/{foodItemId:int}")]
-    public async Task<IActionResult> AddFoodItem(int mealPlanId, int foodItemId, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddFoodItem(int mealPlanId, int foodItemId)
     {
-        await this.mealPlanService.AddFoodItemToPlanAsync(mealPlanId, foodItemId, cancellationToken);
+        await this.mealPlanService.AddFoodItemToPlanAsync(mealPlanId, foodItemId);
         return this.NoContent();
     }
 
     [HttpDelete("{mealPlanId:int}/fooditems/{foodItemId:int}")]
-    public async Task<IActionResult> RemoveFoodItem(int mealPlanId, int foodItemId, CancellationToken cancellationToken)
+    public async Task<IActionResult> RemoveFoodItem(int mealPlanId, int foodItemId)
     {
-        await this.mealPlanService.RemoveFoodItemFromPlanAsync(mealPlanId, foodItemId, cancellationToken);
+        await this.mealPlanService.RemoveFoodItemFromPlanAsync(mealPlanId, foodItemId);
         return this.NoContent();
     }
 
     [HttpGet("{mealPlanId:int}/fooditems")]
-    public async Task<IActionResult> GetFoodItems(int mealPlanId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetFoodItems(int mealPlanId)
     {
-        var foodItems = await this.mealPlanService.GetFoodItemsForPlanAsync(mealPlanId, cancellationToken);
+        var foodItems = await this.mealPlanService.GetFoodItemsForPlanAsync(mealPlanId);
         return this.Ok(foodItems);
     }
 }

@@ -24,7 +24,7 @@ public sealed class WorkoutLogDataTransferObject
 
     public string IntensityTag { get; set; } = string.Empty;
 
-    public double Rating { get; set; }
+    public double? Rating { get; set; }
 
     public string TrainerNotes { get; set; } = string.Empty;
 }

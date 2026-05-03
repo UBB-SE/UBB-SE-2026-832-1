@@ -1,6 +1,8 @@
 using ClassLibrary.DTOs;
+using ClassLibrary.Filters;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
+using WebAPI.IServices;
 
 namespace WebAPI.Services;
 
@@ -13,21 +15,21 @@ public sealed class FoodItemService : IFoodItemService
         this.foodItemRepository = foodItemRepository;
     }
 
-    public async Task<IReadOnlyList<FoodItemDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<FoodItemDto>> GetAllAsync()
     {
-        var foodItems = await this.foodItemRepository.GetAllAsync(cancellationToken);
+        var foodItems = await this.foodItemRepository.GetAllAsync();
         return MapToDtos(foodItems);
     }
 
-    public async Task<FoodItemDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<FoodItemDto?> GetByIdAsync(int id)
     {
-        var foodItem = await this.foodItemRepository.GetByIdAsync(id, cancellationToken);
+        var foodItem = await this.foodItemRepository.GetByIdAsync(id);
         return foodItem is null ? null : MapToDto(foodItem);
     }
 
-    public async Task<IReadOnlyList<FoodItemDto>> GetFilteredAsync(FoodItemFilter filter, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<FoodItemDto>> GetFilteredAsync(FoodItemFilter filter)
     {
-        var foodItems = await this.foodItemRepository.GetByFilterAsync(filter, cancellationToken);
+        var foodItems = await this.foodItemRepository.GetByFilterAsync(filter);
         return MapToDtos(foodItems);
     }
 

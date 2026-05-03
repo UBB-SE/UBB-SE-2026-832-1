@@ -2,6 +2,7 @@ using System;
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
+using WebAPI.IServices;
 
 namespace WebAPI.Services;
 
@@ -16,47 +17,47 @@ public sealed class MealPlanService : IMealPlanService
         this.mealPlanRepository = mealPlanRepository;
     }
 
-    public async Task<MealPlanDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<MealPlanDto?> GetByIdAsync(int id)
     {
-        var mealPlan = await this.mealPlanRepository.GetByIdAsync(id, cancellationToken);
+        var mealPlan = await this.mealPlanRepository.GetByIdAsync(id);
 
         if (mealPlan is null)
         {
             return null;
         }
 
-        var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(id, cancellationToken);
+        var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(id);
 
         return MapToMealPlanDto(mealPlan, foodItems);
     }
 
-    public async Task<IReadOnlyList<MealPlanDto>> GetByUserIdAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<MealPlanDto>> GetByUserIdAsync(int userId)
     {
-        var mealPlans = await this.mealPlanRepository.GetByUserIdAsync(userId, cancellationToken);
+        var mealPlans = await this.mealPlanRepository.GetByUserIdAsync(userId);
 
         var results = new List<MealPlanDto>(mealPlans.Count);
         foreach (var mealPlan in mealPlans)
         {
-            var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(mealPlan.MealPlanId, cancellationToken);
+            var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(mealPlan.MealPlanId);
             results.Add(MapToMealPlanDto(mealPlan, foodItems));
         }
 
         return results;
     }
 
-    public async Task AddFoodItemToPlanAsync(int mealPlanId, int foodItemId, CancellationToken cancellationToken = default)
+    public async Task AddFoodItemToPlanAsync(int mealPlanId, int foodItemId)
     {
-        await this.mealPlanRepository.AddFoodItemToPlanAsync(mealPlanId, foodItemId, cancellationToken);
+        await this.mealPlanRepository.AddFoodItemToPlanAsync(mealPlanId, foodItemId);
     }
 
-    public async Task RemoveFoodItemFromPlanAsync(int mealPlanId, int foodItemId, CancellationToken cancellationToken = default)
+    public async Task RemoveFoodItemFromPlanAsync(int mealPlanId, int foodItemId)
     {
-        await this.mealPlanRepository.RemoveFoodItemFromPlanAsync(mealPlanId, foodItemId, cancellationToken);
+        await this.mealPlanRepository.RemoveFoodItemFromPlanAsync(mealPlanId, foodItemId);
     }
 
-    public async Task<IReadOnlyList<FoodItemDto>> GetFoodItemsForPlanAsync(int mealPlanId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<FoodItemDto>> GetFoodItemsForPlanAsync(int mealPlanId)
     {
-        var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(mealPlanId, cancellationToken);
+        var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(mealPlanId);
         return MapToFoodItemDtos(foodItems);
     }
 

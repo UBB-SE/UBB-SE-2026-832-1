@@ -1,8 +1,8 @@
 using ClassLibrary.Repositories;
-using ClassLibrary.Repositories.Interfaces;
+using ClassLibrary.IRepositories;
 using Microsoft.Extensions.DependencyInjection;
+using WebAPI.IServices;
 using WebAPI.Services;
-using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Extensions;
 
@@ -15,6 +15,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IClientService, ClientService>();
         services.AddScoped<IFoodItemService, FoodItemService>();
         services.AddScoped<IMealPlanService, MealPlanService>();
+        services.AddScoped<IInventoryService, InventoryService>();
+        services.AddScoped<IShoppingListService, ShoppingListService>();
+        services.AddScoped<INutritionPlanService, NutritionPlanService>();
+        services.AddScoped<IWorkoutLogService, WorkoutLogService>();
         return services;
     }
 }

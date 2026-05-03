@@ -4,7 +4,7 @@ namespace ClassLibrary.IRepositories;
 
 public interface INotificationRepository
 {
-    Task<IReadOnlyList<Notification>> GetNotificationsAsync(int clientId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Notification>> GetNotificationsAsync(int clientId);
 
-    Task<bool> SaveNotificationAsync(Notification notification, CancellationToken cancellationToken = default);
+    Task SaveNotificationAsync(Notification notification);
 }
