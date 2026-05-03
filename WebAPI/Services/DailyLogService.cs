@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ClassLibrary.DTOs;
+﻿using ClassLibrary.DTOs;
 using ClassLibrary.Filters;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
+using WebApi.IServices;
 using WebAPI.IServices;
 
 namespace WebAPI.Services;
 
-public sealed class DailyLogService
+public sealed class DailyLogService : IDailyLogService
 {
     private const int DAYS_IN_WEEK = 7;
     private const int ONE_DAY = 1;
@@ -18,16 +16,19 @@ public sealed class DailyLogService
 
     private readonly IDailyLogRepository dailyLogRepository;
     private readonly IUserRepository userRepository;
+    private readonly IFoodItemRepository foodItemRepository;
     private readonly IFoodItemService foodItemService;
 
     public DailyLogService(
         IDailyLogRepository dailyLogRepository,
         IUserRepository userRepository,
-        IFoodItemService foodItemService)
+        IFoodItemService foodItemService,
+        IFoodItemRepository foodItemRepository)
     {
         this.dailyLogRepository = dailyLogRepository;
         this.userRepository = userRepository;
         this.foodItemService = foodItemService;
+        this.foodItemRepository = foodItemRepository;
     }
 
     private static DailyLogTotalsDto MapToDailyLogTotalsDto(DailyLog? log)
@@ -127,7 +128,7 @@ public sealed class DailyLogService
 
     public async Task LogFoodItemAsync(int userId, LogMealRequestDto request)
     {
-        var foodItem = await this.foodItemService.GetByIdAsync(request.MealId);
+        var foodItem = await this.foodItemRepository.GetByIdAsync(request.MealId);
 
         if (foodItem is null)
         {
@@ -143,14 +144,12 @@ public sealed class DailyLogService
         var dailyLog = new DailyLog
         {
             User = user,
-            // Assuming your DailyLog model was updated to point to FoodItem. 
-            // If it still says MealId, change this next line to MealId = foodItem.FoodItemId
-            FoodItemId = foodItem.FoodItemId,
+            FoodItem = foodItem,
             Calories = foodItem.Calories,
             Protein = foodItem.Protein,
             Carbohydrates = foodItem.Carbohydrates,
             Fats = foodItem.Fat,
-            LoggedAt = DateTime.UtcNow // Using UtcNow is much safer for APIs than DateTime.Now!
+            LoggedAt = DateTime.UtcNow
         };
 
         await this.dailyLogRepository.AddAsync(dailyLog);
