@@ -13,6 +13,7 @@ public sealed partial class MainWindowView : Page
         ViewModel = new MainWindowViewModel();
         InitializeComponent();
         ViewModel.AddTab("Home", typeof(MainView));
+        ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
         ViewModel.AddTab("Inventory", typeof(InventoryView));
         ViewModel.Tabs.CollectionChanged += OnTabsCollectionChanged;
         PopulateTabs();
