@@ -69,12 +69,12 @@ public partial class MealPlanViewModel : ObservableObject
             IsLoading = true;
             ErrorMessage = string.Empty;
 
-            var items = await this.mealPlanService.GetFoodItemsForPlanAsync(this.SelectedMealPlan.MealPlanId);
+            var foodItems = await this.mealPlanService.GetFoodItemsForPlanAsync(this.SelectedMealPlan.MealPlanId);
 
             this.FoodItems.Clear();
-            foreach (var item in items)
+            foreach (var foodItem in foodItems)
             {
-                this.FoodItems.Add(item);
+                this.FoodItems.Add(foodItem);
             }
         }
         catch (Exception exception)
