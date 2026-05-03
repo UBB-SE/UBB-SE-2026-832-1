@@ -4,7 +4,7 @@ namespace ClassLibrary.Models;
 
 public class Reminder
 {
-    public int Id { get; set; }
+    public int ReminderId { get; set; }
 
     public virtual User User { get; set; } = null!;
 
@@ -17,6 +17,4 @@ public class Reminder
     public string ReminderDate { get; set; } = string.Empty;
 
     public string Frequency { get; set; } = "Once";
-
-    public string FullDateTimeDisplay => $"{ReminderDate ?? "No date"} at {Time}";
 }
