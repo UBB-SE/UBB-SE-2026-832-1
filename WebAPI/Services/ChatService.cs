@@ -1,10 +1,11 @@
 ﻿using ClassLibrary.IRepositories;
 using ClassLibrary.DTOs;
 using ClassLibrary.Models;
+using WebApi.Services.Interfaces;
 
 namespace WebApi.Services
 {
-    public class ChatService
+    public class ChatService : IChatService
     {
         private readonly IChatRepository chatRepository;
 
