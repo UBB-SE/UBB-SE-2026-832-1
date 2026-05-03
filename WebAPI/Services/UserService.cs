@@ -6,7 +6,7 @@ using WebAPI.IServices;
 
 namespace WebAPI.Services;
 
-public sealed class UserService : IUserService
+public class UserService : IUserService
 {
     private readonly IUserRepository userRepository;
 
@@ -61,6 +61,7 @@ public sealed class UserService : IUserService
         };
 
         await this.userRepository.AddAsync(user);
+
         return new UserDto
         {
             Id = user.UserId,
@@ -72,7 +73,7 @@ public sealed class UserService : IUserService
     public async Task<bool> CheckIfUsernameExistsAsync(string username)
     {
         var users = await this.userRepository.GetAllAsync();
-        return users.Any(u => string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase));
+        return users.Any(user => string.Equals(user.Username, username, StringComparison.OrdinalIgnoreCase));
     }
 
     public async Task<UserDataDto?> GetUserDataAsync(int userId)

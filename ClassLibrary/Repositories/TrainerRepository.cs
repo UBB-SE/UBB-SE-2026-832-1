@@ -5,19 +5,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories
 {
-    public class TrainerRepository : ITrainerRepository
+    public sealed class TrainerRepository : ITrainerRepository
     {
         private readonly AppDbContext databaseContext;
 
-        public TrainerRepository(AppDbContext context)
+        public TrainerRepository(AppDbContext databaseContext)
         {
-            databaseContext = context;
+            this.databaseContext = databaseContext;
         }
 
-        
         public async Task<List<Client>> GetTrainerClientsAsync(int trainerId)
         {
-            return await databaseContext.Clients
+            return await this.databaseContext.Clients
                 .Include(client => client.WorkoutLogs)
                 .ToListAsync();
         }
@@ -26,19 +25,19 @@ namespace ClassLibrary.Repositories
         {
             if (template.WorkoutTemplateId == 0)
             {
-                await databaseContext.Set<WorkoutTemplate>().AddAsync(template);
+                await this.databaseContext.Set<WorkoutTemplate>().AddAsync(template);
             }
             else
             {
-                databaseContext.Set<WorkoutTemplate>().Update(template);
+                this.databaseContext.Set<WorkoutTemplate>().Update(template);
             }
 
-            await databaseContext.SaveChangesAsync();
+            await this.databaseContext.SaveChangesAsync();
         }
 
         public async Task DeleteWorkoutTemplateAsync(int templateId)
         {
-            var template = await databaseContext.Set<WorkoutTemplate>()
+            var template = await this.databaseContext.Set<WorkoutTemplate>()
                 .FirstOrDefaultAsync(template => template.WorkoutTemplateId == templateId);
 
             if (template == null)
@@ -46,8 +45,8 @@ namespace ClassLibrary.Repositories
                 throw new KeyNotFoundException($"Workout template with ID {templateId} not found.");
             }
 
-            databaseContext.Remove(template);
-            await databaseContext.SaveChangesAsync();
+            this.databaseContext.Remove(template);
+            await this.databaseContext.SaveChangesAsync();
         }
     }
 }

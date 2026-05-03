@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace ClassLibrary.Models;
 
 public class DailyLog
@@ -18,4 +16,5 @@ public class DailyLog
 
     public virtual User User { get; set; } = null!;
     public virtual Meal Meal { get; set; } = null!;
+    public virtual FoodItem FoodItem { get; set; } = null!;
 }
