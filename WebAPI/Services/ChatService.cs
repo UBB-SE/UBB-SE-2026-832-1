@@ -14,6 +14,40 @@ namespace WebApi.Services
             this.chatRepository = chatRepository;
         }
 
+        private static ConversationDto MapToConversationDto(Conversation conversation)
+        {
+            return new ConversationDto
+            {
+                ConversationId = conversation.Id,
+                HasUnanswered = conversation.HasUnanswered,
+                UserId = conversation.User.UserId,
+                UserName = conversation.User.Username
+            };
+        }
+
+        private static List<ConversationDto> MapToConversationDtos(IEnumerable<Conversation> conversations)
+        {
+            return conversations.Select(MapToConversationDto).ToList();
+        }
+
+        private static MessageDto MapToMessageDto(Message message)
+        {
+            return new MessageDto
+            {
+                MessageId = message.Id,
+                SentAt = message.SentAt,
+                ConversationId = message.Conversation.Id,
+                SenderUsername = message.Sender.Username,
+                SenderRole = message.Sender.Role,
+                TextContent = message.TextContent
+            };
+        }
+
+        private static List<MessageDto> MapToMessageDtos(IEnumerable<Message> messages)
+        {
+            return messages.Select(MapToMessageDto).ToList();
+        }
+
         public async Task<IEnumerable<ConversationDto>> GetAllConversationsAsync()
         {
             var conversations = await this.chatRepository.GetAllConversationsAsync();
@@ -89,40 +123,6 @@ namespace WebApi.Services
             }
 
             return MapToConversationDtos(conversations);
-        }
-
-        private static ConversationDto MapToConversationDto(Conversation conversation)
-        {
-            return new ConversationDto
-            {
-                ConversationId = conversation.Id,
-                HasUnanswered = conversation.HasUnanswered,
-                UserId = conversation.User.UserId,
-                UserName = conversation.User.Username
-            };
-        }
-
-        private static List<ConversationDto> MapToConversationDtos(IEnumerable<Conversation> conversations)
-        {
-            return conversations.Select(MapToConversationDto).ToList();
-        }
-
-        private static MessageDto MapToMessageDto(Message message)
-        {
-            return new MessageDto
-            {
-                MessageId = message.Id,
-                SentAt = message.SentAt,
-                ConversationId = message.Conversation.Id,
-                SenderUsername = message.Sender.Username,
-                SenderRole = message.Sender.Role,
-                TextContent = message.TextContent
-            };
-        }
-
-        private static List<MessageDto> MapToMessageDtos(IEnumerable<Message> messages)
-        {
-            return messages.Select(MapToMessageDto).ToList();
         }
     }
 }
