@@ -1,6 +1,6 @@
 ﻿using ClassLibrary.DTOs;
 
-namespace WebApi.Services.Interfaces
+namespace WebApi.IServices
 {
     public interface IChatService
     {

@@ -1,7 +1,7 @@
 ﻿using ClassLibrary.IRepositories;
 using ClassLibrary.DTOs;
 using ClassLibrary.Models;
-using WebApi.Services.Interfaces;
+using WebApi.IServices;
 
 namespace WebApi.Services
 {
