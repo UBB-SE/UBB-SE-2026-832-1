@@ -20,8 +20,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IInventoryService, InventoryService>();
         services.AddScoped<IShoppingListService, ShoppingListService>();
-
-        
+        services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<INutritionPlanService, NutritionPlanService>();
         services.AddScoped<IWorkoutLogService, WorkoutLogService>();
 
