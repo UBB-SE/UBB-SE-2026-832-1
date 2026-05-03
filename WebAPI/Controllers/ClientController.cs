@@ -81,6 +81,18 @@ public sealed class ClientController : ControllerBase
         return this.Ok();
     }
 
+    [HttpPut("modify-workout")]
+    public async Task<IActionResult> ModifyWorkout([FromBody] WorkoutLogDataTransferObject updatedWorkoutLog)
+    {
+        var success = await this.clientService.ModifyWorkoutAsync(updatedWorkoutLog);
+        if (!success)
+        {
+            return this.BadRequest("Failed to modify workout.");
+        }
+
+        return this.Ok();
+    }
+
     [HttpPost("confirm-deload")]
     public async Task<IActionResult> ConfirmDeload([FromBody] ConfirmDeloadRequestDataTransferObject request)
     {

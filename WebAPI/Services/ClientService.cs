@@ -239,6 +239,30 @@ public sealed class ClientService : IClientService
         }
     }
 
+    public async Task<bool> ModifyWorkoutAsync(WorkoutLogDataTransferObject updatedWorkoutLog)
+    {
+        if (updatedWorkoutLog == null || updatedWorkoutLog.WorkoutLogId <= 0)
+        {
+            return false;
+        }
+
+        if (updatedWorkoutLog.Client == null || updatedWorkoutLog.Client.ClientId <= 0)
+        {
+            return false;
+        }
+
+        var client = await this.clientRepository.GetByIdAsync(updatedWorkoutLog.Client.ClientId);
+        if (client == null)
+        {
+            return false;
+        }
+
+        var log = MapToWorkoutLog(updatedWorkoutLog, client);
+        log.WorkoutLogId = updatedWorkoutLog.WorkoutLogId;
+        await this.workoutLogRepository.UpdateWorkoutLogAsync(log);
+        return true;
+    }
+
     private static WorkoutLogDataTransferObject MapWorkoutLog(WorkoutLog log)
     {
         return new WorkoutLogDataTransferObject
