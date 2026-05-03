@@ -1,22 +1,26 @@
-using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ClassLibrary.Models;
 
 public class Reminder
 {
+    [Key]
     public int Id { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    [Required]
+    public int UserId { get; set; }
 
+    [Required]
+    [MaxLength(100)]
     public string Name { get; set; } = string.Empty;
 
     public bool HasSound { get; set; }
 
+    [Required]
     public TimeSpan Time { get; set; }
 
-    public string ReminderDate { get; set; } = string.Empty;
+    public string? ReminderDate { get; set; }
 
+    [MaxLength(50)]
     public string Frequency { get; set; } = "Once";
-
-    public string FullDateTimeDisplay => $"{ReminderDate ?? "No date"} at {Time}";
 }

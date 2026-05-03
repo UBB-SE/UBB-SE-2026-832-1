@@ -6,7 +6,7 @@ using WebAPI.IServices;
 
 namespace WebAPI.Services;
 
-public sealed class UserService : IUserService
+public class UserService : IUserService
 {
     private readonly IUserRepository userRepository;
 
@@ -61,6 +61,7 @@ public sealed class UserService : IUserService
         };
 
         await this.userRepository.AddAsync(user);
+
         return new UserDto
         {
             Id = user.UserId,
