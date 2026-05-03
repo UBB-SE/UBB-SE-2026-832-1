@@ -44,6 +44,7 @@
     - `protected`
     - `public`
 - Cancellation token shouldn't exist as a parameter anywhere. We use basic authentification
+- WinUi Services are different from WebApi Services, WinUi Services commmunicates with the controllers in WebApi through api calls
 ## Whitespace rules
 
 - a maximum of one statement per line
