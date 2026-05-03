@@ -2,11 +2,11 @@
 
 public sealed class DailyLogTotalsDto
 {
-    public int TotalCalories { get; set; }
+    public double TotalCalories { get; set; }
 
-    public int TotalProtein { get; set; }
+    public double TotalProtein { get; set; }
 
-    public int TotalCarbohydrates { get; set; }
+    public double TotalCarbohydrates { get; set; }
 
-    public int TotalFat { get; set; }
+    public double TotalFat { get; set; }
 }
