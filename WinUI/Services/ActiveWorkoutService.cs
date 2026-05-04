@@ -53,4 +53,9 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
         var response = await this.httpClient.PostAsJsonAsync($"{BaseRoute}/finalize-workout", dto);
         return response.IsSuccessStatusCode;
     }
+
+    public Task<IDictionary<string, double>> GetPreviousBestWeightsAsync(int clientId)
+    {
+        throw new NotImplementedException();
+    }
 }
