@@ -1,10 +1,11 @@
-using ClassLibrary.Repositories;
 using ClassLibrary.IRepositories;
+using ClassLibrary.Repositories;
 using Microsoft.Extensions.DependencyInjection;
+using WebApi.IServices;
+using WebApi.Services;
 using WebAPI.IServices;
 using WebAPI.Services;
-using WebApi.Services;
-using WebApi.IServices;
+using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Extensions;
 
@@ -28,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEvaluationEngineService, EvaluationEngineService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<IWorkoutDataForwarder, WorkoutDataForwarder>();
 
         return services;
     }
