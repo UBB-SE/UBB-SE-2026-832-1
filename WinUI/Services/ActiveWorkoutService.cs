@@ -19,10 +19,9 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
         return availableWorkoutsResponse ?? new List<WorkoutTemplateDataTransferObject>();
     }
 
-    public async Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetCustomAndTrainerAssignedWorkoutsForClient(int clientId)
+    public Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetCustomAndTrainerAssignedWorkoutsForClient(int clientId)
     {
-        var customAndTrainerWorkoutsResponse = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{BaseRoute}/{clientId}/available-workouts");
-        return customAndTrainerWorkoutsResponse ?? new List<WorkoutTemplateDataTransferObject>();
+        return GetAvailableWorkoutsForClient(clientId);
     }
 
     public async Task<WorkoutTemplateDataTransferObject?> FindWorkoutTemplateById(int clientId, int? id)
