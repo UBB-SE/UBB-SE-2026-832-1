@@ -6,7 +6,8 @@ namespace WinUI.Services;
 public sealed class ActiveWorkoutService : IActiveWorkoutService
 {
     private readonly HttpClient httpClient;
-    private const string BaseRoute = "https://localhost:7197/api/client";
+    private const string API_URL = "https://localhost:7197/api";
+    private const string BaseRoute = API_URL + "/client";
 
     public ActiveWorkoutService(HttpClient httpClient)
     {
@@ -41,10 +42,8 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
         return response?.BestWeightsByExercise ?? new Dictionary<string, double>();
     }
 
-    public Task<bool> SaveSetAsync(WorkoutLogDataTransferObject workoutLog, string exerciseName, LoggedExerciseDataTransferObject set)
+    public Task<bool> SaveSetAsync(WorkoutLogDataTransferObject workoutLog)
     {
-        _ = exerciseName;
-        _ = set;
         return this.FinalizeWorkoutAsync(workoutLog);
     }
 
