@@ -4,5 +4,5 @@ namespace ClassLibrary.IRepositories;
 
 public interface IClientRepository
 {
-    Task<Client?> GetByIdAsync(int clientId, CancellationToken cancellationToken = default);
+    Task<Client?> GetByIdAsync(int clientId);
 }

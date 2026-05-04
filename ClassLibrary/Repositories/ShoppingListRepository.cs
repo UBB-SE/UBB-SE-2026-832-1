@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ClassLibrary.Data;
@@ -18,57 +17,57 @@ public sealed class ShoppingListRepository : IShoppingListRepository
         this.databaseContext = databaseContext;
     }
 
-    public async Task AddAsync(ShoppingItem item, CancellationToken cancellationToken = default)
+    public async Task AddAsync(ShoppingItem item)
     {
-        await databaseContext.ShoppingItems.AddAsync(item, cancellationToken);
-        await databaseContext.SaveChangesAsync(cancellationToken);
+        await databaseContext.ShoppingItems.AddAsync(item);
+        await databaseContext.SaveChangesAsync();
     }
 
-    public async Task<IReadOnlyList<ShoppingItem>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ShoppingItem>> GetAllAsync()
     {
         return await databaseContext.ShoppingItems
             .AsNoTracking()
             .Include(shoppingItem => shoppingItem.Ingredient)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<ShoppingItem?> GetByIdAsync(int shoppingItemId, CancellationToken cancellationToken = default)
+    public async Task<ShoppingItem?> GetByIdAsync(int shoppingItemId)
     {
         return await databaseContext.ShoppingItems
             .Include(shoppingItem => shoppingItem.Ingredient)
-            .FirstOrDefaultAsync(shoppingItem => shoppingItem.ShoppingItemId == shoppingItemId, cancellationToken);
+            .Include(shoppingItem => shoppingItem.User)
+            .FirstOrDefaultAsync(shoppingItem => shoppingItem.ShoppingItemId == shoppingItemId);
     }
 
-    public async Task<ShoppingItem?> GetByUserAndIngredientAsync(int userId, int ingredientId, CancellationToken cancellationToken = default)
+    public async Task<ShoppingItem?> GetByUserAndIngredientAsync(int userId, int ingredientId)
     {
         return await databaseContext.ShoppingItems
             .Include(shoppingItem => shoppingItem.Ingredient)
             .FirstOrDefaultAsync(
                 shoppingItem =>
                     shoppingItem.User.UserId == userId &&
-                    shoppingItem.Ingredient.IngredientId == ingredientId,
-                cancellationToken);
+                    shoppingItem.Ingredient.IngredientId == ingredientId);
     }
 
-    public async Task<IReadOnlyList<ShoppingItem>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ShoppingItem>> GetAllByUserIdAsync(int userId)
     {
         return await databaseContext.ShoppingItems
             .AsNoTracking()
             .Include(shoppingItem => shoppingItem.Ingredient)
             .Where(shoppingItem => shoppingItem.User.UserId == userId)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task UpdateAsync(ShoppingItem item, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(ShoppingItem item)
     {
         databaseContext.ShoppingItems.Update(item);
-        await databaseContext.SaveChangesAsync(cancellationToken);
+        await databaseContext.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(int shoppingItemId, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(int shoppingItemId)
     {
         await databaseContext.ShoppingItems
             .Where(shoppingItem => shoppingItem.ShoppingItemId == shoppingItemId)
-            .ExecuteDeleteAsync(cancellationToken);
+            .ExecuteDeleteAsync();
     }
 }

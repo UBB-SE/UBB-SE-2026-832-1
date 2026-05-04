@@ -7,34 +7,34 @@ namespace ClassLibrary.Repositories;
 
 public class ReminderRepository : IReminderRepository
 {
-    private readonly AppDbContext dbContext;
+    private readonly AppDbContext databaseContext;
 
-    public ReminderRepository(AppDbContext dbContext)
+    public ReminderRepository(AppDbContext databaseContext)
     {
-        this.dbContext = dbContext;
+        this.databaseContext = databaseContext;
     }
 
     public async Task<IEnumerable<Reminder>> GetAllAsync()
     {
-        return await dbContext.Reminders.ToListAsync();
+        return await databaseContext.Reminders.ToListAsync();
     }
 
     public async Task<IEnumerable<Reminder>> GetAllByUserIdAsync(int userId)
     {
-        return await dbContext.Reminders
+        return await databaseContext.Reminders
             .Where(reminder => reminder.UserId == userId)
             .ToListAsync();
     }
 
     public async Task<Reminder?> GetByIdAsync(int id)
     {
-        return await dbContext.Reminders
-            .FirstOrDefaultAsync(reminder => reminder.Id == id);
+        return await databaseContext.Reminders
+            .FirstOrDefaultAsync(reminder => reminder.ReminderId == id);
     }
 
     public async Task<Reminder?> GetNextReminderAsync(int userId)
     {
-        return await dbContext.Reminders
+        return await databaseContext.Reminders
             .Where(reminder => reminder.UserId == userId)
             .OrderBy(reminder => reminder.Time)
             .FirstOrDefaultAsync();
@@ -42,24 +42,22 @@ public class ReminderRepository : IReminderRepository
 
     public async Task AddAsync(Reminder reminder)
     {
-        await dbContext.Reminders.AddAsync(reminder);
-        await dbContext.SaveChangesAsync();
+        await databaseContext.Reminders.AddAsync(reminder);
+        await databaseContext.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Reminder reminder)
     {
-        dbContext.Reminders.Update(reminder);
-        await dbContext.SaveChangesAsync();
+        databaseContext.Reminders.Update(reminder);
+        await databaseContext.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)
     {
-        var reminder = await dbContext.Reminders.FindAsync(id);
+        var reminder = await databaseContext.Reminders.FindAsync(id);
+        if (reminder == null) return;
 
-        if (reminder == null)
-            return;
-
-        dbContext.Reminders.Remove(reminder);
-        await dbContext.SaveChangesAsync();
+        databaseContext.Reminders.Remove(reminder);
+        await databaseContext.SaveChangesAsync();
     }
 }

@@ -1,7 +1,6 @@
 using ClassLibrary.Data;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Repositories;
-using ClassLibrary.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,15 +23,13 @@ public static class DataAccessServiceCollectionExtensions
         services.AddScoped<IChatRepository, ChatRepository>();
         services.AddScoped<IDailyLogRepository, DailyLogRepository>();
 
-        
-        
         services.AddScoped<IRepositoryWorkoutLog, RepositoryWorkoutLog>();
 
-        
         services.AddScoped<IWorkoutLogRepository, WorkoutLogRepository>();
         services.AddScoped<IWorkoutTemplateRepository, WorkoutTemplateRepository>();
         services.AddScoped<IClientRepository, ClientRepository>();
         services.AddScoped<IIngredientRepository, IngredientRepository>();
+        services.AddScoped<IInventoryRepository, InventoryRepository>();
         services.AddScoped<IShoppingListRepository, ShoppingListRepository>();
         services.AddScoped<IWorkoutAnalyticsRepository, WorkoutAnalyticsRepository>();
 

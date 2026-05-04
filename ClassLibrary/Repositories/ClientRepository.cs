@@ -14,9 +14,9 @@ public sealed class ClientRepository : IClientRepository
         this.databaseContext = databaseContext;
     }
 
-    public async Task<Client?> GetByIdAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<Client?> GetByIdAsync(int clientId)
     {
         return await this.databaseContext.Clients
-            .FirstOrDefaultAsync(client => client.ClientId == clientId, cancellationToken);
+            .FirstOrDefaultAsync(client => client.ClientId == clientId);
     }
 }

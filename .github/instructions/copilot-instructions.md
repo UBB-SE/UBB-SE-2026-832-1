@@ -8,9 +8,9 @@
 - Model object links via class references, not foreign-key id fields.
 - `WebAPI` should call extension methods for data-layer wiring, not reference data-layer internals directly.
 - Keep registration ownership explicit: `WebAPI` registers API services; `ClassLibrary` registers data access.
-- `WinUI` communicates with backend through services/proxies, not direct database access.
-- `WinUI` proxy services must receive all dependencies via constructor injection (e.g., `HttpClient`, config, auth handlers) and avoid instantiating dependencies inside the proxy.
-- Request flow: `WinUI` (`ServiceProxy`) -> `WebAPI` (`Controller`) -> `WebAPI` (`IUserService`/ `Service`) -> `ClassLibrary` (`IRepository` + `Repository` + `AppDbContext`) -> `database`
+- `WinUI` communicates with backend through services, not direct database access.
+- Request flow: `WinUI` (`Service`) -> `WebAPI` (`Controller`) -> `WebAPI` (`IUserService`/ `Service`) -> `ClassLibrary` (`IRepository` + `Repository` + `AppDbContext`) -> `database`
+- Do not use `CancellationToken` in interfaces, services, controllers, repositories, or method signatures.
 
 # Formatting guidelines
 

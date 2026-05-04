@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ClassLibrary.Data;
@@ -19,32 +18,32 @@ public sealed class WorkoutAnalyticsRepository : IWorkoutAnalyticsRepository
         this.databaseContext = databaseContext;
     }
 
-    public async Task SaveWorkoutAsync(WorkoutLog workoutLog, CancellationToken cancellationToken = default)
+    public async Task SaveWorkoutAsync(WorkoutLog workoutLog)
     {
-        await databaseContext.WorkoutLogs.AddAsync(workoutLog, cancellationToken);
-        await databaseContext.SaveChangesAsync(cancellationToken);
+        await databaseContext.WorkoutLogs.AddAsync(workoutLog);
+        await databaseContext.SaveChangesAsync();
     }
 
-    public async Task<int> GetTotalWorkoutsAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task<int> GetTotalWorkoutsAsync(int clientId)
     {
         return await databaseContext.WorkoutLogs
-            .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId, cancellationToken);
+            .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId);
     }
 
     public async Task<IReadOnlyList<WorkoutLog>> GetWorkoutsInRangeAsync(
-        int clientId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        int clientId, DateTime startDate, DateTime endDate)
     {
         return await databaseContext.WorkoutLogs
             .AsNoTracking()
             .Where(workoutLog => workoutLog.Client.ClientId == clientId && workoutLog.Date >= startDate && workoutLog.Date <= endDate)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
     public async Task<(IReadOnlyList<WorkoutLog> WorkoutLogs, int TotalCount)> GetWorkoutHistoryPageAsync(
-        int clientId, int skip, int take, CancellationToken cancellationToken = default)
+        int clientId, int skip, int take)
     {
         var totalCount = await databaseContext.WorkoutLogs
-            .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId, cancellationToken);
+            .CountAsync(workoutLog => workoutLog.Client.ClientId == clientId);
 
         var workoutLogs = await databaseContext.WorkoutLogs
             .AsNoTracking()
@@ -53,17 +52,17 @@ public sealed class WorkoutAnalyticsRepository : IWorkoutAnalyticsRepository
             .ThenByDescending(workoutLog => workoutLog.WorkoutLogId)
             .Skip(skip)
             .Take(take)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
 
         return (workoutLogs, totalCount);
     }
 
     public async Task<WorkoutLog?> GetWorkoutLogWithSetsAsync(
-        int clientId, int workoutLogId, CancellationToken cancellationToken = default)
+        int clientId, int workoutLogId)
     {
         return await databaseContext.WorkoutLogs
             .AsNoTracking()
             .Include(workoutLog => workoutLog.Exercises)
-            .FirstOrDefaultAsync(workoutLog => workoutLog.WorkoutLogId == workoutLogId && workoutLog.Client.ClientId == clientId, cancellationToken);
+            .FirstOrDefaultAsync(workoutLog => workoutLog.WorkoutLogId == workoutLogId && workoutLog.Client.ClientId == clientId);
     }
 }
