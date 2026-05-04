@@ -42,11 +42,11 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
         return response?.BestWeightsByExercise ?? new Dictionary<string, double>();
     }
 
-    public async Task<bool> SaveSetAsync(WorkoutLogDataTransferObject workoutLog, string exerciseName, LoggedExerciseDataTransferObject set)
+    public Task<bool> SaveSetAsync(WorkoutLogDataTransferObject workoutLog, string exerciseName, LoggedExerciseDataTransferObject set)
     {
-        var dto = new FinalizeWorkoutRequestDataTransferObject { WorkoutLog = workoutLog };
-        var response = await this.httpClient.PostAsJsonAsync($"{BaseRoute}/finalize-workout", dto);
-        return response.IsSuccessStatusCode;
+        _ = exerciseName;
+        _ = set;
+        return this.FinalizeWorkoutAsync(workoutLog);
     }
 
     public async Task<bool> FinalizeWorkoutAsync(WorkoutLogDataTransferObject workoutLog)
