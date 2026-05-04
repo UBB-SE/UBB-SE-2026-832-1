@@ -14,6 +14,15 @@ public sealed class WorkoutTemplateRepository : IWorkoutTemplateRepository
         this.databaseContext = databaseContext;
     }
 
+    public async Task<IReadOnlyList<WorkoutTemplate>> GetAllTemplatesAsync()
+    {
+        return await this.databaseContext.WorkoutTemplates
+            .AsNoTracking()
+            .Include(workoutTemplate => workoutTemplate.Exercises)
+            .OrderBy(workoutTemplate => workoutTemplate.WorkoutTemplateId)
+            .ToListAsync();
+    }
+
     public async Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId)
     {
         return await this.databaseContext.WorkoutTemplates
