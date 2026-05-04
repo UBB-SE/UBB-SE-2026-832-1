@@ -10,7 +10,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserServiceProxy, UserServiceProxy>();
         services.AddHttpClient<IActiveWorkoutService, ActiveWorkoutService>();
-        services.AddScoped<IClientDashboardService, ClientDashboardService>();
         return services;
     }
 }
