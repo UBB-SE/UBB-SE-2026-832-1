@@ -15,14 +15,14 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
 
     public async Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetAvailableWorkoutsForClient(int clientId)
     {
-        var response = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{BaseRoute}/{clientId}/available-workouts");
-        return response ?? new List<WorkoutTemplateDataTransferObject>();
+        var availableWorkoutsResponse = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{BaseRoute}/{clientId}/available-workouts");
+        return availableWorkoutsResponse ?? new List<WorkoutTemplateDataTransferObject>();
     }
 
     public async Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetCustomAndTrainerAssignedWorkoutsForClient(int clientId)
     {
-        var response = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{BaseRoute}/{clientId}/available-workouts");
-        return response ?? new List<WorkoutTemplateDataTransferObject>();
+        var customAndTrainerWorkoutsResponse = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{BaseRoute}/{clientId}/available-workouts");
+        return customAndTrainerWorkoutsResponse ?? new List<WorkoutTemplateDataTransferObject>();
     }
 
     public async Task<WorkoutTemplateDataTransferObject?> FindWorkoutTemplateById(int clientId, int? id)
@@ -32,8 +32,8 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
             return null;
         }
 
-        var all = await GetAvailableWorkoutsForClient(clientId);
-        return all.FirstOrDefault(w => w.WorkoutTemplateId == id.Value);
+        var availableWorkoutTemplates = await GetAvailableWorkoutsForClient(clientId);
+        return availableWorkoutTemplates.FirstOrDefault(workoutTemplate => workoutTemplate.WorkoutTemplateId == id.Value);
     }
 
     public async Task<IDictionary<string, double>> GetPreviousBestWeights(int clientId)
