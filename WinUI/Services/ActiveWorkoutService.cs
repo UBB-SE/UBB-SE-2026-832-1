@@ -38,8 +38,8 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
 
     public async Task<IDictionary<string, double>> GetPreviousBestWeights(int clientId)
     {
-        var response = await this.httpClient.GetFromJsonAsync<Dictionary<string, double>>($"{BaseRoute}/{clientId}/previous-best-weights");
-        return response ?? new Dictionary<string, double>();
+        var response = await this.httpClient.GetFromJsonAsync<PreviousBestWeightsDataTransferObject>($"{BaseRoute}/{clientId}/previous-best-weights");
+        return response?.BestWeightsByExercise ?? new Dictionary<string, double>();
     }
 
     public async Task<bool> SaveSetAsync(WorkoutLogDataTransferObject workoutLog, string exerciseName, LoggedExerciseDataTransferObject set)
