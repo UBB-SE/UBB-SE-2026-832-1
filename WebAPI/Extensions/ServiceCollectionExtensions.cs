@@ -29,10 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEvaluationEngineService, EvaluationEngineService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IChatService, ChatService>();
-        services.AddScoped<IWorkoutAnalyticsStore, WorkoutAnalyticsStore>();
-        services.AddScoped<IAnalyticsDashboardRefreshBus, AnalyticsDashboardRefreshBus>();
         services.AddScoped<IWorkoutDataForwarder, WorkoutDataForwarder>();
-        services.AddSingleton<IAnalyticsDashboardRefreshBus, AnalyticsDashboardRefreshBus>();
 
 
         return services;
