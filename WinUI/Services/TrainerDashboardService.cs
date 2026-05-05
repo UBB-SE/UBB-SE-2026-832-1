@@ -44,7 +44,7 @@ public sealed class TrainerDashboardService : ITrainerDashboardService
 
     public async Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId)
     {
-        var response = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{ApiUrl}/client/{clientId}/available-workouts");
+        var response = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{ApiUrl}/{Route}/{clientId}/available-workouts");
         var dtos = response ?? new List<WorkoutTemplateDataTransferObject>();
         return dtos.Select(dto => new WorkoutTemplate
         {
