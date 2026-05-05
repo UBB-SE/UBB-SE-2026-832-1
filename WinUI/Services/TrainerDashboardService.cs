@@ -50,7 +50,7 @@ public sealed class TrainerDashboardService : ITrainerDashboardService
         {
             WorkoutTemplateId = dto.WorkoutTemplateId,
             Name = dto.Name,
-            Type = Enum.TryParse<WorkoutType>(dto.Type, true, out var parsed) ? parsed : WorkoutType.Custom,
+            Type = Enum.TryParse<WorkoutType>(dto.Type, true, out var parsed) ? parsed : WorkoutType.CUSTOM,
         }).ToList();
     }
 
