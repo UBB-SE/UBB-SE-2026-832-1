@@ -13,6 +13,8 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<ICreateWorkoutService, CreateWorkoutService>();
         services.AddHttpClient<ITrainerDashboardService, TrainerDashboardService>();
         services.AddHttpClient<IAchievementsService, AchievementsService>();
+        services.AddScoped<IWorkoutLogService, WorkoutLogService>();
+        services.AddScoped<IWorkoutLogServiceProxy, WorkoutLogServiceProxy>();
         return services;
     }
 }
