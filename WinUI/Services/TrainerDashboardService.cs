@@ -7,8 +7,8 @@ namespace WinUI.Services;
 public sealed class TrainerDashboardService : ITrainerDashboardService
 {
     private readonly HttpClient httpClient;
-    private const string ApiUrl = "https://localhost:7197/api";
-    private const string Route = "trainer";
+    private const string baseAddress = "https://localhost:7197/api";
+    private const string trainerRoute = "trainer";
 
     public TrainerDashboardService(HttpClient httpClient)
     {
@@ -17,62 +17,41 @@ public sealed class TrainerDashboardService : ITrainerDashboardService
 
     public async Task<IReadOnlyList<Client>> GetAssignedClientsAsync(int trainerId)
     {
-        var response = await this.httpClient.GetFromJsonAsync<List<ClientDataTransferObject>>($"{ApiUrl}/{Route}/{trainerId}/assigned-clients");
-        var dtos = response ?? new List<ClientDataTransferObject>();
-        return dtos.Select(dto => new Client
-        {
-            ClientId = dto.ClientId,
-            Email = dto.Email,
-            FullName = dto.FullName,
-        }).ToList();
+        var clientDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<ClientDataTransferObject>>($"{baseAddress}/{trainerRoute}/{trainerId}/assigned-clients");
+        return DataTransferObjectToDomainModelMappers.MapClients(clientDataTransferObjects);
     }
 
     public async Task<IReadOnlyList<WorkoutLog>> GetClientWorkoutHistoryAsync(int clientId)
     {
-        var response = await this.httpClient.GetFromJsonAsync<List<WorkoutLogDataTransferObject>>($"{ApiUrl}/{Route}/{clientId}/workout-history");
-        var dtos = response ?? new List<WorkoutLogDataTransferObject>();
-        return dtos.Select(dto => new WorkoutLog
-        {
-            WorkoutLogId = dto.WorkoutLogId,
-            Date = dto.Date,
-            WorkoutName = dto.WorkoutName,
-            Duration = dto.Duration,
-            TotalCaloriesBurned = dto.TotalCaloriesBurned,
-            IntensityTag = dto.IntensityTag,
-        }).ToList();
+        var workoutLogDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<WorkoutLogDataTransferObject>>($"{baseAddress}/{trainerRoute}/{clientId}/workout-history");
+        return DataTransferObjectToDomainModelMappers.MapWorkoutLogs(workoutLogDataTransferObjects);
     }
 
     public async Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId)
     {
-        var response = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{ApiUrl}/{Route}/{clientId}/available-workouts");
-        var dtos = response ?? new List<WorkoutTemplateDataTransferObject>();
-        return dtos.Select(dto => new WorkoutTemplate
-        {
-            WorkoutTemplateId = dto.WorkoutTemplateId,
-            Name = dto.Name,
-            Type = Enum.TryParse<WorkoutType>(dto.Type, true, out var parsed) ? parsed : WorkoutType.CUSTOM,
-        }).ToList();
+        var workoutTemplateDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{baseAddress}/{trainerRoute}/{clientId}/available-workouts");
+        return DataTransferObjectToDomainModelMappers.MapWorkoutTemplates(workoutTemplateDataTransferObjects);
     }
 
     public async Task<IReadOnlyList<string>> GetAllExerciseNamesAsync()
     {
-        var response = await this.httpClient.GetFromJsonAsync<List<string>>($"{ApiUrl}/{Route}/exercise-names");
-        return response ?? new List<string>();
+        var exerciseNames = await this.httpClient.GetFromJsonAsync<List<string>>($"{baseAddress}/{trainerRoute}/exercise-names");
+        return exerciseNames ?? new List<string>();
     }
 
     public async Task<bool> DeleteWorkoutTemplateAsync(int templateId)
     {
-        var response = await this.httpClient.DeleteAsync($"{ApiUrl}/trainer/workout-template/{templateId}");
-        return response.IsSuccessStatusCode;
+        var deleteWorkoutTemplateResponse = await this.httpClient.DeleteAsync($"{baseAddress}/trainer/workout-template/{templateId}");
+        return deleteWorkoutTemplateResponse.IsSuccessStatusCode;
     }
 
-    public async Task<OperationResult> AssignNewRoutineAsync(int templateId, int clientId, string name, IReadOnlyList<TemplateExercise> exercises)
+    public async Task<bool> AssignNewRoutineAsync(int templateId, int clientId, string name, IReadOnlyList<TemplateExercise> exercises)
     {
-        var dto = new AssignRoutineRequestDataTransferObject
+        var assignNewRoutineRequestDataTransferObject = new AssignNewRoutineRequestDataTransferObject
         {
-            TemplateId = templateId,
+            EditingTemplateId = templateId,
             ClientId = clientId,
-            Name = name,
+            RoutineName = name,
             Exercises = exercises.Select(exercise => new TemplateExerciseDataTransferObject
             {
                 Name = exercise.Name,
@@ -83,37 +62,32 @@ public sealed class TrainerDashboardService : ITrainerDashboardService
             }).ToList()
         };
 
-        var response = await this.httpClient.PostAsJsonAsync($"{ApiUrl}/trainer/assign-routine", dto);
-        if (!response.IsSuccessStatusCode)
-        {
-            return new OperationResult { Success = false, ErrorMessage = "Failed to assign" };
-        }
-
-        return new OperationResult { Success = true };
+        var assignNewRoutineResponse = await this.httpClient.PostAsJsonAsync($"{baseAddress}/trainer/assign-new-routine", assignNewRoutineRequestDataTransferObject);
+        return assignNewRoutineResponse.IsSuccessStatusCode;
     }
 
     public async Task SaveWorkoutFeedbackAsync(WorkoutLog workoutLog)
     {
-        var dto = new SaveWorkoutFeedbackRequestDataTransferObject
+        var saveWorkoutFeedbackRequestDataTransferObject = new SaveWorkoutFeedbackRequestDataTransferObject
         {
             WorkoutLogId = workoutLog.WorkoutLogId,
             Rating = workoutLog.Rating,
             TrainerNotes = workoutLog.TrainerNotes,
         };
 
-        await this.httpClient.PutAsJsonAsync($"{ApiUrl}/trainer/save-workout-feedback", dto);
+        await this.httpClient.PutAsJsonAsync($"{baseAddress}/trainer/save-workout-feedback", saveWorkoutFeedbackRequestDataTransferObject);
     }
 
     public async Task<bool> CreateAndAssignNutritionPlanAsync(DateTime startDate, DateTime endDate, int clientId)
     {
-        var dto = new CreateNutritionPlanRequestDataTransferObject
+        var createNutritionPlanRequestDataTransferObject = new CreateNutritionPlanRequestDataTransferObject
         {
             StartDate = startDate,
             EndDate = endDate,
             ClientId = clientId,
         };
 
-        var response = await this.httpClient.PostAsJsonAsync($"{ApiUrl}/trainer/create-assign-nutrition-plan", dto);
-        return response.IsSuccessStatusCode;
+        var createAndAssignNutritionPlanResponse = await this.httpClient.PostAsJsonAsync($"{baseAddress}/trainer/create-assign-nutrition-plan", createNutritionPlanRequestDataTransferObject);
+        return createAndAssignNutritionPlanResponse.IsSuccessStatusCode;
     }
 }

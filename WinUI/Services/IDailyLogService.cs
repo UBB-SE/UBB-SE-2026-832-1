@@ -1,18 +1,16 @@
-using ClassLibrary.DTOs;
+﻿using ClassLibrary.DTOs;
 
-namespace WinUI.Services;
-
-public interface IDailyLogService
+namespace WinUI.Services
 {
-    Task<DailyLogTotalsDto> GetTodayTotalsAsync(int userId);
-
-    Task<DailyLogTotalsDto> GetCurrentWeekTotalsAsync(int userId);
-
-    Task<UserDataDto?> GetNutritionTargetsAsync(int userId);
-
-    Task<double> GetTodayBurnedCaloriesAsync(int userId);
-
-    Task<IReadOnlyList<FoodItemDto>> SearchFoodItemsAsync(string? searchTerm);
-
-    Task LogFoodItemAsync(int userId, LogMealRequestDto request);
+    public interface IDailyLogService
+    {
+        Task<UserDataDto?> GetCurrentUserNutritionTargetsAsync(int userId);
+        Task<DailyLogTotalsDto> GetCurrentWeekTotalsAsync(int userId);
+        Task<IReadOnlyList<FoodItemDto>> GetFoodItemsForAutocompleteAsync();
+        Task<double> GetTodayBurnedCaloriesAsync(int userId);
+        Task<DailyLogTotalsDto> GetTodayTotalsAsync(int userId);
+        Task<bool> HasAnyLogsAsync(int userId);
+        Task LogFoodItemAsync(int userId, LogMealRequestDto request);
+        Task<IReadOnlyList<FoodItemDto>> SearchFoodItemsAsync(string? searchTerm);
+    }
 }
