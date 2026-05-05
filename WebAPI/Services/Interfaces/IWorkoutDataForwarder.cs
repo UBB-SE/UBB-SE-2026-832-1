@@ -8,3 +8,4 @@ public interface IWorkoutDataForwarder
         WorkoutLogRequestDto request,
         CancellationToken cancellationToken = default);
 }
+
