@@ -22,10 +22,9 @@ public sealed class AchievementsService : IAchievementsService
         return dtos.Select(dto => new Achievement
         {
             AchievementId = dto.AchievementId,
-            Title = dto.Title,
+            Name = dto.Name,
             Description = dto.Description,
             Criteria = dto.Criteria,
-            ThresholdWorkouts = dto.ThresholdWorkouts,
         }).ToList();
     }
 }
