@@ -29,7 +29,7 @@ public sealed class TrainerDashboardService : ITrainerDashboardService
 
     public async Task<IReadOnlyList<WorkoutLog>> GetClientWorkoutHistoryAsync(int clientId)
     {
-        var response = await this.httpClient.GetFromJsonAsync<List<WorkoutLogDataTransferObject>>($"{ApiUrl}/client/{clientId}/workout-history");
+        var response = await this.httpClient.GetFromJsonAsync<List<WorkoutLogDataTransferObject>>($"{ApiUrl}/{Route}/{clientId}/workout-history");
         var dtos = response ?? new List<WorkoutLogDataTransferObject>();
         return dtos.Select(dto => new WorkoutLog
         {
