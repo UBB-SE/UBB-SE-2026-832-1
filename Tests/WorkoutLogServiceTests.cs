@@ -79,6 +79,47 @@ public sealed class WorkoutLogServiceTests
         Assert.Empty(result);
     }
 
+    [Fact]
+    public async Task GetClientWeightAsync_ShouldDelegateToRepository()
+    {
+        this.workoutLogRepository
+            .Setup(repository => repository.GetClientWeightAsync(1))
+            .ReturnsAsync(82.5);
+
+        var service = this.CreateService();
+        var result = await service.GetClientWeightAsync(1);
+
+        Assert.Equal(82.5, result);
+    }
+
+    [Fact]
+    public async Task SaveWorkoutLogAsync_ShouldPersistMappedModel()
+    {
+        var dto = new ClassLibrary.DTOs.WorkoutLogDataTransferObject
+        {
+            WorkoutLogId = 5,
+            WorkoutName = "Leg Day",
+            Date = DateTime.Today,
+            Duration = TimeSpan.FromMinutes(45),
+            Type = "CUSTOM",
+            Rating = 4.0,
+            TrainerNotes = "Good form",
+            Exercises = new List<ClassLibrary.DTOs.LoggedExerciseDataTransferObject>(),
+            Client = new ClassLibrary.DTOs.ClientDataTransferObject { ClientId = 1 },
+        };
+
+        var service = this.CreateService();
+        await service.SaveWorkoutLogAsync(dto);
+
+        this.workoutLogRepository.Verify(
+            repository => repository.SaveWorkoutLogAsync(
+                It.Is<WorkoutLog>(log =>
+                    log.WorkoutName == "Leg Day"
+                    && log.Rating == 4.0
+                    && log.Type == WorkoutType.CUSTOM)),
+            Times.Once);
+    }
+
     private static WorkoutLog CreateLogWithRating(double rating)
     {
         return new WorkoutLog
