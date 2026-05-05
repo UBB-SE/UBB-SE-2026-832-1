@@ -2,13 +2,13 @@
 using ClassLibrary.DTOs;
 namespace WinUI.Services;
 
-public sealed class ReminderService : IReminderService
+public sealed class RemindersService : IRemindersService
 {
     private const string API_BASE_ADDRESS = "https://localhost:7197";
 
     private readonly HttpClient httpClient;
 
-    public ReminderService(HttpClient httpClient)
+    public RemindersService(HttpClient httpClient)
     {
         this.httpClient = httpClient;
     }
