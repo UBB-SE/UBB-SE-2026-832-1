@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDailyLogServiceProxy, DailyLogServiceProxy>();
         services.AddScoped<IWorkoutLogService, WorkoutLogService>();
         services.AddScoped<IWorkoutLogServiceProxy, WorkoutLogServiceProxy>();
+        services.AddHttpClient<IMealService, MealService>();
         return services;
     }
 }
