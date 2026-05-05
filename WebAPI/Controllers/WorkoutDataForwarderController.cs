@@ -1,11 +1,11 @@
-﻿namespace WebAPI.Controllers;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI.Services.Interfaces;
 using ClassLibrary.DTOs;
 
+namespace WebAPI.Controllers;
+
 [ApiController]
-[Route("api/workoutDataForwarder")]
+[Route("api/workout-data-forwarder")]
 public class WorkoutDataForwarderController : ControllerBase
 {
     private readonly IWorkoutDataForwarder workoutDataForwarder;
