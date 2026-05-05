@@ -9,22 +9,23 @@ namespace WinUI.ViewModels;
 
 public partial class RankShowcaseViewModel : ObservableObject
 {
-    private const string defaultLevelDisplayLine = "Level 1: Beginner";
-    private const string defaultUnlockedAchievementsDisplay = "0 achievements unlocked";
-    private const string defaultNextRankInfo = "Complete more achievements to unlock your next rank.";
-    private const string rankShowcaseLoadErrorFormat = "Failed to load rank showcase: {0}";
+    private const string DEFAULT_LEVEL_DISPLAY_LINE = "Level 1: Beginner";
+    private const string DEFAULT_UNLOCKED_ACHIEVEMENTS_DISPLAY = "0 achievements unlocked";
+    private const string DEFAULT_NEXT_RANK_INFO = "Complete more achievements to unlock your next rank.";
+    private const string RANK_SHOWCASE_LOAD_ERROR_FORMAT = "Failed to load rank showcase: {0}";
+
 
     private readonly IRankShowcaseService rankShowcaseService;
     private readonly UserSession userSession;
 
     [ObservableProperty]
-    private string levelDisplayLine = defaultLevelDisplayLine;
+    private string levelDisplayLine = DEFAULT_LEVEL_DISPLAY_LINE;
 
     [ObservableProperty]
-    private string unlockedAchievementsDisplay = defaultUnlockedAchievementsDisplay;
+    private string unlockedAchievementsDisplay = DEFAULT_UNLOCKED_ACHIEVEMENTS_DISPLAY;
 
     [ObservableProperty]
-    private string nextRankInfo = defaultNextRankInfo;
+    private string nextRankInfo = DEFAULT_NEXT_RANK_INFO;
 
     [ObservableProperty]
     private bool isLoading;
@@ -72,7 +73,7 @@ public partial class RankShowcaseViewModel : ObservableObject
         }
         catch (Exception exception)
         {
-            this.ErrorMessage = string.Format(rankShowcaseLoadErrorFormat, exception.Message);
+            this.ErrorMessage = string.Format(RANK_SHOWCASE_LOAD_ERROR_FORMAT, exception.Message);
         }
         finally
         {
