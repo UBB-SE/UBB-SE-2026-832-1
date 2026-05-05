@@ -19,10 +19,13 @@ public partial class UserViewModel : ObservableObject
     private const string ERROR_INVALID_CREDENTIALS = "Invalid username or password.";
     private const string ERROR_SAVING_DATA_FORMAT = "An error occurred while saving: {0}";
 
-    private readonly IUserService userService;
+    private readonly IUserService? userService;
 
     [ObservableProperty]
-    private string username = string.Empty;
+    private string userName = string.Empty;
+
+    [ObservableProperty]
+    private string userEmail = string.Empty;
 
     [ObservableProperty]
     private string password = string.Empty;
@@ -58,6 +61,10 @@ public partial class UserViewModel : ObservableObject
 
     public event EventHandler? SaveDataSuccess;
 
+    public UserViewModel()
+    {
+    }
+
     public UserViewModel(IUserService userService)
     {
         this.userService = userService;
@@ -66,9 +73,10 @@ public partial class UserViewModel : ObservableObject
     [RelayCommand]
     private async Task OnRegisterAsync()
     {
+        if (this.userService == null) return;
         this.StatusMessage = string.Empty;
 
-        if (string.IsNullOrWhiteSpace(this.Username) || string.IsNullOrWhiteSpace(this.Password))
+        if (string.IsNullOrWhiteSpace(this.UserName) || string.IsNullOrWhiteSpace(this.Password))
         {
             this.StatusMessage = ERROR_USERNAME_PASSWORD_REQUIRED;
             return;
@@ -76,7 +84,7 @@ public partial class UserViewModel : ObservableObject
 
         string role = this.IsNutritionistChecked ? ROLE_NUTRITIONIST : ROLE_USER;
 
-        if (await this.userService.CheckIfUsernameExistsAsync(this.Username))
+        if (await this.userService.CheckIfUsernameExistsAsync(this.UserName))
         {
             this.StatusMessage = ERROR_USERNAME_EXISTS;
             return;
@@ -88,7 +96,7 @@ public partial class UserViewModel : ObservableObject
         }
         else
         {
-            var registered = await this.userService.RegisterAsync(this.Username, this.Password, role);
+            var registered = await this.userService.RegisterAsync(this.UserName, this.Password, role);
             if (registered != null)
             {
                 this.LoggedInUserId = registered.Id;
@@ -105,6 +113,7 @@ public partial class UserViewModel : ObservableObject
     [RelayCommand]
     private async Task OnSaveDataAsync()
     {
+        if (this.userService == null) return;
         this.StatusMessage = string.Empty;
 
         try
@@ -117,7 +126,7 @@ public partial class UserViewModel : ObservableObject
             }
 
             string role = this.IsNutritionistChecked ? ROLE_NUTRITIONIST : ROLE_USER;
-            var registered = await this.userService.RegisterAsync(this.Username, this.Password, role);
+            var registered = await this.userService.RegisterAsync(this.UserName, this.Password, role);
             if (registered == null)
             {
                 this.StatusMessage = ERROR_REGISTRATION_FAILED;
@@ -149,9 +158,10 @@ public partial class UserViewModel : ObservableObject
     [RelayCommand]
     private async Task OnLoginAsync()
     {
+        if (this.userService == null) return;
         this.StatusMessage = string.Empty;
 
-        if (string.IsNullOrWhiteSpace(this.Username) || string.IsNullOrWhiteSpace(this.Password))
+        if (string.IsNullOrWhiteSpace(this.UserName) || string.IsNullOrWhiteSpace(this.Password))
         {
             this.StatusMessage = ERROR_USERNAME_PASSWORD_REQUIRED;
             return;
@@ -159,7 +169,7 @@ public partial class UserViewModel : ObservableObject
 
         try
         {
-            var user = await this.userService.LoginAsync(this.Username, this.Password);
+            var user = await this.userService.LoginAsync(this.UserName, this.Password);
 
             if (user != null)
             {
