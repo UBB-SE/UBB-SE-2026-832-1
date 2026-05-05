@@ -65,8 +65,7 @@ public class UserService : IUserService
     public async Task<bool> CheckIfUsernameExistsAsync(string username)
     {
         var users = await this.userRepository.GetAllAsync();
-        return users.Any(user =>
-            string.Equals(user.Username, username, StringComparison.OrdinalIgnoreCase));
+        return users.Any(user => string.Equals(user.Username, username, StringComparison.OrdinalIgnoreCase));
     }
 
     public async Task<UserDataDto?> GetUserDataAsync(int userId)

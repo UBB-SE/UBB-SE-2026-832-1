@@ -21,6 +21,9 @@
   - whenever possible to use `const` keyword before a variable, it must be used
   - constants must use `UPPER_CASE_WITH_UNDERSCORES` naming convention
 
+6. Observable variables
+   - Variables with [ObservableProperty] adnotation should be partial public not private
+
 ### Files
 
 - filenames and directory names must use `PascalCase`
@@ -44,6 +47,7 @@
     - `protected`
     - `public`
 - Cancellation token shouldn't exist as a parameter anywhere. We use basic authentification
+- WinUi Services are different from WebApi Services, WinUi Services commmunicates with the controllers in WebApi through api calls
 ## Whitespace rules
 
 - a maximum of one statement per line

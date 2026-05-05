@@ -1,22 +1,15 @@
-﻿using ClassLibrary.Data;
-using ClassLibrary.Models;
-using ClassLibrary.IRepositories;
-using Microsoft.EntityFrameworkCore;
-
-namespace ClassLibrary.Repositories;
-
 public class RepositoryTrainer : IRepositoryTrainer
 {
-    private readonly AppDbContext databaseContext;
+    private readonly AppDbContext dbContext;
 
-    public RepositoryTrainer(AppDbContext databaseContext)
+    public RepositoryTrainer(AppDbContext dbContext)
     {
-        this.databaseContext = databaseContext;
+        this.dbContext = dbContext;
     }
 
     public async Task<List<Client>> GetTrainerClientsAsync(int trainerId)
     {
-        return await databaseContext.Clients
+        return await dbContext.Clients
             .Include(client => client.WorkoutLogs)
             .ToListAsync();
     }
@@ -24,21 +17,26 @@ public class RepositoryTrainer : IRepositoryTrainer
     public async Task<bool> SaveTrainerWorkoutAsync(WorkoutTemplate workoutTemplate)
     {
         if (workoutTemplate.WorkoutTemplateId == 0)
-            await databaseContext.Set<WorkoutTemplate>().AddAsync(workoutTemplate);
+        {
+            await dbContext.Set<WorkoutTemplate>().AddAsync(workoutTemplate);
+        }
         else
-            databaseContext.Set<WorkoutTemplate>().Update(workoutTemplate);
+        {
+            dbContext.Set<WorkoutTemplate>().Update(workoutTemplate);
+        }
 
-        return await databaseContext.SaveChangesAsync() > 0;
+        return await dbContext.SaveChangesAsync() > 0;
     }
 
     public async Task<bool> DeleteWorkoutTemplateAsync(int workoutTemplateId)
     {
-        var workoutTemplate = await databaseContext.Set<WorkoutTemplate>()
+        var workoutTemplate = await dbContext.Set<WorkoutTemplate>()
             .FirstOrDefaultAsync(template => template.WorkoutTemplateId == workoutTemplateId);
 
-        if (workoutTemplate == null) return false;
+        if (workoutTemplate == null)
+            return false;
 
-        databaseContext.Remove(workoutTemplate);
-        return await databaseContext.SaveChangesAsync() > 0;
+        dbContext.Remove(workoutTemplate);
+        return await dbContext.SaveChangesAsync() > 0;
     }
 }

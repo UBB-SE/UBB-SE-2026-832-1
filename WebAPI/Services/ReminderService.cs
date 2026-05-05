@@ -1,40 +1,63 @@
-﻿using ClassLibrary.Models;
+using ClassLibrary.DTOs;
+using ClassLibrary.Models;
 using ClassLibrary.IRepositories;
-using WebAPI.Services.Interfaces;
+using WebAPI.IServices;
 
 namespace WebAPI.Services;
 
-public class ReminderService : IReminderService
+public sealed class ReminderService : IReminderService
 {
     private readonly IReminderRepository reminderRepository;
+    private readonly IUserRepository userRepository;
 
-    public ReminderService(IReminderRepository reminderRepository)
+    public ReminderService(IReminderRepository reminderRepository, IUserRepository userRepository)
     {
         this.reminderRepository = reminderRepository;
+        this.userRepository = userRepository;
     }
 
-    public async Task<List<Reminder>> GetUserRemindersAsync(int userId)
+    public async Task<IReadOnlyList<ReminderDataTransferObject>> GetUserRemindersAsync(int userId)
     {
         var reminders = await this.reminderRepository.GetAllByUserIdAsync(userId);
-        return reminders.ToList();
+        return reminders.Select(MapToDto).ToList();
     }
 
-    public async Task<Reminder?> GetReminderByIdAsync(int id)
+    public async Task<ReminderDataTransferObject?> GetReminderByIdAsync(int id)
     {
-        return await this.reminderRepository.GetByIdAsync(id);
+        var reminder = await this.reminderRepository.GetByIdAsync(id);
+        return reminder == null ? null : MapToDto(reminder);
     }
 
-    public async Task<Reminder?> GetNextReminderAsync(int userId)
+    public async Task<ReminderDataTransferObject?> GetNextReminderAsync(int userId)
     {
-        return await this.reminderRepository.GetNextReminderAsync(userId);
+        var reminder = await this.reminderRepository.GetNextReminderAsync(userId);
+        return reminder == null ? null : MapToDto(reminder);
     }
 
-    public async Task<bool> SaveReminderAsync(Reminder reminder)
+    public async Task<bool> SaveReminderAsync(SaveReminderRequestDataTransferObject request)
     {
-        if (string.IsNullOrWhiteSpace(reminder.Name) || reminder.Name.Length > 50)
+        if (request == null || request.UserId <= 0)
             return false;
 
-        if (reminder.Id == 0)
+        if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Length > 50)
+            return false;
+
+        var user = await this.userRepository.GetByIdAsync(request.UserId);
+        if (user == null)
+            return false;
+
+        var reminder = new Reminder
+        {
+            ReminderId = request.Id,
+            UserId = request.UserId,
+            Name = request.Name,
+            HasSound = request.HasSound,
+            Time = request.Time,
+            ReminderDate = request.ReminderDate,
+            Frequency = request.Frequency,
+        };
+
+        if (reminder.ReminderId == 0)
             await this.reminderRepository.AddAsync(reminder);
         else
             await this.reminderRepository.UpdateAsync(reminder);
@@ -45,5 +68,19 @@ public class ReminderService : IReminderService
     public async Task DeleteReminderAsync(int id)
     {
         await this.reminderRepository.DeleteAsync(id);
+    }
+
+    private static ReminderDataTransferObject MapToDto(Reminder reminder)
+    {
+        return new ReminderDataTransferObject
+        {
+            Id = reminder.ReminderId,
+            UserId = reminder.UserId,
+            Name = reminder.Name,
+            HasSound = reminder.HasSound,
+            Time = reminder.Time,
+            ReminderDate = reminder.ReminderDate,
+            Frequency = reminder.Frequency,
+        };
     }
 }

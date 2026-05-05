@@ -239,6 +239,30 @@ public sealed class ClientService : IClientService
         }
     }
 
+    public async Task<bool> ModifyWorkoutAsync(WorkoutLogDataTransferObject updatedWorkoutLog)
+    {
+        if (updatedWorkoutLog == null || updatedWorkoutLog.WorkoutLogId <= 0)
+        {
+            return false;
+        }
+
+        if (updatedWorkoutLog.Client == null || updatedWorkoutLog.Client.ClientId <= 0)
+        {
+            return false;
+        }
+
+        var client = await this.clientRepository.GetByIdAsync(updatedWorkoutLog.Client.ClientId);
+        if (client == null)
+        {
+            return false;
+        }
+
+        var log = MapToWorkoutLog(updatedWorkoutLog, client);
+        log.WorkoutLogId = updatedWorkoutLog.WorkoutLogId;
+        await this.workoutLogRepository.UpdateWorkoutLogAsync(log);
+        return true;
+    }
+
     private static WorkoutLogDataTransferObject MapWorkoutLog(WorkoutLog log)
     {
         return new WorkoutLogDataTransferObject
@@ -254,7 +278,7 @@ public sealed class ClientService : IClientService
             TotalCaloriesBurned = log.TotalCaloriesBurned,
             AverageMetabolicEquivalent = log.AverageMetabolicEquivalent,
             IntensityTag = log.IntensityTag,
-            Rating = log.Rating,
+            Rating = log.Rating <= 0 ? null : log.Rating,
             TrainerNotes = log.TrainerNotes,
         };
     }
@@ -373,7 +397,7 @@ public sealed class ClientService : IClientService
             TotalCaloriesBurned = workoutLogDataTransferObject.TotalCaloriesBurned,
             AverageMetabolicEquivalent = workoutLogDataTransferObject.AverageMetabolicEquivalent,
             IntensityTag = workoutLogDataTransferObject.IntensityTag,
-            Rating = workoutLogDataTransferObject.Rating,
+            Rating = workoutLogDataTransferObject.Rating ?? 0,
             TrainerNotes = workoutLogDataTransferObject.TrainerNotes,
         };
 

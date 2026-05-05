@@ -27,6 +27,12 @@ public sealed class AppDbContext : DbContext
     public DbSet<WorkoutTemplate> WorkoutTemplates { get; set; } = default!;
     public DbSet<Notification> Notifications { get; set; } = default!;
     public DbSet<Reminder> Reminders { get; set; } = default!;
+    public DbSet<NutritionPlan> NutritionPlans { get; set; } = default!;
+    public DbSet<Meal> Meals { get; set; } = default!;
+    public DbSet<ClientNutritionPlan> ClientNutritionPlans { get; set; } = default!;
+    public DbSet<DailyLog> DailyLogs { get; set; } = default!;
+    public DbSet<Conversation> Conversations { get; set; } = default!;
+    public DbSet<Message> Messages { get; set; } = default!;
     public DbSet<ShoppingItem> ShoppingItems { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -41,15 +47,12 @@ public sealed class AppDbContext : DbContext
                     JsonSerializer.Deserialize<List<string>>(serializedIngredientList, (JsonSerializerOptions?)null)
                     ?? new List<string>())
             .Metadata.SetValueComparer(new ValueComparer<List<string>>(
-                (firstIngredientList, secondIngredientList) =>
-                    (firstIngredientList ?? new List<string>())
-                        .SequenceEqual(secondIngredientList ?? new List<string>()),
-
-                ingredientList =>
-                    ingredientList.Aggregate(0, (combinedHash, currentItem) =>
+                (firstList, secondList) =>
+                    (firstList ?? new List<string>()).SequenceEqual(secondList ?? new List<string>()),
+                list =>
+                    list.Aggregate(0, (combinedHash, currentItem) =>
                         HashCode.Combine(combinedHash, currentItem.GetHashCode())),
-
-                ingredientList => ingredientList.ToList()));
+                list => list.ToList()));
 
         modelBuilder.Entity<Reminder>(entity =>
         {
@@ -59,6 +62,10 @@ public sealed class AppDbContext : DbContext
 
             entity.Property(reminder => reminder.Frequency)
                 .HasMaxLength(50);
+
+            entity.HasOne(reminder => reminder.User)
+                .WithMany(user => user.Reminders)
+                .IsRequired();
         });
     }
 }

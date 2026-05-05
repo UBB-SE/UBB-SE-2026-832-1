@@ -1,4 +1,4 @@
-using ClassLibrary.DTOs;
+using ClassLibrary.Models;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.IServices;
 
@@ -18,65 +18,71 @@ public sealed class UsersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var users = await this.userService.GetUsersAsync();
-        return this.Ok(users);
+        var users = await userService.GetUsersAsync();
+        return Ok(users);
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await this.userService.LoginAsync(request.Username, request.Password);
+        var user = await userService.LoginAsync(request.Username, request.Password);
         if (user == null)
         {
-            return this.Unauthorized();
+            return Unauthorized();
         }
 
-        return this.Ok(user);
+        return Ok(user);
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var user = await this.userService.RegisterAsync(request.Username, request.Password, request.Role);
+        var user = await userService.RegisterUserAsync(new User
+        {
+            Username = request.Username,
+            Password = request.Password,
+            Role = request.Role
+        });
+
         if (user == null)
         {
-            return this.Conflict("Username already taken.");
+            return Conflict("Username already taken.");
         }
 
-        return this.CreatedAtAction(nameof(GetAll), user);
+        return CreatedAtAction(nameof(GetAll), user);
     }
 
     [HttpGet("exists/{username}")]
     public async Task<IActionResult> CheckUsernameExists(string username)
     {
-        bool exists = await this.userService.CheckIfUsernameExistsAsync(username);
-        return this.Ok(exists);
+        bool exists = await userService.CheckIfUsernameExistsAsync(username);
+        return Ok(exists);
     }
 
     [HttpGet("{userId}/data")]
     public async Task<IActionResult> GetUserData(int userId)
     {
-        var userData = await this.userService.GetUserDataAsync(userId);
+        var userData = await userService.GetUserDataAsync(userId);
         if (userData == null)
         {
-            return this.NotFound();
+            return NotFound();
         }
 
-        return this.Ok(userData);
+        return Ok(userData);
     }
 
     [HttpPost("data")]
-    public async Task<IActionResult> AddUserData([FromBody] UserDataDto userDataDto)
+    public async Task<IActionResult> AddUserData([FromBody] UserData userData)
     {
-        await this.userService.AddUserDataAsync(userDataDto);
-        return this.Ok();
+        await userService.UpdateUserDataAsync(userData);
+        return Ok();
     }
 
     [HttpPut("data")]
-    public async Task<IActionResult> UpdateUserData([FromBody] UserDataDto userDataDto)
+    public async Task<IActionResult> UpdateUserData([FromBody] UserData userData)
     {
-        await this.userService.UpdateUserDataAsync(userDataDto);
-        return this.Ok();
+        await userService.UpdateUserDataAsync(userData);
+        return Ok();
     }
 }
 

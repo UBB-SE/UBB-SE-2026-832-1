@@ -1,10 +1,12 @@
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using WinRT.Interop;
+using WinUI.Services;
 using WinUI.ViewModels;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -19,7 +21,9 @@ public sealed partial class CalendarIntegrationPage : Page
     {
         this.InitializeComponent();
 
-        this.viewModel = new CalendarIntegrationViewModel();
+        this.viewModel = new CalendarIntegrationViewModel(
+            new CalendarIntegrationService(new HttpClient()),
+            new UserSession());
         this.DataContext = this.viewModel;
 
         this.Loaded += async (_, _) =>

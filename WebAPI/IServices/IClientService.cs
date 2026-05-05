@@ -23,4 +23,6 @@ public interface IClientService
     Task<bool> ConfirmDeloadAsync(ConfirmDeloadRequestDataTransferObject request);
 
     Task<bool> SyncNutritionAsync(NutritionSyncRequestDataTransferObject request);
+
+    Task<bool> ModifyWorkoutAsync(WorkoutLogDataTransferObject updatedWorkoutLog);
 }

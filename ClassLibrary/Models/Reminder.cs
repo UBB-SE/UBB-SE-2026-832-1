@@ -1,6 +1,8 @@
+namespace ClassLibrary.Models;
+
 public class Reminder
 {
-    public int ReminderId { get; set; } 
+    public int ReminderId { get; set; }
 
     public int UserId { get; set; }
 
