@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEvaluationEngineService, EvaluationEngineService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<ICalendarWorkoutCatalogService, CalendarWorkoutCatalogService>();
         services.AddSingleton<IAchievementUnlockedBus, AchievementUnlockedBus>();
 
         return services;
