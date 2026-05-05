@@ -2,7 +2,7 @@ namespace ClassLibrary.Models;
 
 public sealed class ShoppingListItem
 {
-    public int ShoppingListItemId { get; set; }
+    public int Id { get; set; }
 
     public string IngredientName { get; set; } = string.Empty;
 

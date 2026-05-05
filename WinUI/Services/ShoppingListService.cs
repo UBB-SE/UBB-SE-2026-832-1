@@ -6,8 +6,8 @@ namespace WinUI.Services;
 
 public sealed class ShoppingListService : IShoppingListService
 {
-    private const string API_BASE_ADDRESS = "https://localhost:7197/api";
-    private const string SHOPPING_LIST_ROUTE = "ShoppingList";
+    private const string apiBaseAddress = "https://localhost:7197/api";
+    private const string shoppingListRoute = "ShoppingList";
     private readonly HttpClient httpClient;
 
     public ShoppingListService(HttpClient httpClient)
@@ -18,7 +18,7 @@ public sealed class ShoppingListService : IShoppingListService
     public async Task<IReadOnlyList<ShoppingListItem>> GetShoppingItemsAsync(int userId)
     {
         var shoppingItemDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<ShoppingItemDto>>(
-            $"{API_BASE_ADDRESS}/{SHOPPING_LIST_ROUTE}/user/{userId}");
+            $"{apiBaseAddress}/{shoppingListRoute}/user/{userId}");
 
         if (shoppingItemDataTransferObjects is null)
         {
@@ -37,7 +37,7 @@ public sealed class ShoppingListService : IShoppingListService
         };
 
         HttpResponseMessage response = await this.httpClient.PostAsJsonAsync(
-            $"{API_BASE_ADDRESS}/{SHOPPING_LIST_ROUTE}/user/{userId}",
+            $"{apiBaseAddress}/{shoppingListRoute}/user/{userId}",
             request);
 
         if (!response.IsSuccessStatusCode)
@@ -55,7 +55,7 @@ public sealed class ShoppingListService : IShoppingListService
     public async Task<bool> RemoveItemAsync(ShoppingListItem item)
     {
         HttpResponseMessage response = await this.httpClient.DeleteAsync(
-            $"{API_BASE_ADDRESS}/{SHOPPING_LIST_ROUTE}/{item.ShoppingListItemId}");
+            $"{apiBaseAddress}/{shoppingListRoute}/{item.Id}");
         return response.IsSuccessStatusCode;
     }
 
@@ -70,7 +70,7 @@ public sealed class ShoppingListService : IShoppingListService
         IReadOnlyList<ShoppingListItem> previousItems = await this.GetShoppingItemsAsync(userId);
 
         HttpResponseMessage response = await this.httpClient.PostAsync(
-            $"{API_BASE_ADDRESS}/{SHOPPING_LIST_ROUTE}/generate/{userId}",
+            $"{apiBaseAddress}/{shoppingListRoute}/generate/{userId}",
             null);
 
         if (!response.IsSuccessStatusCode)
@@ -92,7 +92,7 @@ public sealed class ShoppingListService : IShoppingListService
     {
         return new ShoppingListItem
         {
-            ShoppingListItemId = shoppingItemDataTransferObject.Id,
+            Id = shoppingItemDataTransferObject.Id,
             IngredientName = shoppingItemDataTransferObject.IngredientName,
             QuantityGrams = shoppingItemDataTransferObject.QuantityGrams,
             IsChecked = shoppingItemDataTransferObject.IsChecked,
