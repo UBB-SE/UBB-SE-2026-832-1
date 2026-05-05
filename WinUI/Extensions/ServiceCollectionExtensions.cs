@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserServiceProxy, UserServiceProxy>();
         services.AddHttpClient<IActiveWorkoutService, ActiveWorkoutService>();
         services.AddHttpClient<ICreateWorkoutService, CreateWorkoutService>();
+        services.AddHttpClient<ITrainerDashboardService, TrainerDashboardService>();
         services.AddHttpClient<IAchievementsService, AchievementsService>();
         return services;
     }
