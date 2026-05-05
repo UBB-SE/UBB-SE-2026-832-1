@@ -9,7 +9,7 @@ namespace WinUI.ViewModels;
 
 public partial class MealDetailViewModel : ObservableObject
 {
-    private const int pageSize = 8;
+    private const int PAGE_SIZE = 8;
     private readonly IMealService mealService;
     private readonly UserSession userSession;
     private readonly List<FoodItem> allMeals = [];
@@ -174,15 +174,15 @@ public partial class MealDetailViewModel : ObservableObject
     {
         this.Meals.Clear();
 
-        int skipCount = (this.CurrentPage - 1) * pageSize;
-        foreach (FoodItem meal in this.allMeals.Skip(skipCount).Take(pageSize))
+        int skipCount = (this.CurrentPage - 1) * PAGE_SIZE;
+        foreach (FoodItem meal in this.allMeals.Skip(skipCount).Take(PAGE_SIZE))
         {
             this.Meals.Add(meal);
         }
 
         this.PageText = $"Page {this.CurrentPage}";
         this.CanGoToPreviousPage = this.CurrentPage > 1;
-        this.CanGoToNextPage = this.CurrentPage * pageSize < this.allMeals.Count;
+        this.CanGoToNextPage = this.CurrentPage * PAGE_SIZE < this.allMeals.Count;
         this.SelectedMeal = this.Meals.FirstOrDefault();
     }
 }
