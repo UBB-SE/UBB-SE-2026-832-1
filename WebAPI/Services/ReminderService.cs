@@ -1,50 +1,49 @@
 ﻿using ClassLibrary.Models;
-using ClassLibrary.IRepositories;   
+using ClassLibrary.IRepositories;
 using WebAPI.Services.Interfaces;
 
-namespace WebAPI.Services
+namespace WebAPI.Services;
+
+public class ReminderService : IReminderService
 {
-    public class ReminderService : IReminderService
+    private readonly IReminderRepository reminderRepository;
+
+    public ReminderService(IReminderRepository reminderRepository)
     {
-        private readonly IReminderRepository _reminderRepository;
+        this.reminderRepository = reminderRepository;
+    }
 
-        public ReminderService(IReminderRepository reminderRepository)
-        {
-            _reminderRepository = reminderRepository;
-        }
+    public async Task<List<Reminder>> GetUserRemindersAsync(int userId)
+    {
+        var reminders = await this.reminderRepository.GetAllByUserIdAsync(userId);
+        return reminders.ToList();
+    }
 
-        public async Task<List<Reminder>> GetUserRemindersAsync(int userId)
-        {
-            var reminders = await _reminderRepository.GetAllByUserIdAsync(userId);
-            return reminders.ToList();
-        }
+    public async Task<Reminder?> GetReminderByIdAsync(int id)
+    {
+        return await this.reminderRepository.GetByIdAsync(id);
+    }
 
-        public async Task<Reminder?> GetReminderByIdAsync(int id)
-        {
-            return await _reminderRepository.GetByIdAsync(id);
-        }
+    public async Task<Reminder?> GetNextReminderAsync(int userId)
+    {
+        return await this.reminderRepository.GetNextReminderAsync(userId);
+    }
 
-        public async Task<Reminder?> GetNextReminderAsync(int userId)
-        {
-            return await _reminderRepository.GetNextReminderAsync(userId);
-        }
+    public async Task<bool> SaveReminderAsync(Reminder reminder)
+    {
+        if (string.IsNullOrWhiteSpace(reminder.Name) || reminder.Name.Length > 50)
+            return false;
 
-        public async Task<bool> SaveReminderAsync(Reminder reminder)
-        {
-            if (string.IsNullOrWhiteSpace(reminder.Name) || reminder.Name.Length > 50)
-                return false;
+        if (reminder.Id == 0)
+            await this.reminderRepository.AddAsync(reminder);
+        else
+            await this.reminderRepository.UpdateAsync(reminder);
 
-            if (reminder.Id == 0)
-                await _reminderRepository.AddAsync(reminder);
-            else
-                await _reminderRepository.UpdateAsync(reminder);
+        return true;
+    }
 
-            return true;
-        }
-
-        public async Task DeleteReminderAsync(int id)
-        {
-            await _reminderRepository.DeleteAsync(id);
-        }
+    public async Task DeleteReminderAsync(int id)
+    {
+        await this.reminderRepository.DeleteAsync(id);
     }
 }

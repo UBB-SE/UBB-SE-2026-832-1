@@ -36,12 +36,20 @@ public sealed class AppDbContext : DbContext
         modelBuilder.Entity<Meal>()
             .Property(meal => meal.Ingredients)
             .HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                v => JsonSerializer.Deserialize<List<string>>(v) ?? new List<string>())
+                ingredientList => JsonSerializer.Serialize(ingredientList, (JsonSerializerOptions?)null),
+                serializedIngredientList =>
+                    JsonSerializer.Deserialize<List<string>>(serializedIngredientList, (JsonSerializerOptions?)null)
+                    ?? new List<string>())
             .Metadata.SetValueComparer(new ValueComparer<List<string>>(
-                (a, b) => (a ?? new List<string>()).SequenceEqual(b ?? new List<string>()),
-                a => a.Aggregate(0, (h, x) => HashCode.Combine(h, x.GetHashCode())),
-                a => a.ToList()));
+                (firstIngredientList, secondIngredientList) =>
+                    (firstIngredientList ?? new List<string>())
+                        .SequenceEqual(secondIngredientList ?? new List<string>()),
+
+                ingredientList =>
+                    ingredientList.Aggregate(0, (combinedHash, currentItem) =>
+                        HashCode.Combine(combinedHash, currentItem.GetHashCode())),
+
+                ingredientList => ingredientList.ToList()));
 
         modelBuilder.Entity<Reminder>(entity =>
         {
