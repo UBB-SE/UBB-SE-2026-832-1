@@ -17,7 +17,7 @@ public sealed class CreateWorkoutService : ICreateWorkoutService
 
     public async Task<IReadOnlyList<string>> GetAllExerciseNamesAsync()
     {
-        var response = await this.httpClient.GetFromJsonAsync<List<string>>($"{ApiUrl}/{Route}/exercises");
+        var response = await this.httpClient.GetFromJsonAsync<List<string>>($"{ApiUrl}/{Route}/exercise-names");
         return response ?? new List<string>();
     }
 
