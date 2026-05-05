@@ -1,13 +1,22 @@
-using ClassLibrary.DTOs;
+using ClassLibrary.Models;
 
 namespace WinUI.Services;
 
 public interface IActiveWorkoutService
 {
-    Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetAvailableWorkoutsForClient(int clientId);
-    Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetCustomAndTrainerAssignedWorkoutsForClient(int clientId);
-    Task<WorkoutTemplateDataTransferObject?> FindWorkoutTemplateById(int clientId, int? id);
+    Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsForClient(int clientId);
+
+    Task<IReadOnlyList<WorkoutTemplate>> GetCustomAndTrainerAssignedWorkoutsForClient(int clientId);
+
+    Task<WorkoutTemplate?> FindWorkoutTemplateById(int clientId, int? id);
+
     Task<IDictionary<string, double>> GetPreviousBestWeightsAsync(int clientId);
-    Task<bool> SaveSetAsync(WorkoutLogDataTransferObject workoutLog);
-    Task<bool> FinalizeWorkoutAsync(WorkoutLogDataTransferObject workoutLog);
+
+    Task<bool> SaveSetAsync(WorkoutLog workoutLog, LoggedSet set);
+
+    Task<bool> FinalizeWorkoutAsync(WorkoutLog workoutLog);
+
+    Task<IReadOnlyList<Notification>> GetNotifications(int clientId);
+
+    Task ConfirmDeload(Notification notification);
 }
