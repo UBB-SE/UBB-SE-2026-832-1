@@ -72,13 +72,13 @@ public sealed class TrainerDashboardService : ITrainerDashboardService
             TemplateId = templateId,
             ClientId = clientId,
             Name = name,
-            Exercises = exercises.Select(e => new TemplateExerciseDataTransferObject
+            Exercises = exercises.Select(exercise => new TemplateExerciseDataTransferObject
             {
-                Name = e.Name,
-                MuscleGroup = e.MuscleGroup.ToString(),
-                TargetSets = e.TargetSets,
-                TargetReps = e.TargetReps,
-                TargetWeight = e.TargetWeight,
+                Name = exercise.Name,
+                MuscleGroup = exercise.MuscleGroup.ToString(),
+                TargetSets = exercise.TargetSets,
+                TargetReps = exercise.TargetReps,
+                TargetWeight = exercise.TargetWeight,
             }).ToList()
         };
 
