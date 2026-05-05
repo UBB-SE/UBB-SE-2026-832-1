@@ -21,8 +21,9 @@ public sealed class TrainerDashboardService : ITrainerDashboardService
         var dtos = response ?? new List<ClientDataTransferObject>();
         return dtos.Select(dto => new Client
         {
-            Id = dto.ClientId,
-            Username = dto.Username,
+            ClientId = dto.ClientId,
+            Email = dto.Email,
+            FullName = dto.FullName,
         }).ToList();
     }
 
