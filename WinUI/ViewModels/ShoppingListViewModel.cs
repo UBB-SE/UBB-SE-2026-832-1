@@ -8,17 +8,17 @@ namespace WinUI.ViewModels;
 
 public partial class ShoppingListViewModel : ObservableObject
 {
-    private const double DEFAULT_PENDING_QUANTITY = 100;
-    private const int STATUS_DISPLAY_DURATION_MS = 3000;
-    private const string STATUS_ADD_SUCCESS_FORMAT = "Updated '{0}' successfully!";
-    private const string STATUS_MOVE_TO_PANTRY_FORMAT = "Moved '{0}' to Pantry.";
-    private const string STATUS_ITEM_REMOVED = "Item removed from list.";
-    private const string STATUS_ALREADY_COMPLETE = "You already have everything you need";
-    private const string STATUS_GENERATE_SUCCESS_FORMAT = "Successfully generated {0} new items from your Meal Plan!";
-    private const string ERROR_ADD_ITEM = "Database error: Could not add item.";
-    private const string ERROR_MOVE_TO_PANTRY = "Failed to move item to Pantry.";
-    private const string ERROR_DELETE_ITEM = "Failed to delete item from database.";
-    private const string ERROR_GENERATE_LIST = "Error analyzing Meal Plan for ingredients.";
+    private const double defaultPendingQuantity = 100;
+    private const int statusDisplayDurationMs = 3000;
+    private const string statusAddSuccessFormat = "Updated '{0}' successfully!";
+    private const string statusMoveToPantryFormat = "Moved '{0}' to Pantry.";
+    private const string statusItemRemoved = "Item removed from list.";
+    private const string statusAlreadyComplete = "You already have everything you need";
+    private const string statusGenerateSuccessFormat = "Successfully generated {0} new items from your Meal Plan!";
+    private const string errorAddItem = "Database error: Could not add item.";
+    private const string errorMoveToPantry = "Failed to move item to Pantry.";
+    private const string errorDeleteItem = "Failed to delete item from database.";
+    private const string errorGenerateList = "Error analyzing Meal Plan for ingredients.";
 
     private readonly IShoppingListService shoppingListService;
     private readonly UserSession userSession;
@@ -36,7 +36,7 @@ public partial class ShoppingListViewModel : ObservableObject
     private bool isError;
 
     [ObservableProperty]
-    private double pendingQuantity = DEFAULT_PENDING_QUANTITY;
+    private double pendingQuantity = defaultPendingQuantity;
 
     [ObservableProperty]
     private string pendingIngredientName = string.Empty;
@@ -86,14 +86,14 @@ public partial class ShoppingListViewModel : ObservableObject
 
         if (addedItem is null)
         {
-            this.ShowStatus(ERROR_ADD_ITEM, true);
+            this.ShowStatus(errorAddItem, true);
             return;
         }
 
         await this.LoadItemsAsync().ConfigureAwait(true);
-        this.ShowStatus(string.Format(STATUS_ADD_SUCCESS_FORMAT, this.PendingIngredientName), false);
+        this.ShowStatus(string.Format(statusAddSuccessFormat, this.PendingIngredientName), false);
         this.PendingIngredientName = string.Empty;
-        this.PendingQuantity = DEFAULT_PENDING_QUANTITY;
+        this.PendingQuantity = defaultPendingQuantity;
     }
 
     [RelayCommand]
@@ -108,11 +108,11 @@ public partial class ShoppingListViewModel : ObservableObject
         if (success)
         {
             this.Items.Remove(item);
-            this.ShowStatus(string.Format(STATUS_MOVE_TO_PANTRY_FORMAT, item.IngredientName), false);
+            this.ShowStatus(string.Format(statusMoveToPantryFormat, item.IngredientName), false);
             return;
         }
 
-        this.ShowStatus(ERROR_MOVE_TO_PANTRY, true);
+        this.ShowStatus(errorMoveToPantry, true);
     }
 
     [RelayCommand]
@@ -127,11 +127,11 @@ public partial class ShoppingListViewModel : ObservableObject
         if (success)
         {
             this.Items.Remove(item);
-            this.ShowStatus(STATUS_ITEM_REMOVED, false);
+            this.ShowStatus(statusItemRemoved, false);
             return;
         }
 
-        this.ShowStatus(ERROR_DELETE_ITEM, true);
+        this.ShowStatus(errorDeleteItem, true);
     }
 
     [RelayCommand]
@@ -147,18 +147,17 @@ public partial class ShoppingListViewModel : ObservableObject
         if (itemsAdded > 0)
         {
             await this.LoadItemsAsync().ConfigureAwait(true);
-            this.ShowStatus(string.Format(STATUS_GENERATE_SUCCESS_FORMAT, itemsAdded), false);
+            this.ShowStatus(string.Format(statusGenerateSuccessFormat, itemsAdded), false);
             return;
         }
 
         if (itemsAdded == 0)
         {
             this.ShowStatus(statusAlreadyComplete, false);
-            this.ShowStatus(STATUS_ALREADY_COMPLETE, false);
             return;
         }
 
-        this.ShowStatus(ERROR_GENERATE_LIST, true);
+        this.ShowStatus(errorGenerateList, true);
     }
 
     public Task<IReadOnlyList<KeyValuePair<int, string>>> SearchIngredientsAsync(string query)
@@ -172,7 +171,7 @@ public partial class ShoppingListViewModel : ObservableObject
         this.IsError = error;
         this.IsStatusVisible = true;
 
-        Task.Delay(STATUS_DISPLAY_DURATION_MS).ContinueWith(_ =>
+        Task.Delay(statusDisplayDurationMs).ContinueWith(_ =>
         {
             this.IsStatusVisible = false;
         }, TaskScheduler.FromCurrentSynchronizationContext());
