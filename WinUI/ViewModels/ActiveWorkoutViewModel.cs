@@ -198,8 +198,8 @@ public partial class ActiveWorkoutViewModel : ObservableObject
     private static string? BuildProgressionHeadsUp(WorkoutLog log)
     {
         var lines = log.Exercises
-            .Where(e => e.IsSystemAdjusted || !string.IsNullOrWhiteSpace(e.AdjustmentNote))
-            .Select(e => string.IsNullOrWhiteSpace(e.AdjustmentNote)
+            .Where(exercise => exercise.IsSystemAdjusted || !string.IsNullOrWhiteSpace(e.AdjustmentNote))
+            .Select(exercise => string.IsNullOrWhiteSpace(exercise.AdjustmentNote)
                 ? $"{e.ExerciseName}: targets were adjusted for next time."
                 : $"{e.ExerciseName}: {e.AdjustmentNote}")
             .ToList();
@@ -241,7 +241,7 @@ public partial class ActiveWorkoutViewModel : ObservableObject
 
             var allWorkouts = await this.activeWorkoutService.GetAvailableWorkoutsForClient(clientId);
             var selected = allWorkouts
-                .Where(w => selectedGoalNames.Contains(w.Name))
+                .Where(workout => selectedGoalNames.Contains(workout.Name))
                 .ToList();
 
             if (selected.Count == 0)
@@ -250,14 +250,14 @@ public partial class ActiveWorkoutViewModel : ObservableObject
             }
 
             this.AvailableWorkouts.Clear();
-            foreach (var w in selected)
+            foreach (var workout in selected)
             {
-                this.AvailableWorkouts.Add(w);
+                this.AvailableWorkouts.Add(workout);
             }
 
             this.activeLog = new WorkoutLog
             {
-                WorkoutName = string.Join(" + ", selected.Select(t => t.Name)),
+                WorkoutName = string.Join(" + ", selected.Select(template => template.Name)),
                 SourceTemplateId = selected[0].WorkoutTemplateId,
                 Type = selected[0].Type,
                 Date = DateTime.Now,
@@ -394,10 +394,10 @@ public partial class ActiveWorkoutViewModel : ObservableObject
                 Type = this.activeLog.Type.ToString(),
                 Exercises = this.activeLog.Exercises.Select(e => new LoggedExerciseDataTransferObject
                 {
-                    ExerciseName = e.ExerciseName,
-                    Sets = e.Sets.Count,
-                    ActualReps = e.Sets.LastOrDefault()?.ActualReps ?? 0,
-                    ActualWeight = e.Sets.LastOrDefault()?.ActualWeight ?? 0,
+                    ExerciseName = exercise.ExerciseName,
+                    Sets = exercise.Sets.Count,
+                    ActualReps = exercise.Sets.LastOrDefault()?.ActualReps ?? 0,
+                    ActualWeight = exercise.Sets.LastOrDefault()?.ActualWeight ?? 0,
                 }).ToList(),
                 TotalCaloriesBurned = this.activeLog.TotalCaloriesBurned,
                 AverageMetabolicEquivalent = this.activeLog.AverageMetabolicEquivalent,
