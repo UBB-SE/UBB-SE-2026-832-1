@@ -106,8 +106,14 @@ public sealed class TrainerDashboardService : ITrainerDashboardService
 
     public async Task<bool> CreateAndAssignNutritionPlanAsync(DateTime startDate, DateTime endDate, int clientId)
     {
-        var dto = new NutritionPlanDataTransferObject { StartDate = startDate, EndDate = endDate };
-        var response = await this.httpClient.PostAsJsonAsync($"{ApiUrl}/trainer/create-nutrition-plan/{clientId}", dto);
+        var dto = new CreateNutritionPlanRequestDataTransferObject
+        {
+            StartDate = startDate,
+            EndDate = endDate,
+            ClientId = clientId,
+        };
+
+        var response = await this.httpClient.PostAsJsonAsync($"{ApiUrl}/trainer/create-assign-nutrition-plan", dto);
         return response.IsSuccessStatusCode;
     }
 }
