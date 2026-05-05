@@ -14,5 +14,5 @@ public sealed class WorkoutTemplateDataTransferObject
 
     public string Type { get; set; } = string.Empty;
 
-    public List<TemplateExerciseDataTransferObject> Exercises { get; set; } = new();
+    public List<TemplateExerciseDataTransferObject> Exercises { get; set; } = [];
 }
