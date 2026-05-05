@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net.Http;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -8,24 +9,50 @@ namespace WinUI.Views;
 
 public sealed partial class WorkoutLogView : Page
 {
-    private readonly WorkoutLogViewModel viewModel;
+    public WorkoutLogViewModel ViewModel { get; }
+
     private readonly UserSession userSession;
 
     public WorkoutLogView()
     {
-        this.InitializeComponent();
-
         this.userSession = new UserSession();
-        this.viewModel = new WorkoutLogViewModel(
+        this.ViewModel = new WorkoutLogViewModel(
             new WorkoutLogService(new WorkoutLogServiceProxy(new HttpClient())));
-        this.DataContext = this.viewModel;
-
-        this.Loaded += OnPageLoaded;
+        this.DataContext = this.ViewModel;
+        this.InitializeComponent();
     }
 
-    private async void OnPageLoaded(object sender, RoutedEventArgs args)
+    private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        await this.viewModel.LoadClientWeightAsync(this.userSession.CurrentClientId).ConfigureAwait(true);
-        await this.viewModel.LoadWorkoutHistoryAsync(this.userSession.CurrentClientId).ConfigureAwait(true);
+        var clientId = this.userSession.CurrentClientId;
+        this.ViewModel.LoadLogsAsyncCommand.Execute(clientId);
+    }
+
+    private void ToggleEditMode_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button || button.Tag is not int id)
+        {
+            return;
+        }
+
+        var item = this.ViewModel.Logs.FirstOrDefault(logItem => logItem.Id == id);
+        if (item is not null)
+        {
+            this.ViewModel.ToggleEditModeCommand.Execute(item);
+        }
+    }
+
+    private void SaveEditedLog_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button || button.Tag is not int id)
+        {
+            return;
+        }
+
+        var item = this.ViewModel.Logs.FirstOrDefault(logItem => logItem.Id == id);
+        if (item is not null)
+        {
+            this.ViewModel.SaveEditedLogCommand.Execute(item);
+        }
     }
 }
