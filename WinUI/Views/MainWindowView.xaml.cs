@@ -16,6 +16,7 @@ public sealed partial class MainWindowView : Page
         ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
         ViewModel.AddTab("Inventory", typeof(InventoryView));
         ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
+        ViewModel.AddTab("Chat", typeof(NutritionistChatView));
         ViewModel.Tabs.CollectionChanged += OnTabsCollectionChanged;
         PopulateTabs();
         mainTabView.SelectionChanged += OnTabSelectionChanged;
