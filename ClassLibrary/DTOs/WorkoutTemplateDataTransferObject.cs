@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ClassLibrary.DTOs;
 
 public sealed class WorkoutTemplateDataTransferObject
