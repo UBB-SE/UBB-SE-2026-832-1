@@ -7,8 +7,8 @@ namespace WinUI.Services;
 
 public sealed class MealService : IMealService
 {
-    private const string apiBaseAddress = "https://localhost:7197/api";
-    private const string foodItemsRoute = "fooditems";
+    private const string API_BASE_ADRESS = "https://localhost:7197/api";
+    private const string FOOD_ITEMS_ROUTE = "fooditems";
     private readonly HttpClient httpClient;
 
     public MealService(HttpClient httpClient)
@@ -29,7 +29,7 @@ public sealed class MealService : IMealService
 
         var foodItemDataTransferObjects =
             await this.httpClient.GetFromJsonAsync<List<FoodItemDto>>(
-                $"{apiBaseAddress}/{foodItemsRoute}/filter?{query}");
+                $"{API_BASE_ADRESS}/{FOOD_ITEMS_ROUTE}/filter?{query}");
 
         if (foodItemDataTransferObjects is null)
         {
