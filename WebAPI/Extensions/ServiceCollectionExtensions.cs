@@ -1,10 +1,12 @@
-using ClassLibrary.Repositories;
 using ClassLibrary.IRepositories;
+using ClassLibrary.Repositories;
 using Microsoft.Extensions.DependencyInjection;
+using WebApi.IServices;
+using WebApi.Services;
 using WebAPI.IServices;
 using WebAPI.Services;
-using WebApi.Services;
-using WebApi.IServices;
+using WebAPI.Services.AchievementBus;
+using WebAPI.Services.AchievementBus.Interfaces;
 
 namespace WebAPI.Extensions;
 
@@ -28,7 +30,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEvaluationEngineService, EvaluationEngineService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IChatService, ChatService>();
-        services.AddScoped<ICalendarExportService, CalendarExportService>();
+        services.AddScoped<ICalendarWorkoutCatalogService, CalendarWorkoutCatalogService>();
+        services.AddSingleton<IAchievementUnlockedBus, AchievementUnlockedBus>();
 
         return services;
     }
