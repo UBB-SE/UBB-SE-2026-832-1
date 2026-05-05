@@ -15,7 +15,7 @@ public interface ITrainerDashboardService
 
     Task<bool> DeleteWorkoutTemplateAsync(int templateId);
 
-    Task<OperationResult> AssignNewRoutineAsync(int templateId, int clientId, string name, IReadOnlyList<TemplateExercise> exercises);
+    Task<bool> AssignNewRoutineAsync(int templateId, int clientId, string name, IReadOnlyList<TemplateExercise> exercises);
 
     Task SaveWorkoutFeedbackAsync(WorkoutLog workoutLog);
 
