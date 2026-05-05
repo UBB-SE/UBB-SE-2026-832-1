@@ -1,57 +1,169 @@
 using System.Net.Http.Json;
 using ClassLibrary.DTOs;
+using ClassLibrary.Models;
 
 namespace WinUI.Services;
 
 public sealed class ActiveWorkoutService : IActiveWorkoutService
 {
     private readonly HttpClient httpClient;
-    private const string API_URL = "https://localhost:7197/api";
-    private const string BaseRoute = API_URL + "/client";
+    private const string baseAddress = "https://localhost:7197/api";
+    private const string clientRoute = baseAddress + "/client";
 
     public ActiveWorkoutService(HttpClient httpClient)
     {
         this.httpClient = httpClient;
     }
 
-    public async Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetAvailableWorkoutsForClient(int clientId)
+    public async Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsForClient(int clientId)
     {
-        var availableWorkoutsResponse = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{BaseRoute}/{clientId}/available-workouts");
-        return availableWorkoutsResponse ?? new List<WorkoutTemplateDataTransferObject>();
+        var workoutTemplateDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{clientRoute}/{clientId}/available-workouts");
+        return DataTransferObjectToDomainModelMappers.MapWorkoutTemplates(workoutTemplateDataTransferObjects);
     }
 
-    public Task<IReadOnlyList<WorkoutTemplateDataTransferObject>> GetCustomAndTrainerAssignedWorkoutsForClient(int clientId)
+    public Task<IReadOnlyList<WorkoutTemplate>> GetCustomAndTrainerAssignedWorkoutsForClient(int clientId)
     {
-        return GetAvailableWorkoutsForClient(clientId);
+        return this.GetAvailableWorkoutsForClient(clientId);
     }
 
-    public async Task<WorkoutTemplateDataTransferObject?> FindWorkoutTemplateById(int clientId, int? id)
+    public async Task<WorkoutTemplate?> FindWorkoutTemplateById(int clientId, int? id)
     {
         if (!id.HasValue)
         {
             return null;
         }
 
-        var availableWorkoutTemplates = await GetAvailableWorkoutsForClient(clientId);
+        var availableWorkoutTemplates = await this.GetAvailableWorkoutsForClient(clientId);
         return availableWorkoutTemplates.FirstOrDefault(workoutTemplate => workoutTemplate.WorkoutTemplateId == id.Value);
     }
 
-    public async Task<IDictionary<string, double>> GetPreviousBestWeights(int clientId)
+    public async Task<IDictionary<string, double>> GetPreviousBestWeightsAsync(int clientId)
     {
-        var response = await this.httpClient.GetFromJsonAsync<PreviousBestWeightsDataTransferObject>($"{BaseRoute}/{clientId}/previous-best-weights");
-        return response?.BestWeightsByExercise ?? new Dictionary<string, double>();
+        var previousBestWeightsDataTransferObject = await this.httpClient.GetFromJsonAsync<PreviousBestWeightsDataTransferObject>($"{clientRoute}/{clientId}/previous-best-weights");
+        return previousBestWeightsDataTransferObject?.BestWeightsByExercise ?? new Dictionary<string, double>();
     }
 
-    public Task<bool> SaveSetAsync(WorkoutLogDataTransferObject workoutLog)
+    public async Task<bool> SaveSetAsync(WorkoutLog workoutLog, LoggedSet set)
     {
-        return this.FinalizeWorkoutAsync(workoutLog);
+        ArgumentNullException.ThrowIfNull(workoutLog);
+        ArgumentNullException.ThrowIfNull(set);
+
+        set.WorkoutLog = workoutLog;
+        var exercise = workoutLog.Exercises.FirstOrDefault(loggedExercise => string.Equals(loggedExercise.ExerciseName, set.ExerciseName, StringComparison.OrdinalIgnoreCase));
+        if (exercise is null)
+        {
+            exercise = new LoggedExercise
+            {
+                ExerciseName = set.ExerciseName,
+                WorkoutLog = workoutLog,
+                TargetMuscles = set.Exercise?.TargetMuscles ?? default,
+            };
+            workoutLog.Exercises.Add(exercise);
+        }
+
+        if (!exercise.Sets.Contains(set))
+        {
+            set.Exercise = exercise;
+            exercise.Sets.Add(set);
+        }
+
+        var modifyWorkoutResponse = await this.httpClient.PutAsJsonAsync($"{clientRoute}/modify-workout", MapToWorkoutLogDataTransferObject(workoutLog));
+        return modifyWorkoutResponse.IsSuccessStatusCode;
     }
 
-    public async Task<bool> FinalizeWorkoutAsync(WorkoutLogDataTransferObject workoutLog)
+    public async Task<bool> FinalizeWorkoutAsync(WorkoutLog workoutLog)
     {
-        var dto = new FinalizeWorkoutRequestDataTransferObject { WorkoutLog = workoutLog };
-        var response = await this.httpClient.PostAsJsonAsync($"{BaseRoute}/finalize-workout", dto);
-        return response.IsSuccessStatusCode;
+        ArgumentNullException.ThrowIfNull(workoutLog);
+
+        var finalizeWorkoutRequestDataTransferObject = new FinalizeWorkoutRequestDataTransferObject
+        {
+            WorkoutLog = MapToWorkoutLogDataTransferObject(workoutLog),
+        };
+        var finalizeWorkoutResponse = await this.httpClient.PostAsJsonAsync($"{clientRoute}/finalize-workout", finalizeWorkoutRequestDataTransferObject);
+        return finalizeWorkoutResponse.IsSuccessStatusCode;
+    }
+
+    public async Task<IReadOnlyList<Notification>> GetNotifications(int clientId)
+    {
+        var notificationDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<NotificationDataTransferObject>>($"{clientRoute}/{clientId}/notifications");
+        return DataTransferObjectToDomainModelMappers.MapNotifications(notificationDataTransferObjects);
+    }
+
+    public async Task ConfirmDeload(Notification notification)
+    {
+        ArgumentNullException.ThrowIfNull(notification);
+
+        var request = new ConfirmDeloadRequestDataTransferObject
+        {
+            NotificationId = notification.NotificationId,
+        };
+
+        var confirmDeloadResponse = await this.httpClient.PostAsJsonAsync($"{clientRoute}/confirm-deload", request);
+        confirmDeloadResponse.EnsureSuccessStatusCode();
+    }
+
+    private static WorkoutLogDataTransferObject MapToWorkoutLogDataTransferObject(WorkoutLog workoutLog)
+    {
+        return new WorkoutLogDataTransferObject
+        {
+            WorkoutLogId = workoutLog.WorkoutLogId,
+            Client = MapToClientDataTransferObject(workoutLog.Client),
+            WorkoutName = workoutLog.WorkoutName,
+            Date = workoutLog.Date,
+            Duration = workoutLog.Duration,
+            SourceTemplateId = workoutLog.SourceTemplateId,
+            Type = workoutLog.Type.ToString(),
+            Exercises = workoutLog.Exercises.Select(MapToLoggedExerciseDataTransferObject).ToList(),
+            TotalCaloriesBurned = workoutLog.TotalCaloriesBurned,
+            AverageMetabolicEquivalent = workoutLog.AverageMetabolicEquivalent,
+            IntensityTag = workoutLog.IntensityTag,
+            Rating = workoutLog.Rating,
+            TrainerNotes = workoutLog.TrainerNotes,
+        };
+    }
+
+    private static ClientDataTransferObject MapToClientDataTransferObject(Client client)
+    {
+        return new ClientDataTransferObject
+        {
+            ClientId = client.ClientId,
+            Email = client.Email,
+            FullName = client.FullName,
+            Weight = client.Weight,
+            Height = client.Height,
+            PrimaryGoal = client.PrimaryGoal,
+        };
+    }
+
+    private static LoggedExerciseDataTransferObject MapToLoggedExerciseDataTransferObject(LoggedExercise exercise)
+    {
+        return new LoggedExerciseDataTransferObject
+        {
+            LoggedExerciseId = exercise.LoggedExerciseId,
+            ExerciseName = exercise.ExerciseName,
+            TargetMuscles = exercise.TargetMuscles.ToString(),
+            Sets = exercise.Sets.Select(MapToLoggedSetDataTransferObject).ToList(),
+            MetabolicEquivalent = exercise.MetabolicEquivalent,
+            ExerciseCaloriesBurned = exercise.ExerciseCaloriesBurned,
+            PerformanceRatio = exercise.PerformanceRatio,
+            IsSystemAdjusted = exercise.IsSystemAdjusted,
+            AdjustmentNote = exercise.AdjustmentNote,
+        };
+    }
+
+    private static LoggedSetDataTransferObject MapToLoggedSetDataTransferObject(LoggedSet set)
+    {
+        return new LoggedSetDataTransferObject
+        {
+            LoggedSetId = set.LoggedSetId,
+            ExerciseName = set.ExerciseName,
+            SetIndex = set.SetIndex,
+            TargetReps = set.TargetReps,
+            ActualReps = set.ActualReps,
+            TargetWeight = set.TargetWeight,
+            ActualWeight = set.ActualWeight,
+            SetNumber = set.SetNumber,
+        };
     }
 
     public Task<IDictionary<string, double>> GetPreviousBestWeightsAsync(int clientId)
