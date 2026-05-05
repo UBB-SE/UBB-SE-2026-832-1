@@ -1,9 +1,9 @@
-﻿namespace WebAPI.Services;
-
-using WebAPI.Services.Interfaces;
+﻿using WebAPI.Services.Interfaces;
 using ClassLibrary.Models;
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
+
+namespace WebAPI.Services;
 
 public sealed class WorkoutDataForwarder : IWorkoutDataForwarder
 {
