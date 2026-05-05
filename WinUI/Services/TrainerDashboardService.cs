@@ -56,7 +56,7 @@ public sealed class TrainerDashboardService : ITrainerDashboardService
 
     public async Task<IReadOnlyList<string>> GetAllExerciseNamesAsync()
     {
-        var response = await this.httpClient.GetFromJsonAsync<List<string>>($"{ApiUrl}/trainer/exercises");
+        var response = await this.httpClient.GetFromJsonAsync<List<string>>($"{ApiUrl}/{Route}/exercise-names");
         return response ?? new List<string>();
     }
 
