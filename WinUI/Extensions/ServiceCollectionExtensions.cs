@@ -15,6 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<IAchievementsService, AchievementsService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IDailyLogServiceProxy, DailyLogServiceProxy>();
+        services.AddScoped<IWorkoutLogService, WorkoutLogService>();
+        services.AddScoped<IWorkoutLogServiceProxy, WorkoutLogServiceProxy>();
         return services;
     }
 }
