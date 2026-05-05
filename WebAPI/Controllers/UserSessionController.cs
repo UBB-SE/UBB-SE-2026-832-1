@@ -1,8 +1,8 @@
 ﻿using ClassLibrary.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Services.UserSession.Interfaces;
+using WebAPI.IServices;
 
-namespace WebApi.Controllers;
+namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/user-session")]

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebAPI.Services.Interfaces;
 using ClassLibrary.DTOs;
+using WebAPI.IServices;
 
 namespace WebAPI.Controllers;
 
@@ -8,17 +8,17 @@ namespace WebAPI.Controllers;
 [Route("api/achievement")]
 public class AchievementController : ControllerBase
 {
-    private readonly IAchievementService achievementService;
+    private readonly IClientService clientService;
 
-    public AchievementController(IAchievementService achievementService)
+    public AchievementController(IClientService clientService)
     {
-        this.achievementService = achievementService;
+        this.clientService = clientService;
     }
 
     [HttpGet("client/{clientId}")]
     public async Task<IActionResult> GetByClient(int clientId)
     {
-        var result = await achievementService.GetAchievementsByClientAsync(clientId);
+        var result = await this.clientService.GetAchievementsAsync(clientId);
         return Ok(result);
     }
 }

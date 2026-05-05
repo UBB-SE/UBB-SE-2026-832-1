@@ -1,10 +1,10 @@
 ﻿namespace WebAPI.Services.AchievementBus.Interfaces;
 
-using ClassLibrary.DTOs;
+using ClassLibrary.Models;
 
 public interface IAchievementUnlockedBus
 {
     event EventHandler<AchievementUnlockedEventArgs>? AchievementUnlocked;
 
-    void NotifyUnlocked(AchievementShowcaseItemDto achievement);
+    void NotifyUnlocked(AchievementShowcaseItem achievement);
 }

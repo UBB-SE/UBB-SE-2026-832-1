@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Services.AchievementBus.Interfaces;
-using ClassLibrary.DTOs;
+using ClassLibrary.Models;
 
 [ApiController]
 [Route("api/achievementUnlockedBus")]
@@ -16,9 +16,9 @@ public class AchievementUnlockedBusController : ControllerBase
     }
 
     [HttpPost("notify-unlocked")]
-    public IActionResult Notify([FromBody] AchievementShowcaseItemDto request)
+    public IActionResult Notify([FromBody] AchievementShowcaseItem request)
     {
-        achievementUnlockedBus.NotifyUnlocked(request);
+        this.achievementUnlockedBus.NotifyUnlocked(request);
         return Ok();
     }
 }

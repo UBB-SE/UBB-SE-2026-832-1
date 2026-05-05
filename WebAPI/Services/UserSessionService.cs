@@ -1,6 +1,29 @@
-﻿namespace WebApi.Services
+﻿using ClassLibrary.Dtos;
+using WebAPI.IServices;
+
+namespace WebAPI.Services;
+
+public sealed class UserSessionService : IUserSessionService
 {
-    public class UserSessionService
+    private long currentUserId = 1;
+    private long currentClientId = 1;
+
+    public Task<UserSessionResponseDto> GetCurrentSessionAsync()
     {
+        var response = new UserSessionResponseDto
+        {
+            UserId = this.currentUserId,
+            ClientId = this.currentClientId,
+        };
+
+        return Task.FromResult(response);
+    }
+
+    public Task<UserSessionResponseDto> UpdateSessionAsync(UserSessionRequestDto request)
+    {
+        this.currentUserId = request.UserId;
+        this.currentClientId = request.ClientId;
+
+        return this.GetCurrentSessionAsync();
     }
 }
