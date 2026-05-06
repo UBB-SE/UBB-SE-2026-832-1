@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using ClassLibrary.Models;
+using UserSession = WinUI.Services.UserSession;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WinUI.Services;
