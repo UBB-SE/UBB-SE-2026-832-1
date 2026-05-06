@@ -128,15 +128,14 @@ public partial class PantryViewModel : ObservableObject
             return;
         }
 
-        if (this.QuantityToAdd <= MIN_QUANTITY_ALLOWED)
-        {
-            this.StatusMessage = INVALID_QUANTITY_MESSAGE;
-            return;
-        }
-
         try
         {
             int quantityGrams = (int)Math.Round(this.QuantityToAdd);
+            if (quantityGrams < 1)
+            {
+                this.StatusMessage = INVALID_QUANTITY_MESSAGE;
+                return;
+            }
             var request = new AddToPantryRequestDataTransferObject
             {
                 UserId = this.currentUserId,
