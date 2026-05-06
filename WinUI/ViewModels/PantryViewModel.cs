@@ -59,6 +59,12 @@ public partial class PantryViewModel : ObservableObject
 
     partial void OnIngredientSearchTextChanged(string value)
     {
+        if (this.SelectedIngredient is not null &&
+            !this.SelectedIngredient.Name.Equals(value, StringComparison.OrdinalIgnoreCase))
+        {
+            this.SelectedIngredient = null;
+        }
+
         this.UpdateFilteredIngredients();
     }
 
