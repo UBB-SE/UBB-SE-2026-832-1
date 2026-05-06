@@ -8,15 +8,6 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <UserControl.Resources>
-        <Style x:Key="DeleteButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#E81123"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="CornerRadius" Value="4"/>
-        </Style>
-    </UserControl.Resources>
-
     <Grid x:Name="RootGrid" Padding="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
