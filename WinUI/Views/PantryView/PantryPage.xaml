@@ -4,12 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:WinUI.ViewModels"
-    xmlns:dto="using:ClassLibrary.DTOs"
-    xmlns:converters="using:WinUI.Converters">
-
-    <Page.Resources>
-        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-    </Page.Resources>
+    xmlns:dto="using:ClassLibrary.DTOs">
 
     <Grid Padding="12">
         <StackPanel>
@@ -80,7 +75,7 @@
 
             <TextBlock
                 Text="{x:Bind ViewModel.EmptyListMessage, Mode=OneWay}"
-                Visibility="{x:Bind ViewModel.IsListEmpty, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                Visibility="{x:Bind ViewModel.IsListEmpty, Mode=OneWay}"
                 Margin="0,12,0,0"/>
 
             <TextBlock

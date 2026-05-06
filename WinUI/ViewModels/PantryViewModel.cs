@@ -26,22 +26,22 @@ public partial class PantryViewModel : ObservableObject
     private readonly int currentUserId;
 
     [ObservableProperty]
-    public partial bool IsBusy { get; set; }
+    private bool isBusy;
 
     [ObservableProperty]
-    public partial string EmptyListMessage { get; set; } = EMPTY_INVENTORY_MESSAGE;
+    private string emptyListMessage = EMPTY_INVENTORY_MESSAGE;
 
     [ObservableProperty]
-    public partial string StatusMessage { get; set; } = string.Empty;
+    private string statusMessage = string.Empty;
 
     [ObservableProperty]
-    public partial string IngredientSearchText { get; set; } = string.Empty;
+    private string ingredientSearchText = string.Empty;
 
     [ObservableProperty]
-    public partial IngredientDataTransferObject? SelectedIngredient { get; set; }
+    private IngredientDataTransferObject? selectedIngredient;
 
     [ObservableProperty]
-    public partial double QuantityToAdd { get; set; } = DEFAULT_QUANTITY_TO_ADD;
+    private double quantityToAdd = DEFAULT_QUANTITY_TO_ADD;
 
     public ObservableCollection<InventoryDataTransferObject> Items { get; } = new();
 
