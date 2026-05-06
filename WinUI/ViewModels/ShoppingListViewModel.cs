@@ -1,9 +1,11 @@
+using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using ClassLibrary.Models;
-using UserSession = WinUI.Services.UserSession;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WinUI.Services;
+using UserSession = WinUI.Services.UserSession;
 
 namespace WinUI.ViewModels;
 
@@ -25,25 +27,25 @@ public partial class ShoppingListViewModel : ObservableObject
     private readonly UserSession userSession;
 
     [ObservableProperty]
-    private ObservableCollection<ShoppingListItem> items = [];
+    public partial ObservableCollection<ShoppingListItem> Items { get; set; } = [];
 
     [ObservableProperty]
-    private string statusMessage = string.Empty;
+    public partial string StatusMessage { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool isStatusVisible;
+    public partial bool IsStatusVisible { get; set; }
 
     [ObservableProperty]
-    private bool isError;
+    public partial bool IsError { get; set; }
 
     [ObservableProperty]
-    private double pendingQuantity = DEFAULT_PENDING_QUANTITY;
+    public partial double PendingQuantity { get; set; } = DEFAULT_PENDING_QUANTITY;
 
     [ObservableProperty]
-    private string pendingIngredientName = string.Empty;
+    public partial string PendingIngredientName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool isLoading;
+    public partial bool IsLoading { get; set; }
 
     public ShoppingListViewModel(IShoppingListService shoppingListService, UserSession userSession)
     {
