@@ -1,7 +1,6 @@
 using System.Net.Http;
 using ClassLibrary.DTOs;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
 using WinUI.Services;
 using WinUI.ViewModels;
 
