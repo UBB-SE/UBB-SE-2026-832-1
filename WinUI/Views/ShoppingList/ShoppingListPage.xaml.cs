@@ -5,7 +5,6 @@ using ClassLibrary.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using WinUI.Services;
-using WinUI.Services.Interfaces;
 using WinUI.ViewModels;
 
 namespace WinUI.Views.ShoppingList;
@@ -26,9 +25,7 @@ public sealed partial class ShoppingListPage : Page
     public ShoppingListPage()
     {
         this.InitializeComponent();
-        var httpClient = new HttpClient();
-        var proxy = new ShoppingListServiceProxy(httpClient);
-        var service = new ShoppingListService(proxy);
+        var service = new ShoppingListService(new HttpClient());
         this.ViewModel = new ShoppingListViewModel(service, new WinUI.Services.UserSession());
         this.DataContext = this.ViewModel;
         this.Loaded += this.OnPageLoaded;

@@ -1,28 +1,39 @@
+using System.Net.Http.Json;
 using ClassLibrary.DTOs;
 using ClassLibrary.Models;
-using WinUI.Services.Interfaces;
 
 namespace WinUI.Services;
 
 public sealed class ShoppingListService : IShoppingListService
 {
-    private readonly IShoppingListServiceProxy serviceProxy;
+    private readonly HttpClient httpClient;
 
-    public ShoppingListService(IShoppingListServiceProxy serviceProxy)
+    public ShoppingListService(HttpClient httpClient)
     {
-        this.serviceProxy = serviceProxy;
+        this.httpClient = httpClient;
     }
 
     public async Task<IReadOnlyList<ShoppingListItem>> GetShoppingItemsAsync(int userId)
     {
-        var dtos = await this.serviceProxy.GetShoppingItemsAsync(userId);
-        return dtos.Select(MapShoppingListItem).ToList();
+        var dtos = await this.httpClient.GetFromJsonAsync<List<ShoppingItemDto>>(
+            $"{ApiBaseUrl.BASE_URL}/api/ShoppingList/user/{userId}");
+
+        return (dtos ?? []).Select(MapShoppingListItem).ToList();
     }
 
     public async Task<ShoppingListItem?> AddItemAsync(string itemName, int userId, double quantityGrams)
     {
-        bool success = await this.serviceProxy.AddItemAsync(itemName, userId, quantityGrams);
-        if (!success)
+        var request = new AddShoppingItemRequest
+        {
+            ItemName = itemName,
+            Quantity = quantityGrams,
+        };
+
+        var response = await this.httpClient.PostAsJsonAsync(
+            $"{ApiBaseUrl.BASE_URL}/api/ShoppingList/user/{userId}",
+            request);
+
+        if (!response.IsSuccessStatusCode)
         {
             return null;
         }
@@ -34,26 +45,44 @@ public sealed class ShoppingListService : IShoppingListService
             .FirstOrDefault();
     }
 
-    public Task<bool> RemoveItemAsync(ShoppingListItem item)
+    public async Task<bool> RemoveItemAsync(ShoppingListItem item)
     {
-        return this.serviceProxy.RemoveItemAsync(item.ShoppingListItemId);
+        var response = await this.httpClient.DeleteAsync(
+            $"{ApiBaseUrl.BASE_URL}/api/ShoppingList/{item.ShoppingListItemId}");
+        return response.IsSuccessStatusCode;
     }
 
-    public Task<bool> MoveToPantryAsync(ShoppingListItem item)
+    public async Task<bool> MoveToPantryAsync(ShoppingListItem item)
     {
-        return this.serviceProxy.MoveToPantryAsync(item.ShoppingListItemId);
+        var response = await this.httpClient.PostAsync(
+            $"{ApiBaseUrl.BASE_URL}/api/ShoppingList/{item.ShoppingListItemId}/move-to-pantry",
+            null);
+        return response.IsSuccessStatusCode;
     }
 
-    public Task<int> GenerateListAsync(int userId)
+    public async Task<int> GenerateListAsync(int userId)
     {
-        return this.serviceProxy.GenerateListAsync(userId);
+        var previousItems = await this.GetShoppingItemsAsync(userId);
+
+        var response = await this.httpClient.PostAsync(
+            $"{ApiBaseUrl.BASE_URL}/api/ShoppingList/generate/{userId}",
+            null);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return -1;
+        }
+
+        var currentItems = await this.GetShoppingItemsAsync(userId);
+        return Math.Max(0, currentItems.Count - previousItems.Count);
     }
 
     public async Task<IReadOnlyList<KeyValuePair<int, string>>> SearchIngredientsAsync(string query)
     {
-        var allIngredients = await this.serviceProxy.GetAllIngredientsAsync();
+        var allIngredients = await this.httpClient.GetFromJsonAsync<List<IngredientDataTransferObject>>(
+            $"{ApiBaseUrl.BASE_URL}/api/inventory/ingredients");
 
-        return allIngredients
+        return (allIngredients ?? [])
             .Where(ingredient => ingredient.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
             .Select(ingredient => new KeyValuePair<int, string>(ingredient.IngredientId, ingredient.Name))
             .ToList();
