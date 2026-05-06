@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using Microsoft.UI.Xaml.Controls;
 using WinUI.ViewModels;
+using WinUI.Views.ShoppingListView;
 
 namespace WinUI.Views;
 
@@ -16,6 +17,7 @@ public sealed partial class MainWindowView : Page
         ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
         ViewModel.AddTab("Inventory", typeof(InventoryView));
         ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
+        ViewModel.AddTab("Shopping List", typeof(ShoppingListPage));
         ViewModel.Tabs.CollectionChanged += OnTabsCollectionChanged;
         PopulateTabs();
         mainTabView.SelectionChanged += OnTabSelectionChanged;
