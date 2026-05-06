@@ -7,8 +7,6 @@ namespace Tests;
 
 public sealed class ShoppingListViewModelTests
 {
-    private const int TEST_USER_ID = 42;
-
     private readonly Mock<IShoppingListService> mockShoppingListService = new();
     private readonly UserSession userSession = new();
 
