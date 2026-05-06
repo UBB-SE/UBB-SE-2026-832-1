@@ -1,6 +1,7 @@
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
+using System.Linq;
 using WebAPI.IServices;
 
 namespace WebAPI.Services;
@@ -32,7 +33,7 @@ public sealed class ProgressionService : IProgressionService
         {
             LoggedExerciseId = exerciseDto.LoggedExerciseId,
             ExerciseName = exerciseDto.ExerciseName,
-            ParentTemplateExerciseId = exerciseDto.ParentTemplateExerciseId,
+            ParentTemplateExerciseId = exerciseDto.ParentTemplateExerciseId ?? 0,
             TargetMuscles = Enum.TryParse<MuscleGroup>(exerciseDto.TargetMuscles, ignoreCase: true, out var muscleGroup)
                 ? muscleGroup
                 : MuscleGroup.OTHER,
