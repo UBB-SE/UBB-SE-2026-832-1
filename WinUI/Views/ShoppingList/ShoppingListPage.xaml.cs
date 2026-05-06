@@ -105,7 +105,7 @@ public sealed partial class ShoppingListPage : Page
 
         if (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {
-            this.ViewModel.MoveToPantryCommand.Execute(item);
+            await this.ViewModel.MoveToPantryCommand.ExecuteAsync(item);
         }
     }
 
@@ -127,7 +127,7 @@ public sealed partial class ShoppingListPage : Page
 
         if (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {
-            this.ViewModel.RemoveItemCommand.Execute(item);
+            await this.ViewModel.RemoveItemCommand.ExecuteAsync(item);
         }
     }
 }
