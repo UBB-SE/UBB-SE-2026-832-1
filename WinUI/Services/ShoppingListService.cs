@@ -6,7 +6,7 @@ namespace WinUI.Services;
 
 public sealed class ShoppingListService : IShoppingListService
 {
-    private const string API_BASE_ADDRESS = "https://localhost:7197/api";
+    private const string API_BASE_ADDRESS = ApiBaseUrl.BASE_URL + "/api";
     private const string SHOPPING_LIST_ROUTE = "ShoppingList";
     private readonly HttpClient httpClient;
 
