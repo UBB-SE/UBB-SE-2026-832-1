@@ -1,7 +1,7 @@
 using System.Collections.Specialized;
 using Microsoft.UI.Xaml.Controls;
 using WinUI.ViewModels;
-using WinUI.Views.ShoppingListView;
+using WinUI.Views.ShoppingList;
 
 namespace WinUI.Views;
 

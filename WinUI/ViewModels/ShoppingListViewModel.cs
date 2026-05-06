@@ -27,25 +27,25 @@ public partial class ShoppingListViewModel : ObservableObject
     private readonly UserSession userSession;
 
     [ObservableProperty]
-    public partial ObservableCollection<ShoppingListItem> Items { get; set; } = [];
+    private ObservableCollection<ShoppingListItem> items = [];
 
     [ObservableProperty]
-    public partial string StatusMessage { get; set; } = string.Empty;
+    private string statusMessage = string.Empty;
 
     [ObservableProperty]
-    public partial bool IsStatusVisible { get; set; }
+    private bool isStatusVisible;
 
     [ObservableProperty]
-    public partial bool IsError { get; set; }
+    private bool isError;
 
     [ObservableProperty]
-    public partial double PendingQuantity { get; set; } = DEFAULT_PENDING_QUANTITY;
+    private double pendingQuantity = DEFAULT_PENDING_QUANTITY;
 
     [ObservableProperty]
-    public partial string PendingIngredientName { get; set; } = string.Empty;
+    private string pendingIngredientName = string.Empty;
 
     [ObservableProperty]
-    public partial bool IsLoading { get; set; }
+    private bool isLoading;
 
     public ShoppingListViewModel(IShoppingListService shoppingListService, UserSession userSession)
     {

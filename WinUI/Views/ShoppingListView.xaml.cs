@@ -12,7 +12,8 @@ public sealed partial class ShoppingListView : Page
     public ShoppingListView()
     {
         this.InitializeComponent();
-        this.ViewModel = new ShoppingListViewModel(new ShoppingListService(new HttpClient()), new UserSession());
+        var proxy = new ShoppingListServiceProxy(new HttpClient());
+        this.ViewModel = new ShoppingListViewModel(new ShoppingListService(proxy), new UserSession());
         this.DataContext = this.ViewModel;
         this.Loaded += this.OnLoaded;
     }

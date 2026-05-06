@@ -8,7 +8,7 @@ using WinUI.Services;
 using WinUI.Services.Interfaces;
 using WinUI.ViewModels;
 
-namespace WinUI.Views.ShoppingListView;
+namespace WinUI.Views.ShoppingList;
 
 public sealed partial class ShoppingListPage : Page
 {
@@ -29,7 +29,7 @@ public sealed partial class ShoppingListPage : Page
         var httpClient = new HttpClient();
         var proxy = new ShoppingListServiceProxy(httpClient);
         var service = new ShoppingListService(proxy);
-        this.ViewModel = new ShoppingListViewModel(service, new UserSession());
+        this.ViewModel = new ShoppingListViewModel(service, new WinUI.Services.UserSession());
         this.DataContext = this.ViewModel;
         this.Loaded += this.OnPageLoaded;
     }
