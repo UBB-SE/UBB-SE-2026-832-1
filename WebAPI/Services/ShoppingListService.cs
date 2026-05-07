@@ -118,8 +118,8 @@ namespace WebAPI.Services
 
             await inventoryRepository.AddAsync(new Inventory
             {
-                User = new User { UserId = userId },
-                Ingredient = new Ingredient { IngredientId = item.Ingredient.IngredientId },
+                UserId = userId,
+                IngredientId = item.Ingredient.IngredientId,
                 QuantityGrams = item.QuantityGrams > 0 ? (int)item.QuantityGrams : 100
             });
 
