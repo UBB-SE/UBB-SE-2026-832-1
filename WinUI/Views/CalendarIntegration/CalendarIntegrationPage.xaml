@@ -1,5 +1,5 @@
 <Page
-    x:Class="WinUI.Views.CalendarIntegrationPage"
+    x:Class="WinUI.Views.CalendarIntegration.CalendarIntegrationPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,11 +9,17 @@
 
     <Grid Padding="24">
         <StackPanel Spacing="16" MaxWidth="600" HorizontalAlignment="Left">
-            <TextBlock Text="Calendar Integration" Style="{ThemeResource TitleTextBlockStyle}"/>
+            <TextBlock Text="Calendar Integration" Style="{ThemeResource TitleTextBlockStyle}" />
 
             <TextBlock Text="Set up your workout calendar by selecting your workout, duration, and the days you want to train." TextWrapping="Wrap" />
 
-            <InfoBar x:Name="StatusInfoBar" IsOpen="False" Margin="0,0,0,8"/>
+            <InfoBar
+                x:Name="StatusInfoBar"
+                Margin="0,0,0,8"
+                IsOpen="{Binding IsStatusOpen, Mode=TwoWay}"
+                Severity="{Binding StatusSeverity, Mode=OneWay}"
+                Title="{Binding StatusTitle, Mode=OneWay}"
+                Message="{Binding StatusMessage, Mode=OneWay}" />
 
             <ComboBox
                 x:Name="WorkoutComboBox"
@@ -22,7 +28,7 @@
                 HorizontalAlignment="Stretch"
                 ItemsSource="{Binding AvailableWorkouts}"
                 SelectedItem="{Binding SelectedWorkout, Mode=TwoWay}"
-                DisplayMemberPath="Name"/>
+                DisplayMemberPath="Name" />
 
             <TextBox
                 x:Name="DurationWeeksTextBox"
@@ -30,18 +36,18 @@
                 PlaceholderText="Enter weeks (1-52)"
                 HorizontalAlignment="Stretch"
                 InputScope="Number"
-                Text="{Binding DurationWeeks, Mode=TwoWay}"/>
+                Text="{Binding DurationWeeks, Mode=TwoWay}" />
 
             <TextBlock Text="Training Days" />
             <ItemsControl ItemsSource="{Binding SelectedDays}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" Spacing="8"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <ToggleButton Content="{Binding DayName}" IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+                        <ToggleButton Content="{Binding DayName}" IsChecked="{Binding IsSelected, Mode=TwoWay}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -51,7 +57,7 @@
                 Content="Generate Calendar"
                 Style="{ThemeResource AccentButtonStyle}"
                 HorizontalAlignment="Stretch"
-                Margin="0,16,0,0"/>
+                Margin="0,16,0,0" />
         </StackPanel>
     </Grid>
 </Page>
