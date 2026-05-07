@@ -9,7 +9,7 @@ using WinUI.ViewModels;
 
 namespace WinUI.Views.ShoppingList;
 
-public sealed partial class ShoppingListPage : Page
+public sealed partial class ShoppingListView : Page
 {
     private const int MIN_SEARCH_LENGTH = 3;
     private const string NO_MATCHING_INGREDIENTS_TEXT = "no matching ingredients found";
@@ -22,7 +22,7 @@ public sealed partial class ShoppingListPage : Page
 
     public ShoppingListViewModel ViewModel { get; }
 
-    public ShoppingListPage()
+    public ShoppingListView()
     {
         this.InitializeComponent();
         var service = new ShoppingListService(new HttpClient());
