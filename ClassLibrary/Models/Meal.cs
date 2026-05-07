@@ -16,4 +16,9 @@ public class Meal
 
     [MaxLength(2000)]
     public string Instructions { get; set; } = string.Empty;
+    public bool IsVegan { get; set; }
+    public bool IsKeto { get; set; }
+    public bool IsGlutenFree { get; set; }
+    public bool IsLactoseFree { get; set; }
+    public bool IsNutFree { get; set; }
 }

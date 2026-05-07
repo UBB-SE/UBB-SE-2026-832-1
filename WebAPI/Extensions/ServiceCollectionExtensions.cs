@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<ICalendarWorkoutCatalogService, CalendarWorkoutCatalogService>();
         services.AddSingleton<IAchievementUnlockedBus, AchievementUnlockedBus>();
+        services.AddScoped<IMealService, MealService>();
 
         return services;
     }
