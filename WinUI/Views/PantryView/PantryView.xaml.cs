@@ -6,11 +6,11 @@ using WinUI.ViewModels;
 
 namespace WinUI.Views.PantryView;
 
-public sealed partial class PantryPage : Page
+public sealed partial class PantryView : Page
 {
     public PantryViewModel ViewModel { get; }
 
-    public PantryPage()
+    public PantryView()
     {
         var userSession = new UserSession();
         this.ViewModel = new PantryViewModel(
