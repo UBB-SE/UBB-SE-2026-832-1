@@ -1,15 +1,15 @@
-﻿using ClassLibrary.DTOs;
+﻿using ClassLibrary.Models;
 
 namespace WinUI.Services
 {
     public interface IChatService
     {
-        Task AddMessageAsync(int conversationId, AddMessageRequestDto request);
-        Task<IReadOnlyList<ConversationDto>> GetAllConversationsAsync();
-        Task<IReadOnlyList<ConversationDto>> GetConversationsWhereNutritionistRespondedAsync(Guid nutritionistId);
-        Task<IReadOnlyList<ConversationDto>> GetConversationsWithMessagesAsync();
-        Task<IReadOnlyList<ConversationDto>> GetConversationsWithUserMessagesAsync();
-        Task<IReadOnlyList<MessageDto>> GetMessagesForConversationAsync(int conversationId);
-        Task<ConversationDto?> GetOrCreateConversationForUserAsync(Guid userId);
+        Task AddMessageAsync(int conversationId, int senderId, string text, bool isNutritionist);
+        Task<IReadOnlyList<Conversation>> GetAllConversationsAsync();
+        Task<IReadOnlyList<Conversation>> GetConversationsWhereNutritionistRespondedAsync(int nutritionistId);
+        Task<IReadOnlyList<Conversation>> GetConversationsWithMessagesAsync();
+        Task<IReadOnlyList<Conversation>> GetConversationsWithUserMessagesAsync();
+        Task<IReadOnlyList<Message>> GetMessagesForConversationAsync(int conversationId);
+        Task<Conversation?> GetOrCreateConversationForUserAsync(int userId);
     }
 }

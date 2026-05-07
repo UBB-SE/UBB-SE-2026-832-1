@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using ClassLibrary.DTOs;
+using ClassLibrary.Models;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
-using ClassLibrary.DTOs;
 
 namespace WinUI.Services;
 
@@ -18,50 +15,118 @@ public sealed class ChatService : IChatService
         this.httpClient = httpClient;
     }
 
-    public async Task<IReadOnlyList<ConversationDto>> GetAllConversationsAsync()
+    private static Guid MapIntToGuid(int id)
     {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat");
-        return conversations ?? [];
+        return new Guid(id.ToString("D32"));
     }
 
-    public async Task<ConversationDto?> GetOrCreateConversationForUserAsync(Guid userId)
+    private static Conversation MapToConversation(ConversationDto dto)
     {
-        var response = await this.httpClient.PostAsync($"{API_BASE_ADDRESS}/api/chat/user/{userId}", null);
+        return new Conversation
+        {
+            Id = dto.ConversationId,
+            HasUnanswered = dto.HasUnanswered,
+
+            User = new User
+            {
+                UserId = dto.UserId,
+                Username = dto.UserName
+            },
+
+            Messages = new List<Message>()
+        };
+    }
+
+    private static Message MapToMessage(MessageDto dto)
+    {
+        return new Message
+        {
+            Id = dto.MessageId,
+            SentAt = dto.SentAt,
+            TextContent = dto.TextContent,
+
+            Sender = new User
+            {
+                Username = dto.SenderUsername,
+                Role = dto.SenderRole
+            },
+
+            Conversation = new Conversation
+            {
+                Id = dto.ConversationId
+            }
+        };
+    }
+
+    public async Task<IReadOnlyList<Conversation>> GetAllConversationsAsync()
+    {
+        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat");
+
+        if (dtos is null) return [];
+
+        return dtos.Select(MapToConversation).ToList();
+    }
+
+    public async Task<Conversation?> GetOrCreateConversationForUserAsync(int userId)
+    {
+        var userGuid = MapIntToGuid(userId);
+        var response = await this.httpClient.PostAsync($"{API_BASE_ADDRESS}/api/chat/user/{userGuid}", null);
 
         if (!response.IsSuccessStatusCode)
         {
             return null;
         }
 
-        return await response.Content.ReadFromJsonAsync<ConversationDto>();
+        var dto = await response.Content.ReadFromJsonAsync<ConversationDto>();
+        return dto is null ? null : MapToConversation(dto);
     }
 
-    public async Task<IReadOnlyList<MessageDto>> GetMessagesForConversationAsync(int conversationId)
+    public async Task<IReadOnlyList<Message>> GetMessagesForConversationAsync(int conversationId)
     {
-        var messages = await this.httpClient.GetFromJsonAsync<List<MessageDto>>($"{API_BASE_ADDRESS}/api/chat/{conversationId}/messages");
-        return messages ?? [];
+        var dtos = await this.httpClient.GetFromJsonAsync<List<MessageDto>>($"{API_BASE_ADDRESS}/api/chat/{conversationId}/messages");
+
+        if (dtos is null) return [];
+
+        return dtos.Select(MapToMessage).ToList();
     }
 
-    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWithMessagesAsync()
+    public async Task<IReadOnlyList<Conversation>> GetConversationsWithMessagesAsync()
     {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/with-messages");
-        return conversations ?? [];
+        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/with-messages");
+
+        if (dtos is null) return [];
+
+        return dtos.Select(MapToConversation).ToList();
     }
 
-    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWithUserMessagesAsync()
+    public async Task<IReadOnlyList<Conversation>> GetConversationsWithUserMessagesAsync()
     {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/with-user-messages");
-        return conversations ?? [];
+        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/with-user-messages");
+
+        if (dtos is null) return [];
+
+        return dtos.Select(MapToConversation).ToList();
     }
 
-    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWhereNutritionistRespondedAsync(Guid nutritionistId)
+    public async Task<IReadOnlyList<Conversation>> GetConversationsWhereNutritionistRespondedAsync(int nutritionistId)
     {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/nutritionist/{nutritionistId}/responded");
-        return conversations ?? [];
+        var nutritionistGuid = MapIntToGuid(nutritionistId);
+        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/nutritionist/{nutritionistGuid}/responded");
+
+        if (dtos is null) return [];
+
+        return dtos.Select(MapToConversation).ToList();
     }
 
-    public async Task AddMessageAsync(int conversationId, AddMessageRequestDto request)
+    public async Task AddMessageAsync(int conversationId, int senderId, string text, bool isNutritionist)
     {
+        var request = new AddMessageRequestDto
+        {
+            SenderId = MapIntToGuid(senderId),
+            Text = text,
+            IsNutritionist = isNutritionist
+        };
+
         var response = await this.httpClient.PostAsJsonAsync($"{API_BASE_ADDRESS}/api/chat/{conversationId}/messages", request);
         response.EnsureSuccessStatusCode();
     }
