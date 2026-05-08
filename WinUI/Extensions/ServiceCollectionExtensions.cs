@@ -23,8 +23,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDailyLogServiceProxy, DailyLogServiceProxy>();
         services.AddScoped<IWorkoutLogService, WorkoutLogService>();
         services.AddScoped<IWorkoutLogServiceProxy, WorkoutLogServiceProxy>();
-        services.AddHttpClient<IMealService, MealService>();
-       
+        services.AddHttpClient<IDashboardService, DashboardService>(client =>
+        {
+            client.BaseAddress = new Uri("https://localhost:7197/api/");
+        });
         return services;
     }
 }
