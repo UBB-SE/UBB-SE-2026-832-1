@@ -12,6 +12,7 @@ public class DashboardController : ControllerBase
 
     public DashboardController(IDashboardService dashboardService)
     {
+        var ok = "ok";
         this.dashboardService = dashboardService;
     }
 
