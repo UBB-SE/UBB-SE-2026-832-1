@@ -86,12 +86,12 @@ public sealed partial class ActiveWorkoutView : Page
         var dialog = new ContentDialog
         {
             Title = string.Empty,
-            CloseButtonText = "Exit Focus Mode",
             DefaultButton = ContentDialogButton.None,
             XamlRoot = XamlRoot,
         };
 
         var focusView = new FocusModeView(ViewModel);
+        focusView.ExitRequested += () => dialog.Hide();
         dialog.Content = focusView;
 
         await dialog.ShowAsync();

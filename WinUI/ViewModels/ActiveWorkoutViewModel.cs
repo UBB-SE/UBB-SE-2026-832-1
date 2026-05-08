@@ -56,6 +56,40 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
     [ObservableProperty]
     private double currentSetWeightInput = double.NaN;
 
+    public string CurrentSetRepsInputText
+    {
+        get => double.IsNaN(this.CurrentSetRepsInput) ? string.Empty : ((int)this.CurrentSetRepsInput).ToString();
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                this.CurrentSetRepsInput = double.NaN;
+                return;
+            }
+            if (int.TryParse(value, out int parsed))
+            {
+                this.CurrentSetRepsInput = parsed;
+            }
+        }
+    }
+
+    public string CurrentSetWeightInputText
+    {
+        get => double.IsNaN(this.CurrentSetWeightInput) ? string.Empty : this.CurrentSetWeightInput.ToString("0.##");
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                this.CurrentSetWeightInput = double.NaN;
+                return;
+            }
+            if (double.TryParse(value, out double parsed))
+            {
+                this.CurrentSetWeightInput = parsed;
+            }
+        }
+    }
+
     [ObservableProperty]
     private int restTimeRemaining;
 
@@ -84,6 +118,9 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
     private ObservableCollection<ActiveExerciseViewModel> exerciseRows = new();
 
     [ObservableProperty]
+    private ActiveExerciseViewModel? currentExercise;
+
+    [ObservableProperty]
     private bool isWorkoutStarted;
 
     [ObservableProperty]
@@ -96,6 +133,16 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
     private ObservableCollection<Notification> notifications = new();
 
     public WorkoutLog? LastCompletedLog { get; private set; }
+
+    partial void OnCurrentSetRepsInputChanged(double value)
+    {
+        OnPropertyChanged(nameof(CurrentSetRepsInputText));
+    }
+
+    partial void OnCurrentSetWeightInputChanged(double value)
+    {
+        OnPropertyChanged(nameof(CurrentSetWeightInputText));
+    }
 
     partial void OnIsWorkoutStartedChanged(bool value)
     {
@@ -448,6 +495,7 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
                 if (!set.IsCompleted)
                 {
                     this.currentPendingSet = set;
+                    this.CurrentExercise = exercise;
                     this.CurrentExerciseName = exercise.ExerciseName;
                     this.CurrentTargetReps = set.TargetReps;
                     this.CurrentSetNumber = set.SetIndex;
@@ -459,6 +507,7 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
         }
 
         this.currentPendingSet = null;
+        this.CurrentExercise = null;
         this.CurrentExerciseName = "Workout complete";
         this.CurrentTargetReps = null;
         this.CurrentSetNumber = 0;
