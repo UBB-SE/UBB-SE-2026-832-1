@@ -2,13 +2,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ClassLibrary.Models;
-using WinUI.Services.Interfaces;
+using WinUI.Services;
 
 namespace WinUI.ViewModels;
 
 public sealed partial class AchievementsViewModel : ObservableObject
 {
-    private readonly IAchievementService achievementService;
+    private readonly IAchievementsService achievementsService;
 
     [ObservableProperty]
     private ObservableCollection<Achievement> achievements;
@@ -16,9 +16,9 @@ public sealed partial class AchievementsViewModel : ObservableObject
     [ObservableProperty]
     private bool isLoading;
 
-    public AchievementsViewModel(IAchievementService achievementService)
+    public AchievementsViewModel(IAchievementsService achievementsService)
     {
-        this.achievementService = achievementService;
+        this.achievementsService = achievementsService;
         this.achievements = new ObservableCollection<Achievement>();
     }
 
@@ -30,7 +30,7 @@ public sealed partial class AchievementsViewModel : ObservableObject
         try
         {
             Achievements.Clear();
-            var result = await achievementService.GetAchievementsAsync(clientId);
+            var result = await achievementsService.GetAchievementsAsync(clientId);
 
             foreach (var achievement in result)
             {

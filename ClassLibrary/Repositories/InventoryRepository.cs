@@ -21,7 +21,7 @@ public sealed class InventoryRepository : IInventoryRepository
         return await this.databaseContext.Inventories
             .AsNoTracking()
             .Include(inventory => inventory.Ingredient)
-            .Where(inventory => EF.Property<int>(inventory, "UserId") == userId)
+            .Where(inventory => inventory.UserId == userId)
             .ToListAsync();
     }
 
@@ -30,21 +30,18 @@ public sealed class InventoryRepository : IInventoryRepository
         return await this.databaseContext.Inventories
             .FirstOrDefaultAsync(
                 existingInventory =>
-                    EF.Property<int>(existingInventory, "UserId") == userId &&
-                    EF.Property<int>(existingInventory, "IngredientId") == ingredientId);
+                    existingInventory.UserId == userId &&
+                    existingInventory.IngredientId == ingredientId);
     }
 
     public async Task AddAsync(Inventory inventory)
     {
-        var userId = inventory.User?.UserId ?? 0;
-        var ingredientId = inventory.Ingredient?.IngredientId ?? 0;
-
-        if (userId <= 0 || ingredientId <= 0)
+        if (inventory.UserId <= 0 || inventory.IngredientId <= 0)
         {
-            throw new ArgumentException("Inventory must include User and Ingredient navigation stubs with valid key values.");
+            throw new ArgumentException("Inventory must have valid UserId and IngredientId.");
         }
 
-        var existing = await this.GetByUserIdAndIngredientIdAsync(userId, ingredientId);
+        var existing = await this.GetByUserIdAndIngredientIdAsync(inventory.UserId, inventory.IngredientId);
         if (existing is not null)
         {
             existing.QuantityGrams += inventory.QuantityGrams;
