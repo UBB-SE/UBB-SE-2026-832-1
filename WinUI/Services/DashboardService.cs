@@ -37,7 +37,13 @@ public sealed class DashboardService : IDashboardService
         return dto == null ? new WorkoutHistoryPageResult() : new WorkoutHistoryPageResult
         {
             TotalCount = dto.TotalCount,
-            Items = dto.Items.Select(i => new WorkoutHistoryItem {   }).ToList()
+            Items = dto.Items.Select(i => new WorkoutHistoryRow 
+            { 
+                Id = (int)i.WorkoutId,
+                WorkoutName = i.ActivityName,
+                LogDate = i.Date,
+                DurationSeconds = (int)(i.Duration * 60)
+            }).ToList()
         };
     }
 }

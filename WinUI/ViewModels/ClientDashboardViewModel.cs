@@ -49,7 +49,7 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
     [ObservableProperty] private bool isLoadingChart;
     [ObservableProperty] private bool showEmptyState = true;
 
-    public ObservableCollection<WorkoutHistoryItem> HistoryItems { get; } = new();
+    public ObservableCollection<WorkoutHistoryRow> HistoryItems { get; } = new();
     public ObservableCollection<Achievement> RecentAchievements { get; } = new();
     public int PageSize { get; set; } = DefaultPageSize;
 
