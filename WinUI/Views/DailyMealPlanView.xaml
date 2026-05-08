@@ -14,7 +14,7 @@
 			<ListView ItemsSource="{x:Bind ViewModel.PlannedMeals, Mode=OneWay}">
 				<ListView.ItemTemplate>
 					<DataTemplate>
-						<TextBlock Text="{Binding Name}" />
+						<TextBlock Text="{Binding}" />
 					</DataTemplate>
 				</ListView.ItemTemplate>
 			</ListView>
