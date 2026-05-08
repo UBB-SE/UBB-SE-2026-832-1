@@ -17,6 +17,7 @@
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Views\NutritionistChatView\NutritionistChatView.xaml" />
     <None Remove="Views\NutritionistChatView.xaml" />
   </ItemGroup>
 
@@ -29,6 +30,12 @@
 
   <ItemGroup>
     <Page Update="Views\NutritionistChatView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\ChatView\NutritionistChatView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

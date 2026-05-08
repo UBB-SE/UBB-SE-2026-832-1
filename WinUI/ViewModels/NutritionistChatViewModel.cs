@@ -1,4 +1,4 @@
-﻿namespace TeamNut.ViewModels
+﻿namespace WinUI.ViewModels
 {
     using ClassLibrary.Models;
     using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,7 +11,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using WinUI.Services;
-
+    using WinUI.ViewModels;
     using UserSession = ClassLibrary.Models.UserSession;
 
     public partial class NutritionistChatViewModel : ObservableObject
@@ -36,7 +36,7 @@
         private ObservableCollection<Conversation> conversations;
 
         [ObservableProperty]
-        private ObservableCollection<Message> messages;
+        private ObservableCollection<MessageViewModel> messages;
 
         [ObservableProperty]
         private string inputText;
@@ -66,7 +66,7 @@
         public NutritionistChatViewModel(IChatService chatService)
         {
             Conversations = new ObservableCollection<Conversation>();
-            Messages = new ObservableCollection<Message>();
+            Messages = new ObservableCollection<MessageViewModel>();
             InputText = string.Empty;
             StatusMessage = string.Empty;
 
@@ -169,7 +169,7 @@
 
             foreach (var messageItem in fetchedMessages)
             {
-                Messages.Add(messageItem);
+                Messages.Add(new MessageViewModel(messageItem));
             }
 
             HasMessages = Messages.Count > 0;
