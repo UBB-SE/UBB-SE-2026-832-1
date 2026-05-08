@@ -174,7 +174,20 @@ internal static class DataTransferObjectToDomainModelMappers
             Client = MapClient(workoutTemplateDataTransferObject.Client, workoutTemplateDataTransferObject.ClientId),
             Name = workoutTemplateDataTransferObject.Name,
             Type = ParseWorkoutType(workoutTemplateDataTransferObject.Type),
-            Exercises = [],
+            Exercises = workoutTemplateDataTransferObject.Exercises.Select(MapTemplateExercise).ToList(),
+        };
+    }
+
+    private static TemplateExercise MapTemplateExercise(TemplateExerciseDataTransferObject dto)
+    {
+        return new TemplateExercise
+        {
+            Name = dto.Name,
+            MuscleGroup = ParseMuscleGroup(dto.MuscleGroup),
+            TargetSets = dto.TargetSets,
+            TargetReps = dto.TargetReps,
+            TargetWeight = dto.TargetWeight,
+            WorkoutTemplate = null!,
         };
     }
 

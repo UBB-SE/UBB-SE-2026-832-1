@@ -165,6 +165,8 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
             return;
         }
 
+        this.IsWorkoutStarted = false;
+
         this.activeLog = new WorkoutLog
         {
             WorkoutName = value.Name,
@@ -229,6 +231,8 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
             {
                 return;
             }
+
+            this.IsWorkoutStarted = false;
 
             this.AvailableWorkouts.Clear();
             foreach (var w in selected)
