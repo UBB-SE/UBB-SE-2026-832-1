@@ -1,0 +1,143 @@
+<Page
+    x:Class="WinUI.Views.MealDetailView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:ClassLibrary.Models"
+    mc:Ignorable="d">
+
+    <Grid x:Name="RootGrid" Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
+            <TextBox
+                Width="250"
+                PlaceholderText="Search meal..."
+                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay}" />
+
+            <Button Content="Search" Command="{x:Bind ViewModel.SearchCommand}" />
+
+            <Button Content="Filters">
+                <Button.Flyout>
+                    <Flyout>
+                        <StackPanel Padding="10" Spacing="5">
+                            <CheckBox Content="Vegan" IsChecked="{x:Bind ViewModel.IsVeganFilterEnabled, Mode=TwoWay}" />
+                            <CheckBox Content="Keto" IsChecked="{x:Bind ViewModel.IsKetoFilterEnabled, Mode=TwoWay}" />
+                            <CheckBox Content="Gluten Free" IsChecked="{x:Bind ViewModel.IsGlutenFreeFilterEnabled, Mode=TwoWay}" />
+                            <CheckBox Content="Lactose Free" IsChecked="{x:Bind ViewModel.IsLactoseFreeFilterEnabled, Mode=TwoWay}" />
+                            <CheckBox Content="No Nuts" IsChecked="{x:Bind ViewModel.IsNutFreeFilterEnabled, Mode=TwoWay}" />
+                            <CheckBox Content="Favorites Only" IsChecked="{x:Bind ViewModel.IsFavoritesOnlyFilterEnabled, Mode=TwoWay}" />
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+        </StackPanel>
+
+        <ListView
+            Grid.Row="1"
+            IsItemClickEnabled="True"
+            ItemsSource="{x:Bind ViewModel.Meals, Mode=OneWay}"
+            SelectedItem="{x:Bind ViewModel.SelectedMeal, Mode=TwoWay}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:FoodItem">
+                    <Grid
+                        Padding="10"
+                        Margin="5"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind Name}" FontSize="17" FontWeight="SemiBold" />
+
+                            <TextBlock Opacity="0.75">
+                                <Run Text="{x:Bind Calories}" />
+                                <Run Text=" kcal" />
+                            </TextBlock>
+
+                            <TextBlock Opacity="0.7" FontSize="12">
+                                <Run Text="P " Foreground="Green" />
+                                <Run Text="{x:Bind Protein}" Foreground="Green" />
+                                <Run Text="g  •  " />
+                                <Run Text="C " Foreground="Orange" />
+                                <Run Text="{x:Bind Carbohydrates}" Foreground="Orange" />
+                                <Run Text="g  •  " />
+                                <Run Text="F " Foreground="Crimson" />
+                                <Run Text="{x:Bind Fat}" Foreground="Crimson" />
+                                <Run Text="g" />
+                            </TextBlock>
+                        </StackPanel>
+
+                        <Button
+                            Grid.Column="1"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Command="{Binding DataContext.ToggleFavoriteCommand, ElementName=RootGrid}"
+                            CommandParameter="{Binding}"
+                            Content="★"
+                            FontSize="22"
+                            Foreground="Gold" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0,10,0,0">
+            <Button Command="{x:Bind ViewModel.PreviousPageCommand}" Content="Prev" IsEnabled="{x:Bind ViewModel.CanGoToPreviousPage, Mode=OneWay}" />
+            <TextBlock VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Text="{x:Bind ViewModel.PageText, Mode=OneWay}" />
+            <Button Command="{x:Bind ViewModel.NextPageCommand}" Content="Next" IsEnabled="{x:Bind ViewModel.CanGoToNextPage, Mode=OneWay}" />
+        </StackPanel>
+
+        <Border
+            Grid.Row="3"
+            Margin="0,12,0,0"
+            Padding="12"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <StackPanel Spacing="6">
+                <TextBlock Text="{x:Bind ViewModel.SelectedMeal.Name, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="{x:Bind ViewModel.SelectedMeal.Description, Mode=OneWay}" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Border x:Load="{x:Bind ViewModel.IsSelectedMealVegan, Mode=OneWay}" Background="#2E7D32" CornerRadius="12" Padding="8,2">
+                        <TextBlock Text="Vegan" Foreground="White" FontSize="11" />
+                    </Border>
+                    <Border x:Load="{x:Bind ViewModel.IsSelectedMealKeto, Mode=OneWay}" Background="#8E24AA" CornerRadius="12" Padding="8,2">
+                        <TextBlock Text="Keto" Foreground="White" FontSize="11" />
+                    </Border>
+                    <Border x:Load="{x:Bind ViewModel.IsSelectedMealGlutenFree, Mode=OneWay}" Background="#EF6C00" CornerRadius="12" Padding="8,2">
+                        <TextBlock Text="Gluten Free" Foreground="White" FontSize="11" />
+                    </Border>
+                    <Border x:Load="{x:Bind ViewModel.IsSelectedMealLactoseFree, Mode=OneWay}" Background="#00838F" CornerRadius="12" Padding="8,2">
+                        <TextBlock Text="Lactose Free" Foreground="White" FontSize="11" />
+                    </Border>
+                    <Border x:Load="{x:Bind ViewModel.IsSelectedMealNutFree, Mode=OneWay}" Background="#5D4037" CornerRadius="12" Padding="8,2">
+                        <TextBlock Text="Nut Free" Foreground="White" FontSize="11" />
+                    </Border>
+                </StackPanel>
+                <TextBlock Foreground="Red" Text="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" />
+            </StackPanel>
+        </Border>
+
+        <ProgressRing
+            Grid.Row="0"
+            Grid.RowSpan="4"
+            Width="40"
+            Height="40"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+    </Grid>
+</Page>
