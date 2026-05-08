@@ -155,6 +155,7 @@
                                     Height="44"
                                     VerticalAlignment="Center">
                                     <Border
+                                        x:Name="UnlockedIconBorder"
                                         x:Load="{x:Bind IsUnlocked, Mode=OneWay}"
                                         Background="{ThemeResource AccentFillColorDefaultBrush}"
                                         CornerRadius="22">
@@ -166,6 +167,7 @@
                                             VerticalAlignment="Center" />
                                     </Border>
                                     <Border
+                                        x:Name="LockedIconBorder"
                                         x:Load="{x:Bind IsLocked, Mode=OneWay}"
                                         Background="{ThemeResource CardStrokeColorDefaultBrush}"
                                         CornerRadius="22">
