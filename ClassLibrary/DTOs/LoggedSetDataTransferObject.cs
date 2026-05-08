@@ -1,24 +1,20 @@
 namespace ClassLibrary.DTOs;
 
-public sealed class LoggedExerciseDataTransferObject
+public sealed class LoggedSetDataTransferObject
 {
-    public int LoggedExerciseId { get; set; }
+    public int LoggedSetId { get; set; }
 
     public string ExerciseName { get; set; } = string.Empty;
 
-    public string TargetMuscles { get; set; } = string.Empty;
+    public int SetIndex { get; set; }
 
-    public List<LoggedSetDataTransferObject> Sets { get; set; } = new();
+    public int TargetReps { get; set; }
 
-    public float MetabolicEquivalent { get; set; }
+    public int ActualReps { get; set; }
 
-    public int ExerciseCaloriesBurned { get; set; }
+    public float TargetWeight { get; set; }
 
-    public double PerformanceRatio { get; set; }
+    public float ActualWeight { get; set; }
 
-    public bool IsSystemAdjusted { get; set; }
-
-    public string AdjustmentNote { get; set; } = string.Empty;
-
-    public int ParentTemplateExerciseId { get; set; }
+    public int SetNumber { get; set; }
 }

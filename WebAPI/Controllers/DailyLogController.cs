@@ -39,7 +39,7 @@ public sealed class DailyLogController : ControllerBase
     [HttpGet("user/{userId:int}/targets")]
     public async Task<IActionResult> GetNutritionTargets(int userId)
     {
-        var targets = await this.dailyLogService.GetCurrentUserNutritionTargetsAsync(userId);
+        var targets = await this.dailyLogService.GetNutritionTargetsAsync(userId);
 
         if (targets is null)
         {
