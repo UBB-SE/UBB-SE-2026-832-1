@@ -13,6 +13,8 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<IActiveWorkoutService, ActiveWorkoutService>();
         services.AddHttpClient<ICreateWorkoutService, CreateWorkoutService>();
         services.AddHttpClient<ITrainerDashboardService, TrainerDashboardService>();
+        services.AddHttpClient<IAchievementsService, AchievementsService>();
+        services.AddHttpClient<IRankShowcaseService, RankShowcaseService>();
         services.AddHttpClient<IAchievementsService, AchievementsService>(client =>
         {
             client.BaseAddress = new Uri($"{ApiBaseUrl.BASE_URL}/api/");
@@ -26,6 +28,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddHttpClient<IShoppingListService, ShoppingListService>();
        
+        services.AddHttpClient<IDashboardService, DashboardService>(client =>
+        {
+            client.BaseAddress = new Uri("https://localhost:7197/api/");
+        });
         return services;
     }
 }

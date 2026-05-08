@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITrainerService, TrainerService>();
         services.AddScoped<ICalendarExportService, CalendarExportService>();
         services.AddSingleton<IAchievementUnlockedBus, AchievementUnlockedBus>();
+        services.AddScoped<IDashboardService, DashboardService>();
 
         return services;
     }
