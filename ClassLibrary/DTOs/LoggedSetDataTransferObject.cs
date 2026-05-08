@@ -8,13 +8,13 @@ public sealed class LoggedSetDataTransferObject
 
     public int SetIndex { get; set; }
 
-    public int? TargetReps { get; set; }
+    public int TargetReps { get; set; }
 
-    public int? ActualReps { get; set; }
+    public int ActualReps { get; set; }
 
-    public double? TargetWeight { get; set; }
+    public float TargetWeight { get; set; }
 
-    public double? ActualWeight { get; set; }
+    public float ActualWeight { get; set; }
 
     public int SetNumber { get; set; }
 }

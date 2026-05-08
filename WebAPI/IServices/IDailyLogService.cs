@@ -4,7 +4,7 @@ namespace WebApi.IServices
 {
     public interface IDailyLogService
     {
-        Task<UserDataDto?> GetCurrentUserNutritionTargetsAsync(int userId);
+        Task<UserDataDto?> GetNutritionTargetsAsync(int userId);
         Task<DailyLogTotalsDto> GetCurrentWeekTotalsAsync(int userId);
         Task<IReadOnlyList<FoodItemDto>> GetFoodItemsForAutocompleteAsync();
         Task<double> GetTodayBurnedCaloriesAsync(int userId);

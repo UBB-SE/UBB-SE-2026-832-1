@@ -19,4 +19,6 @@ public sealed class AchievementShowcaseItem
     public string Criteria { get; init; } = string.Empty;
 
     public bool IsUnlocked { get; init; }
+
+    public bool IsLocked => !this.IsUnlocked;
 }

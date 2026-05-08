@@ -306,10 +306,10 @@ public sealed class ClientService : IClientService
             LoggedSetId = set.LoggedSetId,
             ExerciseName = set.ExerciseName,
             SetIndex = set.SetIndex,
-            TargetReps = set.TargetReps,
-            ActualReps = set.ActualReps,
-            TargetWeight = set.TargetWeight,
-            ActualWeight = set.ActualWeight,
+            TargetReps = set.TargetReps ?? 0,
+            ActualReps = set.ActualReps ?? 0,
+            TargetWeight = (float)(set.TargetWeight ?? 0),
+            ActualWeight = (float)(set.ActualWeight ?? 0),
             SetNumber = set.SetNumber,
         };
     }
