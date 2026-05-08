@@ -13,6 +13,8 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<IActiveWorkoutService, ActiveWorkoutService>();
         services.AddHttpClient<ICreateWorkoutService, CreateWorkoutService>();
         services.AddHttpClient<ITrainerDashboardService, TrainerDashboardService>();
+        services.AddHttpClient<IAchievementsService, AchievementsService>();
+        services.AddHttpClient<IRankShowcaseService, RankShowcaseService>();
         services.AddHttpClient<IAchievementsService, AchievementsService>(client =>
         {
             client.BaseAddress = new Uri($"{ApiBaseUrl.BASE_URL}/api/");
