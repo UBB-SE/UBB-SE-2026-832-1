@@ -2,12 +2,12 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
+using ClassLibrary.Models;
 
 namespace WinUI.Services;
 
 public sealed class ChatService : IChatService
 {
-
     private readonly HttpClient httpClient;
 
     public ChatService(HttpClient httpClient)
@@ -15,50 +15,55 @@ public sealed class ChatService : IChatService
         this.httpClient = httpClient;
     }
 
-    public async Task<IReadOnlyList<ConversationDto>> GetAllConversationsAsync()
+    public async Task<IReadOnlyList<Conversation>> GetAllConversationsAsync()
     {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat");
-        return conversations ?? [];
+        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat");
+        return DataTransferObjectToDomainModelMappers.MapConversations(dtos);
     }
 
-    public async Task<ConversationDto?> GetOrCreateConversationForUserAsync(int userId)
+    public async Task<Conversation?> GetOrCreateConversationForUserAsync(int userId)
     {
         var response = await this.httpClient.PostAsync($"{ApiBaseUrl.BASE_URL}/api/chat/user/{userId}", null);
 
-        if (!response.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode) return null;
+
+        var dto = await response.Content.ReadFromJsonAsync<ConversationDto>();
+        return dto != null ? DataTransferObjectToDomainModelMappers.MapConversation(dto) : null;
+    }
+
+    public async Task<IReadOnlyList<Message>> GetMessagesForConversationAsync(int conversationId)
+    {
+        var dtos = await this.httpClient.GetFromJsonAsync<List<MessageDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/{conversationId}/messages");
+        return DataTransferObjectToDomainModelMappers.MapMessages(dtos);
+    }
+
+    public async Task<IReadOnlyList<Conversation>> GetConversationsWithMessagesAsync()
+    {
+        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/with-messages");
+        return DataTransferObjectToDomainModelMappers.MapConversations(dtos);
+    }
+
+    public async Task<IReadOnlyList<Conversation>> GetConversationsWithUserMessagesAsync()
+    {
+        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/with-user-messages");
+        return DataTransferObjectToDomainModelMappers.MapConversations(dtos);
+    }
+
+    public async Task<IReadOnlyList<Conversation>> GetConversationsWhereNutritionistRespondedAsync(int nutritionistId)
+    {
+        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/nutritionist/{nutritionistId}/responded");
+        return DataTransferObjectToDomainModelMappers.MapConversations(dtos);
+    }
+
+    public async Task AddMessageAsync(int conversationId, int senderId, string textContent, bool isNutritionist)
+    {
+        var request = new AddMessageRequestDto
         {
-            return null;
-        }
+            SenderId = senderId,
+            Text = textContent,
+            IsNutritionist = isNutritionist
+        };
 
-        return await response.Content.ReadFromJsonAsync<ConversationDto>();
-    }
-
-    public async Task<IReadOnlyList<MessageDto>> GetMessagesForConversationAsync(int conversationId)
-    {
-        var messages = await this.httpClient.GetFromJsonAsync<List<MessageDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/{conversationId}/messages");
-        return messages ?? [];
-    }
-
-    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWithMessagesAsync()
-    {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/with-messages");
-        return conversations ?? [];
-    }
-
-    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWithUserMessagesAsync()
-    {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/with-user-messages");
-        return conversations ?? [];
-    }
-
-    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWhereNutritionistRespondedAsync(int nutritionistId)
-    {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/nutritionist/{nutritionistId}/responded");
-        return conversations ?? [];
-    }
-
-    public async Task AddMessageAsync(int conversationId, AddMessageRequestDto request)
-    {
         var response = await this.httpClient.PostAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/chat/{conversationId}/messages", request);
         response.EnsureSuccessStatusCode();
     }
