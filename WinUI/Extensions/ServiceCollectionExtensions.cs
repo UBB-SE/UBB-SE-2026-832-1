@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<ITrainerDashboardService, TrainerDashboardService>();
         services.AddHttpClient<IAchievementsService, AchievementsService>(client =>
         {
-            client.BaseAddress = new Uri("https://localhost:7197/api/");
+            client.BaseAddress = new Uri($"{ApiBaseUrl.BASE_URL}/api/");
         });
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IDailyLogServiceProxy, DailyLogServiceProxy>();

@@ -7,7 +7,7 @@ namespace WinUI.Services;
 public sealed class CreateWorkoutService : ICreateWorkoutService
 {
     private readonly HttpClient httpClient;
-    private const string ApiUrl = "https://localhost:7197/api";
+    private const string ApiUrl = ApiBaseUrl.BASE_URL + "/api";
     private const string Route = "trainer";
 
     public CreateWorkoutService(HttpClient httpClient)
