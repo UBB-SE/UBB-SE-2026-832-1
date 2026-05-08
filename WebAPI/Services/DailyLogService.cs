@@ -94,7 +94,7 @@ public sealed class DailyLogService : IDailyLogService
         return MapToDailyLogTotalsDto(log);
     }
 
-    public async Task<UserDataDto?> GetCurrentUserNutritionTargetsAsync(int userId)
+    public async Task<UserDataDto?> GetNutritionTargetsAsync(int userId)
     {
         var userData = await this.userRepository.GetUserDataByUserIdAsync(userId);
 

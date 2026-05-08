@@ -86,8 +86,8 @@ public sealed class InventoryService : IInventoryService
     {
         var newItem = new Inventory
         {
-            User = new User { UserId = request.UserId },
-            Ingredient = new Ingredient { IngredientId = request.IngredientId },
+            UserId = request.UserId,
+            IngredientId = request.IngredientId,
             QuantityGrams = request.QuantityGrams,
         };
 

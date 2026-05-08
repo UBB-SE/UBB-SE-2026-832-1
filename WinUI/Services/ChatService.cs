@@ -1,12 +1,12 @@
-﻿using ClassLibrary.DTOs;
-using ClassLibrary.Models;
+﻿using System.Collections.Generic;
 using System.Net.Http.Json;
+using System.Threading.Tasks;
+using ClassLibrary.DTOs;
 
 namespace WinUI.Services;
 
 public sealed class ChatService : IChatService
 {
-    private const string API_BASE_ADDRESS = "https://localhost:7197";
 
     private readonly HttpClient httpClient;
 
@@ -15,119 +15,51 @@ public sealed class ChatService : IChatService
         this.httpClient = httpClient;
     }
 
-    private static Guid MapIntToGuid(int id)
+    public async Task<IReadOnlyList<ConversationDto>> GetAllConversationsAsync()
     {
-        return new Guid(id.ToString("D32"));
+        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat");
+        return conversations ?? [];
     }
 
-    private static Conversation MapToConversation(ConversationDto dto)
+    public async Task<ConversationDto?> GetOrCreateConversationForUserAsync(int userId)
     {
-        return new Conversation
-        {
-            Id = dto.ConversationId,
-            HasUnanswered = dto.HasUnanswered,
-
-            User = new User
-            {
-                UserId = dto.UserId,
-                Username = dto.UserName
-            },
-
-            Messages = new List<Message>()
-        };
-    }
-
-    private static Message MapToMessage(MessageDto dto)
-    {
-        return new Message
-        {
-            Id = dto.MessageId,
-            SentAt = dto.SentAt,
-            TextContent = dto.TextContent,
-
-            Sender = new User
-            {
-                Username = dto.SenderUsername,
-                Role = dto.SenderRole
-            },
-
-            Conversation = new Conversation
-            {
-                Id = dto.ConversationId
-            }
-        };
-    }
-
-    public async Task<IReadOnlyList<Conversation>> GetAllConversationsAsync()
-    {
-        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat");
-
-        if (dtos is null) return [];
-
-        return dtos.Select(MapToConversation).ToList();
-    }
-
-    public async Task<Conversation?> GetOrCreateConversationForUserAsync(int userId)
-    {
-        var userGuid = MapIntToGuid(userId);
-        var response = await this.httpClient.PostAsync($"{API_BASE_ADDRESS}/api/chat/user/{userGuid}", null);
+        var response = await this.httpClient.PostAsync($"{ApiBaseUrl.BASE_URL}/api/chat/user/{userId}", null);
 
         if (!response.IsSuccessStatusCode)
         {
             return null;
         }
 
-        var dto = await response.Content.ReadFromJsonAsync<ConversationDto>();
-        return dto is null ? null : MapToConversation(dto);
+        return await response.Content.ReadFromJsonAsync<ConversationDto>();
     }
 
-    public async Task<IReadOnlyList<Message>> GetMessagesForConversationAsync(int conversationId)
+    public async Task<IReadOnlyList<MessageDto>> GetMessagesForConversationAsync(int conversationId)
     {
-        var dtos = await this.httpClient.GetFromJsonAsync<List<MessageDto>>($"{API_BASE_ADDRESS}/api/chat/{conversationId}/messages");
-
-        if (dtos is null) return [];
-
-        return dtos.Select(MapToMessage).ToList();
+        var messages = await this.httpClient.GetFromJsonAsync<List<MessageDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/{conversationId}/messages");
+        return messages ?? [];
     }
 
-    public async Task<IReadOnlyList<Conversation>> GetConversationsWithMessagesAsync()
+    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWithMessagesAsync()
     {
-        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/with-messages");
-
-        if (dtos is null) return [];
-
-        return dtos.Select(MapToConversation).ToList();
+        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/with-messages");
+        return conversations ?? [];
     }
 
-    public async Task<IReadOnlyList<Conversation>> GetConversationsWithUserMessagesAsync()
+    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWithUserMessagesAsync()
     {
-        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/with-user-messages");
-
-        if (dtos is null) return [];
-
-        return dtos.Select(MapToConversation).ToList();
+        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/with-user-messages");
+        return conversations ?? [];
     }
 
-    public async Task<IReadOnlyList<Conversation>> GetConversationsWhereNutritionistRespondedAsync(int nutritionistId)
+    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWhereNutritionistRespondedAsync(int nutritionistId)
     {
-        var nutritionistGuid = MapIntToGuid(nutritionistId);
-        var dtos = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/nutritionist/{nutritionistGuid}/responded");
-
-        if (dtos is null) return [];
-
-        return dtos.Select(MapToConversation).ToList();
+        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/nutritionist/{nutritionistId}/responded");
+        return conversations ?? [];
     }
 
-    public async Task AddMessageAsync(int conversationId, int senderId, string text, bool isNutritionist)
+    public async Task AddMessageAsync(int conversationId, AddMessageRequestDto request)
     {
-        var request = new AddMessageRequestDto
-        {
-            SenderId = MapIntToGuid(senderId),
-            Text = text,
-            IsNutritionist = isNutritionist
-        };
-
-        var response = await this.httpClient.PostAsJsonAsync($"{API_BASE_ADDRESS}/api/chat/{conversationId}/messages", request);
+        var response = await this.httpClient.PostAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/chat/{conversationId}/messages", request);
         response.EnsureSuccessStatusCode();
     }
 }

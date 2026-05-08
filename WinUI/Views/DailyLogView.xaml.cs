@@ -17,7 +17,7 @@ public sealed partial class DailyLogView : Page
 
         this.userSession = new UserSession();
         this.viewModel = new DailyLogViewModel(
-            new DailyLogService(new DailyLogServiceProxy(new HttpClient())));
+            new DailyLogService(new HttpClient()));
         this.DataContext = this.viewModel;
 
         this.Loaded += OnPageLoaded;

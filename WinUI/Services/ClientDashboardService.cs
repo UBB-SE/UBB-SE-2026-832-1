@@ -6,7 +6,6 @@ namespace WinUI.Services;
 
 public sealed class ClientDashboardService : IClientDashboardService
 {
-    private const string API_BASE_ADDRESS = "https://localhost:7197";
     private const string ROUTE = "api/client";
     private readonly HttpClient httpClient;
 
@@ -28,14 +27,14 @@ public sealed class ClientDashboardService : IClientDashboardService
     public async Task<WorkoutHistoryPageResult> GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize)
     {
         var items = await httpClient.GetFromJsonAsync<List<WorkoutHistoryRow>>(
-            $"{API_BASE_ADDRESS}/{ROUTE}/{clientId}/workout-history");
+            $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/workout-history");
         return new WorkoutHistoryPageResult { TotalCount = items?.Count ?? 0, Items = items ?? [] };
     }
 
     public async Task<IReadOnlyList<AchievementDataTransferObject>> GetRecentAchievementsAsync(int clientId)
     {
         var achievements = await httpClient.GetFromJsonAsync<List<AchievementDataTransferObject>>(
-            $"{API_BASE_ADDRESS}/{ROUTE}/{clientId}/achievements");
+            $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/achievements");
         return achievements ?? [];
     }
 }

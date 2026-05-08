@@ -22,8 +22,8 @@ namespace WebApi.Controllers
             return this.Ok(conversations);
         }
 
-        [HttpPost("user/{userId:guid}")]
-        public async Task<IActionResult> GetOrCreateConversationForUser(Guid userId)
+        [HttpPost("user/{userId:int}")]
+        public async Task<IActionResult> GetOrCreateConversationForUser(int userId)
         {
             var conversation = await this.chatService.GetOrCreateConversationForUserAsync(userId);
 
@@ -56,8 +56,8 @@ namespace WebApi.Controllers
             return this.Ok(conversations);
         }
 
-        [HttpGet("nutritionist/{nutritionistId:guid}/responded")]
-        public async Task<IActionResult> GetConversationsWhereNutritionistResponded(Guid nutritionistId)
+        [HttpGet("nutritionist/{nutritionistId:int}/responded")]
+        public async Task<IActionResult> GetConversationsWhereNutritionistResponded(int nutritionistId)
         {
             var conversations = await this.chatService.GetConversationsWhereNutritionistRespondedAsync(nutritionistId);
             return this.Ok(conversations);
