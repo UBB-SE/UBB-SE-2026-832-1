@@ -18,7 +18,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\NutritionistChatView\NutritionistChatView.xaml" />
-    <None Remove="Views\NutritionistChatView.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,12 +25,6 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.0.1" />
     <ProjectReference Include="..\ClassLibrary\ClassLibrary.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Views\NutritionistChatView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
 
   <ItemGroup>
