@@ -1,4 +1,3 @@
-using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -16,8 +15,9 @@ public sealed partial class WorkoutHistoryPage : Page
     {
         var userSession = new UserSession();
         ClientId = userSession.CurrentClientId;
+        var httpClient = new System.Net.Http.HttpClient();
         ViewModel = new WorkoutLogViewModel(
-            new WorkoutLogService(new WorkoutLogServiceProxy(new System.Net.Http.HttpClient())));
+            new WorkoutLogService(new WorkoutLogServiceProxy(httpClient)));
         ViewModel.StartWorkoutRequested += clientId => Frame.Navigate(typeof(ActiveWorkoutView), clientId);
         InitializeComponent();
     }
@@ -36,31 +36,7 @@ public sealed partial class WorkoutHistoryPage : Page
         ViewModel.LoadLogsCommand.Execute(ClientId);
     }
 
-    private void ToggleEditMode_Click(object sender, RoutedEventArgs e)
+    private void EditButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button button || button.Tag is not int id)
-        {
-            return;
-        }
-
-        var item = ViewModel.Logs.FirstOrDefault(l => l.Id == id);
-        if (item is not null)
-        {
-            ViewModel.ToggleEditModeCommand.Execute(item);
-        }
-    }
-
-    private void SaveEditedLog_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not Button button || button.Tag is not int id)
-        {
-            return;
-        }
-
-        var item = ViewModel.Logs.FirstOrDefault(l => l.Id == id);
-        if (item is not null)
-        {
-            ViewModel.SaveEditedLogCommand.Execute(item);
-        }
     }
 }

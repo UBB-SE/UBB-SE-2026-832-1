@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
-using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WinUI.Services;
+using WinUI.Services.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -64,51 +64,5 @@ public sealed partial class WorkoutLogViewModel : ObservableObject
     private void StartWorkout(int clientId)
     {
         StartWorkoutRequested?.Invoke(clientId);
-    }
-
-    [RelayCommand]
-    private void ToggleEditMode(WorkoutLogItemViewModel item)
-    {
-        if (item is null)
-        {
-            return;
-        }
-
-        if (item.IsEditMode)
-        {
-            item.CancelEditMode();
-        }
-        else
-        {
-            item.EnterEditMode();
-        }
-    }
-
-    [RelayCommand]
-    private async Task SaveEditedLog(WorkoutLogItemViewModel item)
-    {
-        if (item is null || !item.IsEditMode)
-        {
-            return;
-        }
-
-        try
-        {
-            this.ErrorMessage = string.Empty;
-            WorkoutLog updated = item.BuildUpdatedWorkoutLog();
-            bool ok = await this.workoutLogService.UpdateWorkoutLogAsync(updated);
-
-            if (!ok)
-            {
-                this.ErrorMessage = "Failed to save workout changes.";
-                return;
-            }
-
-            item.CommitEditMode();
-        }
-        catch (Exception ex)
-        {
-            this.ErrorMessage = $"Failed to save workout changes: {ex.Message}";
-        }
     }
 }

@@ -1,5 +1,5 @@
 using ClassLibrary.DTOs;
-using ClassLibrary.Models;
+using WinUI.Services.Interfaces;
 
 namespace WinUI.Services;
 
@@ -20,10 +20,5 @@ public sealed class WorkoutLogService : IWorkoutLogService
     public Task<double> GetClientWeightAsync(int clientId)
     {
         return this.serviceProxy.GetClientWeightAsync(clientId);
-    }
-
-    public Task<bool> UpdateWorkoutLogAsync(WorkoutLog workoutLog)
-    {
-        return this.serviceProxy.UpdateWorkoutLogAsync(workoutLog);
     }
 }

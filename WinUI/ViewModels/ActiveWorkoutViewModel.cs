@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
 using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -278,6 +280,7 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
             {
                 this.LastCompletedLog = this.activeLog;
                 this.workoutUiState.ProgressionHeadsUp = BuildProgressionHeadsUp(this.activeLog);
+                SaveWorkoutCalendar(this.activeLog);
                 this.IsWorkoutStarted = false;
                 this.ExerciseRows.Clear();
                 this.activeLog = new WorkoutLog { Date = DateTime.Now, Client = new Client { ClientId = clientId } };
@@ -472,5 +475,49 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
                 : $"{e.ExerciseName}: {e.AdjustmentNote}")
             .ToList();
         return lines.Count == 0 ? null : string.Join("\n", lines);
+    }
+
+    private static void SaveWorkoutCalendar(WorkoutLog workoutLog)
+    {
+        try
+        {
+            string icsContent = BuildIcsContent(workoutLog);
+            string folder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "VibeCoders",
+                "WorkoutCalendar");
+            Directory.CreateDirectory(folder);
+            string fileName = $"workout-{workoutLog.Date:yyyyMMdd-HHmmss}.ics";
+            string filePath = Path.Combine(folder, fileName);
+            File.WriteAllText(filePath, icsContent, Encoding.UTF8);
+        }
+        catch
+        {
+        }
+    }
+
+    private static string BuildIcsContent(WorkoutLog workoutLog)
+    {
+        DateTime startUtc = workoutLog.Date.ToUniversalTime();
+        DateTime endUtc = workoutLog.Duration > TimeSpan.Zero
+            ? startUtc.Add(workoutLog.Duration)
+            : startUtc.AddMinutes(30);
+        string workoutName = string.IsNullOrWhiteSpace(workoutLog.WorkoutName) ? "Workout" : workoutLog.WorkoutName;
+        string description = $"Calories burned: {workoutLog.TotalCaloriesBurned:F0} kcal\\nExercises: {workoutLog.Exercises.Count}";
+
+        var builder = new StringBuilder();
+        builder.AppendLine("BEGIN:VCALENDAR");
+        builder.AppendLine("VERSION:2.0");
+        builder.AppendLine("PRODID:-//VibeCoders//WorkoutLog//EN");
+        builder.AppendLine("BEGIN:VEVENT");
+        builder.AppendLine($"UID:{Guid.NewGuid()}@vibecoders");
+        builder.AppendLine($"DTSTAMP:{DateTime.UtcNow:yyyyMMddTHHmmssZ}");
+        builder.AppendLine($"DTSTART:{startUtc:yyyyMMddTHHmmssZ}");
+        builder.AppendLine($"DTEND:{endUtc:yyyyMMddTHHmmssZ}");
+        builder.AppendLine($"SUMMARY:{workoutName}");
+        builder.AppendLine($"DESCRIPTION:{description}");
+        builder.AppendLine("END:VEVENT");
+        builder.AppendLine("END:VCALENDAR");
+        return builder.ToString();
     }
 }
