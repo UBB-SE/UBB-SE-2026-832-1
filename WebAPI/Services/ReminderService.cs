@@ -1,4 +1,4 @@
-﻿using ClassLibrary.DTOs;
+using ClassLibrary.DTOs;
 using ClassLibrary.Models;
 using ClassLibrary.IRepositories;
 using WebAPI.IServices;
@@ -37,20 +37,15 @@ public sealed class ReminderService : IReminderService
     public async Task<bool> SaveReminderAsync(SaveReminderRequestDataTransferObject request)
     {
         if (request == null || request.UserId <= 0)
-        {
             return false;
-        }
 
         if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Length > 50)
-        {
             return false;
-        }
 
         var user = await this.userRepository.GetByIdAsync(request.UserId);
+
         if (user == null)
-        {
             return false;
-        }
 
         var reminder = new Reminder
         {

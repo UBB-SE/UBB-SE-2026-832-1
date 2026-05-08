@@ -1,4 +1,4 @@
-﻿using ClassLibrary.Models;
+using ClassLibrary.Models;
 
 namespace ClassLibrary.IRepositories;
 

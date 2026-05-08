@@ -23,7 +23,6 @@ public sealed class AppDbContext : DbContext
     public DbSet<FoodItemIngredient> FoodItemIngredients { get; set; } = default!;
     public DbSet<MealPlanFoodItem> MealPlanFoodItems { get; set; } = default!;
     public DbSet<Client> Clients { get; set; } = default!;
-    public DbSet<Achievement> Achievements { get; set; } = default!;
     public DbSet<WorkoutLog> WorkoutLogs { get; set; } = default!;
     public DbSet<WorkoutTemplate> WorkoutTemplates { get; set; } = default!;
     public DbSet<Notification> Notifications { get; set; } = default!;
@@ -106,125 +105,21 @@ public sealed class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey("NutritionPlanId");
 
-        // ✅ TRECHO CORRIGIDO (EXATAMENTE O QUE O REVIEWER PEDIU)
+        
         modelBuilder.Entity<Meal>()
             .Property(meal => meal.Ingredients)
             .HasConversion(
                 ingredientList => JsonSerializer.Serialize(ingredientList, (JsonSerializerOptions?)null),
-                serializedIngredientList => JsonSerializer.Deserialize<List<string>>(serializedIngredientList, (JsonSerializerOptions?)null) ?? new List<string>())
+                serializedIngredientList =>
+                    JsonSerializer.Deserialize<List<string>>(serializedIngredientList, (JsonSerializerOptions?)null)
+                    ?? new List<string>())
             .Metadata.SetValueComparer(new ValueComparer<List<string>>(
-                (firstIngredientList, secondIngredientList) =>
-                    (firstIngredientList ?? new List<string>()).SequenceEqual(secondIngredientList ?? new List<string>()),
-                ingredientList =>
-                    ingredientList.Aggregate(0, (combinedHash, ingredient) =>
-                        HashCode.Combine(combinedHash, ingredient.GetHashCode())),
-                ingredientList => ingredientList.ToList()));
-
-        modelBuilder.Entity<DailyLog>(entity =>
-        {
-            entity.HasOne(dailyLog => dailyLog.User)
-                .WithMany()
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasOne(dailyLog => dailyLog.Meal)
-                .WithMany()
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.Property(dailyLog => dailyLog.LoggedAt).IsRequired();
-        });
-
-        modelBuilder.Entity<Ingredient>(entity =>
-        {
-            entity.Property(ingredient => ingredient.Name)
-                .IsRequired()
-                .HasMaxLength(200);
-        });
-
-        modelBuilder.Entity<Inventory>(entity =>
-        {
-            entity.HasOne(inventory => inventory.User)
-                .WithMany()
-                .HasForeignKey("UserId")
-                .IsRequired();
-
-            entity.HasOne(inventory => inventory.Ingredient)
-                .WithMany()
-                .HasForeignKey("IngredientId")
-                .IsRequired();
-        });
-
-        modelBuilder.Entity<Notification>(entity =>
-        {
-            entity.HasOne(notification => notification.Client)
-                .WithMany(client => client.Notifications)
-                .HasForeignKey("ClientId")
-                .IsRequired();
-        });
-
-        modelBuilder.Entity<ShoppingItem>(entity =>
-        {
-            entity.HasOne(shoppingItem => shoppingItem.User)
-                .WithMany()
-                .HasForeignKey("UserId")
-                .IsRequired();
-
-            entity.HasOne(shoppingItem => shoppingItem.Ingredient)
-                .WithMany()
-                .HasForeignKey("IngredientId")
-                .IsRequired();
-        });
-
-        modelBuilder.Entity<Conversation>()
-            .HasOne(conversation => conversation.User)
-            .WithMany()
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Conversation>()
-            .HasMany(conversation => conversation.Messages)
-            .WithOne(message => message.Conversation)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Message>()
-            .HasOne(message => message.Sender)
-            .WithMany()
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<TemplateExercise>(entity =>
-        {
-            entity.HasOne(templateExercise => templateExercise.WorkoutTemplate)
-                .WithMany(workoutTemplate => workoutTemplate.Exercises)
-                .HasForeignKey("WorkoutTemplateId")
-                .IsRequired();
-        });
-
-        modelBuilder.Entity<UserData>(entity =>
-        {
-            entity.HasOne(userData => userData.User)
-                .WithMany()
-                .HasForeignKey("UserId")
-                .IsRequired();
-        });
-
-        modelBuilder.Entity<WorkoutLog>(entity =>
-        {
-            entity.HasOne(workoutLog => workoutLog.Client)
-                .WithMany(client => client.WorkoutLogs)
-                .HasForeignKey("ClientId")
-                .IsRequired();
-        });
-
-        modelBuilder.Entity<WorkoutTemplate>(entity =>
-        {
-            entity.HasOne(workoutTemplate => workoutTemplate.Client)
-                .WithMany()
-                .HasForeignKey("ClientId")
-                .IsRequired();
-        });
+                (firstList, secondList) =>
+                    (firstList ?? new List<string>()).SequenceEqual(secondList ?? new List<string>()),
+                list =>
+                    list.Aggregate(0, (combinedHash, currentItem) =>
+                        HashCode.Combine(combinedHash, currentItem.GetHashCode())),
+                list => list.ToList()));
 
         modelBuilder.Entity<Reminder>(entity =>
         {

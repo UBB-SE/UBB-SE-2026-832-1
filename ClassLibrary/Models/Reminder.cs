@@ -1,12 +1,10 @@
-using System;
-
 namespace ClassLibrary.Models;
 
 public class Reminder
 {
     public int ReminderId { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public int UserId { get; set; }
 
     public string Name { get; set; } = string.Empty;
 
@@ -14,7 +12,7 @@ public class Reminder
 
     public TimeSpan Time { get; set; }
 
-    public string ReminderDate { get; set; } = string.Empty;
+    public string? ReminderDate { get; set; }
 
     public string Frequency { get; set; } = "Once";
 }

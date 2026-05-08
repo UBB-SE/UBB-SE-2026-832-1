@@ -1,14 +1,6 @@
-﻿using ClassLibrary.Data;
-using ClassLibrary.Models;
-using ClassLibrary.IRepositories;
-using Microsoft.EntityFrameworkCore;
-
-namespace ClassLibrary.Repositories;
-
 public class RepositoryWorkoutLog : IRepositoryWorkoutLog
 {
     private readonly AppDbContext databaseContext;
-
     private const double DefaultClientWeight = 75.0;
 
     public RepositoryWorkoutLog(AppDbContext databaseContext)
@@ -19,7 +11,7 @@ public class RepositoryWorkoutLog : IRepositoryWorkoutLog
     public async Task<double> GetClientWeightAsync(int clientId)
     {
         var client = await databaseContext.Clients
-            .FirstOrDefaultAsync(clientEntity => clientEntity.ClientId == clientId);
+            .FirstOrDefaultAsync(c => c.ClientId == clientId);
 
         return client?.Weight ?? DefaultClientWeight;
     }
@@ -33,15 +25,15 @@ public class RepositoryWorkoutLog : IRepositoryWorkoutLog
     public async Task<IReadOnlyList<WorkoutLog>> GetWorkoutHistoryAsync(int clientId)
     {
         return await databaseContext.WorkoutLogs
-            .Where(workoutLog => workoutLog.Client.ClientId == clientId)
-            .OrderByDescending(workoutLog => workoutLog.Date)
+            .Where(w => w.Client.ClientId == clientId)
+            .OrderByDescending(w => w.Date)
             .ToListAsync();
     }
 
     public async Task<bool> UpdateWorkoutLogFeedbackAsync(int workoutLogId, double rating, string notes)
     {
         var workoutLog = await databaseContext.WorkoutLogs
-            .FirstOrDefaultAsync(logEntity => logEntity.WorkoutLogId == workoutLogId);
+            .FirstOrDefaultAsync(w => w.WorkoutLogId == workoutLogId);
 
         if (workoutLog == null)
             return false;

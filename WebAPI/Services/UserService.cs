@@ -19,45 +19,37 @@ public class UserService : IUserService
     {
         var users = await this.userRepository.GetAllAsync();
 
-        return users
-            .Select(user => new UserDto
-            {
-                Id = user.UserId,
-                Username = user.Username,
-                Role = user.Role,
-            })
-            .ToList();
+        return users.Select(user => new UserDto
+        {
+            Id = user.UserId,
+            Username = user.Username,
+            Role = user.Role
+        }).ToList();
     }
 
     public async Task<UserDto?> LoginAsync(string username, string password)
     {
         var user = await this.userRepository.GetByUsernameAndPasswordAsync(username, password);
-        if (user == null)
-        {
-            return null;
-        }
+        if (user == null) return null;
 
         return new UserDto
         {
             Id = user.UserId,
             Username = user.Username,
-            Role = user.Role,
+            Role = user.Role
         };
     }
 
     public async Task<UserDto?> RegisterAsync(string username, string password, string role)
     {
         var existing = await this.userRepository.GetByUsernameAndPasswordAsync(username, password);
-        if (existing != null)
-        {
-            return null;
-        }
+        if (existing != null) return null;
 
         var user = new User
         {
             Username = username,
             Password = password,
-            Role = role,
+            Role = role
         };
 
         await this.userRepository.AddAsync(user);
@@ -66,7 +58,7 @@ public class UserService : IUserService
         {
             Id = user.UserId,
             Username = user.Username,
-            Role = user.Role,
+            Role = user.Role
         };
     }
 
@@ -79,10 +71,7 @@ public class UserService : IUserService
     public async Task<UserDataDto?> GetUserDataAsync(int userId)
     {
         var userData = await this.userRepository.GetUserDataByUserIdAsync(userId);
-        if (userData == null)
-        {
-            return null;
-        }
+        if (userData == null) return null;
 
         return MapToUserDataDto(userData, userId);
     }
@@ -96,26 +85,27 @@ public class UserService : IUserService
     public async Task UpdateUserDataAsync(UserDataDto userDataDto)
     {
         var userData = MapToUserData(userDataDto);
-        var computedData = NutritionCalculator.ComputeAllNutritionValues(userData);
-        await this.userRepository.UpdateUserDataAsync(computedData);
+        var computed = NutritionCalculator.ComputeAllNutritionValues(userData);
+
+        await this.userRepository.UpdateUserDataAsync(computed);
     }
 
-    private static UserDataDto MapToUserDataDto(UserData userData, int userId)
+    private static UserDataDto MapToUserDataDto(UserData data, int userId)
     {
         return new UserDataDto
         {
-            UserDataId = userData.UserDataId,
+            UserDataId = data.UserDataId,
             UserId = userId,
-            Weight = userData.Weight,
-            Height = userData.Height,
-            Age = userData.Age,
-            Gender = userData.Gender,
-            Goal = userData.Goal,
-            BodyMassIndex = userData.BodyMassIndex,
-            CalorieNeeds = userData.CalorieNeeds,
-            ProteinNeeds = userData.ProteinNeeds,
-            CarbohydrateNeeds = userData.CarbohydrateNeeds,
-            FatNeeds = userData.FatNeeds,
+            Weight = data.Weight,
+            Height = data.Height,
+            Age = data.Age,
+            Gender = data.Gender,
+            Goal = data.Goal,
+            BodyMassIndex = data.BodyMassIndex,
+            CalorieNeeds = data.CalorieNeeds,
+            ProteinNeeds = data.ProteinNeeds,
+            CarbohydrateNeeds = data.CarbohydrateNeeds,
+            FatNeeds = data.FatNeeds
         };
     }
 
@@ -134,7 +124,7 @@ public class UserService : IUserService
             CalorieNeeds = dto.CalorieNeeds,
             ProteinNeeds = dto.ProteinNeeds,
             CarbohydrateNeeds = dto.CarbohydrateNeeds,
-            FatNeeds = dto.FatNeeds,
+            FatNeeds = dto.FatNeeds
         };
     }
 }

@@ -1,6 +1,6 @@
 using ClassLibrary.Data;
-using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
+using ClassLibrary.IRepositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
@@ -22,7 +22,7 @@ public class ReminderRepository : IReminderRepository
     public async Task<IEnumerable<Reminder>> GetAllByUserIdAsync(int userId)
     {
         return await dbContext.Reminders
-            .Where(reminder => reminder.User.UserId == userId)
+            .Where(reminder => reminder.UserId == userId)
             .ToListAsync();
     }
 
@@ -35,7 +35,7 @@ public class ReminderRepository : IReminderRepository
     public async Task<Reminder?> GetNextReminderAsync(int userId)
     {
         return await dbContext.Reminders
-            .Where(reminder => reminder.User.UserId == userId)
+            .Where(reminder => reminder.UserId == userId)
             .OrderBy(reminder => reminder.Time)
             .FirstOrDefaultAsync();
     }

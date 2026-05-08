@@ -1,10 +1,3 @@
-﻿using ClassLibrary.Data;
-using ClassLibrary.Models;
-using ClassLibrary.IRepositories; 
-using Microsoft.EntityFrameworkCore;
-
-namespace ClassLibrary.Repositories;
-
 public class RepositoryTrainer : IRepositoryTrainer
 {
     private readonly AppDbContext dbContext;
