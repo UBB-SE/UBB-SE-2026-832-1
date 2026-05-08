@@ -166,8 +166,5 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
         };
     }
 
-    public Task<IDictionary<string, double>> GetPreviousBestWeightsAsync(int clientId)
-    {
-        throw new NotImplementedException();
-    }
+
 }

@@ -11,7 +11,7 @@ public partial class MealDetailViewModel : ObservableObject
 {
     private const int PAGE_SIZE = 8;
     private readonly IMealService mealService;
-    private readonly UserSession userSession;
+    private readonly WinUI.Services.UserSession userSession;
     private readonly List<FoodItem> allMeals = [];
 
     [ObservableProperty]
@@ -74,7 +74,7 @@ public partial class MealDetailViewModel : ObservableObject
     [ObservableProperty]
     private bool isSelectedMealNutFree;
 
-    public MealDetailViewModel(IMealService mealService, UserSession userSession)
+    public MealDetailViewModel(IMealService mealService, WinUI.Services.UserSession userSession)
     {
         this.mealService = mealService;
         this.userSession = userSession;

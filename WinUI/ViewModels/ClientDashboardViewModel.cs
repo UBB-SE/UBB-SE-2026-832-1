@@ -1,4 +1,4 @@
-﻿using ClassLibrary.DTOs.Analytics;
+using ClassLibrary.DTOs.Analytics;
 using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -9,7 +9,6 @@ using SkiaSharp;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using WinUI.Services;
-using WinUI.Services.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -18,14 +17,14 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
     private const int DefaultPageSize = 5;
 
     private readonly IDashboardService dashboardService;
-    private readonly IAchievementService achievementService;
+    private readonly IAchievementsService achievementService;
     private readonly IUserSession session;
     private readonly IAnalyticsDashboardRefreshBus refreshBus;
     private CancellationTokenSource? loadCts;
 
     public ClientDashboardViewModel(
         IDashboardService dashboardService,
-        IAchievementService achievementService,
+        IAchievementsService achievementService,
         IUserSession session,
         IAnalyticsDashboardRefreshBus refreshBus)
     {

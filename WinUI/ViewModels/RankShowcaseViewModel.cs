@@ -16,7 +16,7 @@ public partial class RankShowcaseViewModel : ObservableObject
 
 
     private readonly IRankShowcaseService rankShowcaseService;
-    private readonly UserSession userSession;
+    private readonly WinUI.Services.UserSession userSession;
 
     [ObservableProperty]
     private string levelDisplayLine = DEFAULT_LEVEL_DISPLAY_LINE;
@@ -39,7 +39,7 @@ public partial class RankShowcaseViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<AchievementShowcaseItem> showcaseAchievements = [];
 
-    public RankShowcaseViewModel(IRankShowcaseService rankShowcaseService, UserSession userSession)
+    public RankShowcaseViewModel(IRankShowcaseService rankShowcaseService, WinUI.Services.UserSession userSession)
     {
         this.rankShowcaseService = rankShowcaseService;
         this.userSession = userSession;

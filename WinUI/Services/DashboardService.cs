@@ -1,8 +1,7 @@
-﻿using ClassLibrary.DTOs;
+using ClassLibrary.DTOs;
 using ClassLibrary.DTOs.Analytics;
 using ClassLibrary.Models;
 using System.Net.Http.Json;
-using WinUI.Services.Interfaces;
 
 namespace WinUI.Services;
 
