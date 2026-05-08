@@ -6,8 +6,6 @@ namespace WinUI.Services;
 
 public sealed class ShoppingListService : IShoppingListService
 {
-    private const string API_BASE_ADDRESS = ApiBaseUrl.BASE_URL + "/api";
-    private const string SHOPPING_LIST_ROUTE = "ShoppingList";
     private readonly HttpClient httpClient;
 
     public ShoppingListService(HttpClient httpClient)
@@ -17,15 +15,10 @@ public sealed class ShoppingListService : IShoppingListService
 
     public async Task<IReadOnlyList<ShoppingListItem>> GetShoppingItemsAsync(int userId)
     {
-        var shoppingItemDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<ShoppingItemDto>>(
-            $"{API_BASE_ADDRESS}/{SHOPPING_LIST_ROUTE}/user/{userId}");
+        var dtos = await this.httpClient.GetFromJsonAsync<List<ShoppingItemDto>>(
+            $"{ApiBaseUrl.BASE_URL}/api/ShoppingList/user/{userId}");
 
-        if (shoppingItemDataTransferObjects is null)
-        {
-            return Array.Empty<ShoppingListItem>();
-        }
-
-        return shoppingItemDataTransferObjects.Select(MapShoppingListItem).ToList();
+        return (dtos ?? []).Select(MapShoppingListItem).ToList();
     }
 
     public async Task<ShoppingListItem?> AddItemAsync(string itemName, int userId, double quantityGrams)
@@ -36,8 +29,8 @@ public sealed class ShoppingListService : IShoppingListService
             Quantity = quantityGrams,
         };
 
-        HttpResponseMessage response = await this.httpClient.PostAsJsonAsync(
-            $"{API_BASE_ADDRESS}/{SHOPPING_LIST_ROUTE}/user/{userId}",
+        var response = await this.httpClient.PostAsJsonAsync(
+            $"{ApiBaseUrl.BASE_URL}/api/ShoppingList/user/{userId}",
             request);
 
         if (!response.IsSuccessStatusCode)
@@ -54,23 +47,25 @@ public sealed class ShoppingListService : IShoppingListService
 
     public async Task<bool> RemoveItemAsync(ShoppingListItem item)
     {
-        HttpResponseMessage response = await this.httpClient.DeleteAsync(
-            $"{API_BASE_ADDRESS}/{SHOPPING_LIST_ROUTE}/{item.ShoppingListItemId}");
+        var response = await this.httpClient.DeleteAsync(
+            $"{ApiBaseUrl.BASE_URL}/api/ShoppingList/{item.ShoppingListItemId}");
         return response.IsSuccessStatusCode;
     }
 
-    public Task<bool> MoveToPantryAsync(ShoppingListItem item)
+    public async Task<bool> MoveToPantryAsync(ShoppingListItem item)
     {
-        // Placeholder until move-to-pantry endpoint is exposed by WebAPI controller.
-        return Task.FromResult(false);
+        var response = await this.httpClient.PostAsync(
+            $"{ApiBaseUrl.BASE_URL}/api/ShoppingList/{item.ShoppingListItemId}/move-to-pantry",
+            null);
+        return response.IsSuccessStatusCode;
     }
 
     public async Task<int> GenerateListAsync(int userId)
     {
-        IReadOnlyList<ShoppingListItem> previousItems = await this.GetShoppingItemsAsync(userId);
+        var previousItems = await this.GetShoppingItemsAsync(userId);
 
-        HttpResponseMessage response = await this.httpClient.PostAsync(
-            $"{API_BASE_ADDRESS}/{SHOPPING_LIST_ROUTE}/generate/{userId}",
+        var response = await this.httpClient.PostAsync(
+            $"{ApiBaseUrl.BASE_URL}/api/ShoppingList/generate/{userId}",
             null);
 
         if (!response.IsSuccessStatusCode)
@@ -78,14 +73,19 @@ public sealed class ShoppingListService : IShoppingListService
             return -1;
         }
 
-        IReadOnlyList<ShoppingListItem> currentItems = await this.GetShoppingItemsAsync(userId);
+        var currentItems = await this.GetShoppingItemsAsync(userId);
         return Math.Max(0, currentItems.Count - previousItems.Count);
     }
 
-    public Task<IReadOnlyList<KeyValuePair<int, string>>> SearchIngredientsAsync(string query)
+    public async Task<IReadOnlyList<KeyValuePair<int, string>>> SearchIngredientsAsync(string query)
     {
-        // Placeholder until ingredient-search endpoint is exposed by WebAPI controller.
-        return Task.FromResult<IReadOnlyList<KeyValuePair<int, string>>>(Array.Empty<KeyValuePair<int, string>>());
+        var allIngredients = await this.httpClient.GetFromJsonAsync<List<IngredientDataTransferObject>>(
+            $"{ApiBaseUrl.BASE_URL}/api/inventory/ingredients");
+
+        return (allIngredients ?? [])
+            .Where(ingredient => ingredient.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+            .Select(ingredient => new KeyValuePair<int, string>(ingredient.IngredientId, ingredient.Name))
+            .ToList();
     }
 
     private static ShoppingListItem MapShoppingListItem(ShoppingItemDto shoppingItemDataTransferObject)

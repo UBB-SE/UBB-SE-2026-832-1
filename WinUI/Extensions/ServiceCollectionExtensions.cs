@@ -2,7 +2,6 @@ using ClassLibrary.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using WinUI.Services;
-
 namespace WinUI.Extensions;
 
 public static class ServiceCollectionExtensions
