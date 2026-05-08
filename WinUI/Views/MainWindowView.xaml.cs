@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using WinUI.ViewModels;
 using WinUI.Views.ShoppingList;
 using WinUI.Views.PantryView;
+using WinUI.Views.WorkoutLog;
 
 namespace WinUI.Views;
 

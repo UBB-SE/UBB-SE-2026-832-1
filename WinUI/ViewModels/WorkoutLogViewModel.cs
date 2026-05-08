@@ -1,73 +1,114 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using ClassLibrary.DTOs;
+using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using WinUI.Services;
 
 namespace WinUI.ViewModels;
 
-public partial class WorkoutLogViewModel : ObservableObject
+public sealed partial class WorkoutLogViewModel : ObservableObject
 {
-    private const string ERROR_LOADING_HISTORY_FORMAT = "Failed to load workout history: {0}";
-    private const string ERROR_LOADING_WEIGHT_FORMAT = "Failed to load client weight: {0}";
-
     private readonly IWorkoutLogService workoutLogService;
 
-    [ObservableProperty]
-    private ObservableCollection<WorkoutLogDataTransferObject> workoutHistory = new();
-
-    [ObservableProperty]
-    private WorkoutLogDataTransferObject? selectedWorkout;
-
-    [ObservableProperty]
-    private double clientWeight;
+    public ObservableCollection<WorkoutLogItemViewModel> Logs { get; } = new();
 
     [ObservableProperty]
     private bool isLoading;
 
     [ObservableProperty]
+    private bool showEmptyState;
+
+    [ObservableProperty]
     private string errorMessage = string.Empty;
+
+    public event Action<int>? StartWorkoutRequested;
 
     public WorkoutLogViewModel(IWorkoutLogService workoutLogService)
     {
-        this.workoutLogService = workoutLogService ?? throw new ArgumentNullException(nameof(workoutLogService));
+        this.workoutLogService = workoutLogService;
     }
 
-    public async Task LoadWorkoutHistoryAsync(int clientId)
+    [RelayCommand]
+    private async Task LoadLogs(int clientId)
     {
         try
         {
-            IsLoading = true;
-            ErrorMessage = string.Empty;
+            this.IsLoading = true;
+            this.ErrorMessage = string.Empty;
+            this.Logs.Clear();
+            this.ShowEmptyState = false;
 
-            var history = await this.workoutLogService.GetWorkoutHistoryAsync(clientId);
+            var dtos = await this.workoutLogService.GetWorkoutHistoryAsync(clientId);
+            var logs = DataTransferObjectToDomainModelMappers.MapWorkoutLogs(dtos);
 
-            this.WorkoutHistory.Clear();
-            foreach (var workoutLog in history)
+            foreach (var log in logs)
             {
-                this.WorkoutHistory.Add(workoutLog);
+                this.Logs.Add(new WorkoutLogItemViewModel(log));
             }
+
+            this.ShowEmptyState = this.Logs.Count == 0;
         }
-        catch (Exception exception)
+        catch (Exception ex)
         {
-            ErrorMessage = string.Format(ERROR_LOADING_HISTORY_FORMAT, exception.Message);
+            this.Logs.Clear();
+            this.ShowEmptyState = true;
+            this.ErrorMessage = $"Failed to load workout logs: {ex.Message}";
         }
         finally
         {
-            IsLoading = false;
+            this.IsLoading = false;
         }
     }
 
-    public async Task LoadClientWeightAsync(int clientId)
+    [RelayCommand]
+    private void StartWorkout(int clientId)
     {
+        StartWorkoutRequested?.Invoke(clientId);
+    }
+
+    [RelayCommand]
+    private void ToggleEditMode(WorkoutLogItemViewModel item)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        if (item.IsEditMode)
+        {
+            item.CancelEditMode();
+        }
+        else
+        {
+            item.EnterEditMode();
+        }
+    }
+
+    [RelayCommand]
+    private async Task SaveEditedLog(WorkoutLogItemViewModel item)
+    {
+        if (item is null || !item.IsEditMode)
+        {
+            return;
+        }
+
         try
         {
-            ClientWeight = await this.workoutLogService.GetClientWeightAsync(clientId);
+            this.ErrorMessage = string.Empty;
+            WorkoutLog updated = item.BuildUpdatedWorkoutLog();
+            bool ok = await this.workoutLogService.UpdateWorkoutLogAsync(updated);
+
+            if (!ok)
+            {
+                this.ErrorMessage = "Failed to save workout changes.";
+                return;
+            }
+
+            item.CommitEditMode();
         }
-        catch (Exception exception)
+        catch (Exception ex)
         {
-            ErrorMessage = string.Format(ERROR_LOADING_WEIGHT_FORMAT, exception.Message);
+            this.ErrorMessage = $"Failed to save workout changes: {ex.Message}";
         }
     }
 }
