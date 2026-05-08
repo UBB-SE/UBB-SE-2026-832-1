@@ -4,6 +4,8 @@ public sealed class LoggedExerciseDataTransferObject
 {
     public int LoggedExerciseId { get; set; }
 
+    public int? ParentTemplateExerciseId { get; set; }
+
     public string ExerciseName { get; set; } = string.Empty;
 
     public string TargetMuscles { get; set; } = string.Empty;

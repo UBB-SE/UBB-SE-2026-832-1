@@ -4,7 +4,7 @@ namespace ClassLibrary.DTOs;
 
 public sealed class SaveReminderRequestDataTransferObject
 {
-    public int Id { get; set; }
+    public int ReminderId { get; set; }
 
     public int UserId { get; set; }
 

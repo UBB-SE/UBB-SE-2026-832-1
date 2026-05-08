@@ -45,5 +45,17 @@ namespace WebAPI.Controllers
             await shoppingListService.DeleteAsync(id);
             return NoContent();
         }
+
+        [HttpPost("{id}/move-to-pantry")]
+        public async Task<IActionResult> MoveToPantry(int id)
+        {
+            var success = await shoppingListService.MoveToPantryAsync(id);
+            if (!success)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
     }
 }

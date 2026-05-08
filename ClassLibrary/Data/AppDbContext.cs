@@ -52,11 +52,7 @@ public sealed class AppDbContext : DbContext
                 .HasForeignKey("FoodItemId")
                 .IsRequired();
 
-            entity.HasIndex(favorite => new
-            {
-                UserId = EF.Property<int>(favorite, "UserId"),
-                FoodItemId = EF.Property<int>(favorite, "FoodItemId"),
-            }).IsUnique();
+            entity.HasIndex("UserId", "FoodItemId").IsUnique();
         });
 
         modelBuilder.Entity<FoodItemIngredient>(entity =>
@@ -71,11 +67,7 @@ public sealed class AppDbContext : DbContext
                 .HasForeignKey("IngredientId")
                 .IsRequired();
 
-            entity.HasIndex(foodItemIngredient => new
-            {
-                FoodItemId = EF.Property<int>(foodItemIngredient, "FoodItemId"),
-                IngredientId = EF.Property<int>(foodItemIngredient, "IngredientId"),
-            }).IsUnique();
+            entity.HasIndex("FoodItemId", "IngredientId").IsUnique();
         });
 
         modelBuilder.Entity<MealPlan>(entity =>
@@ -98,11 +90,7 @@ public sealed class AppDbContext : DbContext
                 .HasForeignKey("FoodItemId")
                 .IsRequired();
 
-            entity.HasIndex(mealPlanFoodItem => new
-            {
-                MealPlanId = EF.Property<int>(mealPlanFoodItem, "MealPlanId"),
-                FoodItemId = EF.Property<int>(mealPlanFoodItem, "FoodItemId"),
-            }).IsUnique();
+            entity.HasIndex("MealPlanId", "FoodItemId").IsUnique();
         });
 
         modelBuilder.Entity<ClientNutritionPlan>()

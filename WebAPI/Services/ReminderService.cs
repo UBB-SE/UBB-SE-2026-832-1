@@ -54,7 +54,7 @@ public sealed class ReminderService : IReminderService
 
         var reminder = new Reminder
         {
-            Id = request.Id,
+            ReminderId = request.ReminderId,
             User = user,
             Name = request.Name,
             HasSound = request.HasSound,
@@ -63,7 +63,7 @@ public sealed class ReminderService : IReminderService
             Frequency = request.Frequency,
         };
 
-        if (reminder.Id == 0)
+        if (reminder.ReminderId == 0)
         {
             await this.reminderRepository.AddAsync(reminder);
         }
@@ -84,7 +84,7 @@ public sealed class ReminderService : IReminderService
     {
         return new ReminderDataTransferObject
         {
-            Id = reminder.Id,
+            Id = reminder.ReminderId,
             UserId = reminder.User?.UserId ?? 0,
             Name = reminder.Name,
             HasSound = reminder.HasSound,

@@ -7,7 +7,7 @@ namespace WinUI.Services;
 public sealed class TrainerDashboardService : ITrainerDashboardService
 {
     private readonly HttpClient httpClient;
-    private const string baseAddress = "https://localhost:7197/api";
+    private const string baseAddress = ApiBaseUrl.BASE_URL + "/api";
     private const string trainerRoute = "trainer";
 
     public TrainerDashboardService(HttpClient httpClient)
