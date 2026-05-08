@@ -45,22 +45,22 @@ public class ChatRepository : IChatRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Conversation>> GetConversationsWhereNutritionistRespondedAsync(Guid nutritionistId)
+    public async Task<IEnumerable<Conversation>> GetConversationsWhereNutritionistRespondedAsync(int nutritionistId)
     {
         return await context.Conversations
             .Include(conversation => conversation.User)
-            .Where(conversation => conversation.Messages.Any(message => EF.Property<Guid>(message.Sender, "Id") == nutritionistId))
+            .Where(conversation => conversation.Messages.Any(message => EF.Property<int>(message.Sender, "Id") == nutritionistId))
             .OrderByDescending(conversation => conversation.HasUnanswered)
             .ThenByDescending(conversation => conversation.Id)
             .Distinct()
             .ToListAsync();
     }
 
-    public async Task<Conversation> GetOrCreateConversationForUserAsync(Guid userId)
+    public async Task<Conversation> GetOrCreateConversationForUserAsync(int userId)
     {
         var conversation = await context.Conversations
             .Include(conversationItem => conversationItem.User)
-            .FirstOrDefaultAsync(conversationItem => EF.Property<Guid>(conversationItem.User, "Id") == userId);
+            .FirstOrDefaultAsync(conversationItem => EF.Property<int>(conversationItem.User, "Id") == userId);
 
         if (conversation != null)
         {
@@ -95,7 +95,7 @@ public class ChatRepository : IChatRepository
             .ToListAsync();
     }
 
-    public async Task AddMessageAsync(int conversationId, Guid senderId, string text, bool isNutritionist)
+    public async Task AddMessageAsync(int conversationId, int senderId, string text, bool isNutritionist)
     {
         var conversation = await context.Conversations.FindAsync(conversationId);
         if (conversation == null)

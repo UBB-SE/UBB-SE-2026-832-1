@@ -12,9 +12,10 @@ public sealed class AchievementUnlockedBus : IAchievementUnlockedBus
     {
         var achievementModel = new AchievementShowcaseItem
         {
-            Id = achievement.Id,
+            AchievementId = achievement.Id,
             Title = achievement.Title,
-            Description = achievement.Description
+            Description = achievement.Description,
+            Criteria = achievement.Description
         };
 
         AchievementUnlocked?.Invoke(this, new AchievementUnlockedEventArgs(achievementModel));

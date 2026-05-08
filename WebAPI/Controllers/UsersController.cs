@@ -37,12 +37,7 @@ public sealed class UsersController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var user = await userService.RegisterUserAsync(new User
-        {
-            Username = request.Username,
-            Password = request.Password,
-            Role = request.Role
-        });
+        var user = await userService.RegisterAsync(request.Username, request.Password, request.Role);
 
         if (user == null)
         {
@@ -72,14 +67,14 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpPost("data")]
-    public async Task<IActionResult> AddUserData([FromBody] UserData userData)
+    public async Task<IActionResult> AddUserData([FromBody] ClassLibrary.DTOs.UserDataDto userData)
     {
-        await userService.UpdateUserDataAsync(userData);
+        await userService.AddUserDataAsync(userData);
         return Ok();
     }
 
     [HttpPut("data")]
-    public async Task<IActionResult> UpdateUserData([FromBody] UserData userData)
+    public async Task<IActionResult> UpdateUserData([FromBody] ClassLibrary.DTOs.UserDataDto userData)
     {
         await userService.UpdateUserDataAsync(userData);
         return Ok();

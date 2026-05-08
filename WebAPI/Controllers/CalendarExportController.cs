@@ -27,13 +27,13 @@ public sealed class CalendarExportController : ControllerBase
         {
             return this.BadRequest(exception.Message);
         }
-        catch (ArgumentException exception)
-        {
-            return this.BadRequest(exception.Message);
-        }
         catch (ArgumentNullException)
         {
             return this.NotFound();
+        }
+        catch (ArgumentException exception)
+        {
+            return this.BadRequest(exception.Message);
         }
         catch (Exception)
         {

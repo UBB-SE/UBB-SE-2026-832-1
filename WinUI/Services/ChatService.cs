@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
@@ -9,7 +7,6 @@ namespace WinUI.Services;
 
 public sealed class ChatService : IChatService
 {
-    private const string API_BASE_ADDRESS = "https://localhost:7197";
 
     private readonly HttpClient httpClient;
 
@@ -20,13 +17,13 @@ public sealed class ChatService : IChatService
 
     public async Task<IReadOnlyList<ConversationDto>> GetAllConversationsAsync()
     {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat");
+        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat");
         return conversations ?? [];
     }
 
-    public async Task<ConversationDto?> GetOrCreateConversationForUserAsync(Guid userId)
+    public async Task<ConversationDto?> GetOrCreateConversationForUserAsync(int userId)
     {
-        var response = await this.httpClient.PostAsync($"{API_BASE_ADDRESS}/api/chat/user/{userId}", null);
+        var response = await this.httpClient.PostAsync($"{ApiBaseUrl.BASE_URL}/api/chat/user/{userId}", null);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -38,31 +35,31 @@ public sealed class ChatService : IChatService
 
     public async Task<IReadOnlyList<MessageDto>> GetMessagesForConversationAsync(int conversationId)
     {
-        var messages = await this.httpClient.GetFromJsonAsync<List<MessageDto>>($"{API_BASE_ADDRESS}/api/chat/{conversationId}/messages");
+        var messages = await this.httpClient.GetFromJsonAsync<List<MessageDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/{conversationId}/messages");
         return messages ?? [];
     }
 
     public async Task<IReadOnlyList<ConversationDto>> GetConversationsWithMessagesAsync()
     {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/with-messages");
+        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/with-messages");
         return conversations ?? [];
     }
 
     public async Task<IReadOnlyList<ConversationDto>> GetConversationsWithUserMessagesAsync()
     {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/with-user-messages");
+        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/with-user-messages");
         return conversations ?? [];
     }
 
-    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWhereNutritionistRespondedAsync(Guid nutritionistId)
+    public async Task<IReadOnlyList<ConversationDto>> GetConversationsWhereNutritionistRespondedAsync(int nutritionistId)
     {
-        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{API_BASE_ADDRESS}/api/chat/nutritionist/{nutritionistId}/responded");
+        var conversations = await this.httpClient.GetFromJsonAsync<List<ConversationDto>>($"{ApiBaseUrl.BASE_URL}/api/chat/nutritionist/{nutritionistId}/responded");
         return conversations ?? [];
     }
 
     public async Task AddMessageAsync(int conversationId, AddMessageRequestDto request)
     {
-        var response = await this.httpClient.PostAsJsonAsync($"{API_BASE_ADDRESS}/api/chat/{conversationId}/messages", request);
+        var response = await this.httpClient.PostAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/chat/{conversationId}/messages", request);
         response.EnsureSuccessStatusCode();
     }
 }

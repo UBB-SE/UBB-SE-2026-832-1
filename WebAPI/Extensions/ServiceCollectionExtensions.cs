@@ -29,7 +29,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<ICalendarWorkoutCatalogService, CalendarWorkoutCatalogService>();
+        services.AddScoped<ITrainerService, TrainerService>();
+        services.AddScoped<ICalendarExportService, CalendarExportService>();
         services.AddSingleton<IAchievementUnlockedBus, AchievementUnlockedBus>();
+        services.AddScoped<IDashboardService, DashboardService>();
 
         return services;
     }

@@ -39,6 +39,73 @@ public sealed class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<Favorite>(entity =>
+        {
+            entity.HasOne(favorite => favorite.User)
+                .WithMany()
+                .HasForeignKey("UserId")
+                .IsRequired();
+
+            entity.HasOne(favorite => favorite.FoodItem)
+                .WithMany()
+                .HasForeignKey("FoodItemId")
+                .IsRequired();
+
+            entity.HasIndex("UserId", "FoodItemId").IsUnique();
+        });
+
+        modelBuilder.Entity<FoodItemIngredient>(entity =>
+        {
+            entity.HasOne(foodItemIngredient => foodItemIngredient.FoodItem)
+                .WithMany()
+                .HasForeignKey("FoodItemId")
+                .IsRequired();
+
+            entity.HasOne(foodItemIngredient => foodItemIngredient.Ingredient)
+                .WithMany()
+                .HasForeignKey("IngredientId")
+                .IsRequired();
+
+            entity.HasIndex("FoodItemId", "IngredientId").IsUnique();
+        });
+
+        modelBuilder.Entity<MealPlan>(entity =>
+        {
+            entity.HasOne(mealPlan => mealPlan.User)
+                .WithMany()
+                .HasForeignKey("UserId")
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<MealPlanFoodItem>(entity =>
+        {
+            entity.HasOne(mealPlanFoodItem => mealPlanFoodItem.MealPlan)
+                .WithMany()
+                .HasForeignKey("MealPlanId")
+                .IsRequired();
+
+            entity.HasOne(mealPlanFoodItem => mealPlanFoodItem.FoodItem)
+                .WithMany()
+                .HasForeignKey("FoodItemId")
+                .IsRequired();
+
+            entity.HasIndex("MealPlanId", "FoodItemId").IsUnique();
+        });
+
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasKey("ClientId", "NutritionPlanId");
+
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasOne(clientNutritionPlan => clientNutritionPlan.Client)
+            .WithMany(client => client.ClientNutritionPlans)
+            .HasForeignKey("ClientId");
+
+        modelBuilder.Entity<ClientNutritionPlan>()
+            .HasOne(clientNutritionPlan => clientNutritionPlan.NutritionPlan)
+            .WithMany()
+            .HasForeignKey("NutritionPlanId");
+
+        
         modelBuilder.Entity<Meal>()
             .Property(meal => meal.Ingredients)
             .HasConversion(

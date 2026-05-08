@@ -1,0 +1,31 @@
+name: build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build ClassLibrary
+        run: dotnet build ClassLibrary/ClassLibrary.csproj -c Release --no-restore
+
+      - name: Build WebAPI
+        run: dotnet build WebAPI/WebApi.csproj -c Release --no-restore
+
+      - name: Build WinUI
+        run: dotnet build WinUI/WinUI.csproj -c Release --no-restore

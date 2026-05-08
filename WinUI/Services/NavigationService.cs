@@ -35,7 +35,7 @@ public sealed class NavigationService : INavigationService
 
     public void NavigateToRankShowcase()
     {
-        // TODO: Navigate to RankShowcasePage once it is implemented
+        frame?.Navigate(typeof(RankShowcaseView));
     }
 
     public void NavigateToActiveWorkout(int clientId = 0)

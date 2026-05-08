@@ -60,7 +60,7 @@ namespace WebApi.Services
             return MapToConversationDtos(conversations);
         }
 
-        public async Task<ConversationDto> GetOrCreateConversationForUserAsync(Guid userId)
+        public async Task<ConversationDto?> GetOrCreateConversationForUserAsync(int userId)
         {
             var conversation = await this.chatRepository.GetOrCreateConversationForUserAsync(userId);
 
@@ -96,7 +96,7 @@ namespace WebApi.Services
             return MapToConversationDtos(conversations);
         }
 
-        public async Task<IEnumerable<ConversationDto>> GetConversationsWhereNutritionistRespondedAsync(Guid nutritionistId)
+        public async Task<IEnumerable<ConversationDto>> GetConversationsWhereNutritionistRespondedAsync(int nutritionistId)
         {
             var conversations = await this.chatRepository.GetConversationsWhereNutritionistRespondedAsync(nutritionistId);
 
@@ -108,7 +108,7 @@ namespace WebApi.Services
             return MapToConversationDtos(conversations);
         }
 
-        public async Task AddMessageAsync(int conversationId, Guid senderId, string text, bool isNutritionist)
+        public async Task AddMessageAsync(int conversationId, int senderId, string text, bool isNutritionist)
         {
             await this.chatRepository.AddMessageAsync(conversationId, senderId, text, isNutritionist);
         }

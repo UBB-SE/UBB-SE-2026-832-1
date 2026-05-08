@@ -43,13 +43,14 @@ public sealed class ReminderService : IReminderService
             return false;
 
         var user = await this.userRepository.GetByIdAsync(request.UserId);
+
         if (user == null)
             return false;
 
         var reminder = new Reminder
         {
-            ReminderId = request.Id,
-            UserId = request.UserId,
+            ReminderId = request.ReminderId,
+            User = user,
             Name = request.Name,
             HasSound = request.HasSound,
             Time = request.Time,
@@ -58,9 +59,13 @@ public sealed class ReminderService : IReminderService
         };
 
         if (reminder.ReminderId == 0)
+        {
             await this.reminderRepository.AddAsync(reminder);
+        }
         else
+        {
             await this.reminderRepository.UpdateAsync(reminder);
+        }
 
         return true;
     }
@@ -75,7 +80,7 @@ public sealed class ReminderService : IReminderService
         return new ReminderDataTransferObject
         {
             Id = reminder.ReminderId,
-            UserId = reminder.UserId,
+            UserId = reminder.User?.UserId ?? 0,
             Name = reminder.Name,
             HasSound = reminder.HasSound,
             Time = reminder.Time,
