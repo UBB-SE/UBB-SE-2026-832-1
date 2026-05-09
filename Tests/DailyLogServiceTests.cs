@@ -117,7 +117,7 @@ public sealed class DailyLogServiceTests
             .Setup(repository => repository.GetUserDataByUserIdAsync(1))
             .ReturnsAsync(userData);
 
-        var result = await this.dailyLogService.GetCurrentUserNutritionTargetsAsync(1);
+        var result = await this.dailyLogService.GetNutritionTargetsAsync(1);
 
         Assert.NotNull(result);
         Assert.Equal(75, result.Weight);
@@ -131,7 +131,7 @@ public sealed class DailyLogServiceTests
             .Setup(repository => repository.GetUserDataByUserIdAsync(999))
             .ReturnsAsync((UserData?)null);
 
-        var result = await this.dailyLogService.GetCurrentUserNutritionTargetsAsync(999);
+        var result = await this.dailyLogService.GetNutritionTargetsAsync(999);
 
         Assert.Null(result);
     }

@@ -35,4 +35,29 @@ public sealed class MealPlanService : IMealPlanService
     {
         return this.serviceProxy.GetFoodItemsForPlanAsync(mealPlanId);
     }
+
+    public Task<MealPlanDto?> GetTodaysMealPlanAsync(int userId)
+    {
+        return this.serviceProxy.GetTodaysMealPlanAsync(userId);
+    }
+
+    public Task<int> GenerateMealPlanAsync(int userId)
+    {
+        return this.serviceProxy.GenerateMealPlanAsync(userId);
+    }
+
+    public Task<string> GetUserGoalAsync(int userId)
+    {
+        return this.serviceProxy.GetUserGoalAsync(userId);
+    }
+
+    public Task SaveMealsToDailyLogAsync(int mealPlanId, int userId)
+    {
+        return this.serviceProxy.SaveMealsToDailyLogAsync(mealPlanId, userId);
+    }
+
+    public Task SaveMealToDailyLogAsync(int foodItemId, int calories, int userId)
+    {
+        return this.serviceProxy.SaveMealToDailyLogAsync(foodItemId, calories, userId);
+    }
 }
