@@ -28,10 +28,11 @@
 
             <Grid ColumnDefinitions="*,80,80,Auto" ColumnSpacing="8">
                 <ComboBox
+                    x:Name="ExerciseComboBox"
                     ItemsSource="{x:Bind ViewModel.AvailableExercises, Mode=OneWay}"
-                    SelectedItem="{x:Bind ViewModel.SelectedNewExercise, Mode=TwoWay}"
                     PlaceholderText="Select exercise"
-                    HorizontalAlignment="Stretch" />
+                    HorizontalAlignment="Stretch"
+                    SelectionChanged="ExerciseComboBox_SelectionChanged" />
                 <NumberBox
                     Grid.Column="1"
                     Value="{x:Bind ViewModel.NewExerciseSets, Mode=TwoWay}"
@@ -97,6 +98,12 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Border>
+
+        <InfoBar
+            IsOpen="{x:Bind ViewModel.HasError, Mode=OneWay}"
+            Severity="Error"
+            Title="Error"
+            Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" />
 
         <Button
             Style="{StaticResource AccentButtonStyle}"

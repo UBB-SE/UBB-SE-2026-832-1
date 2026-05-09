@@ -23,6 +23,15 @@ namespace ClassLibrary.Repositories
 
         public async Task SaveTrainerWorkoutAsync(WorkoutTemplate template)
         {
+            if (template.Client is { ClientId: > 0 })
+            {
+                var existingClient = await this.databaseContext.Clients.FindAsync(template.Client.ClientId);
+                if (existingClient is not null)
+                {
+                    template.Client = existingClient;
+                }
+            }
+
             if (template.WorkoutTemplateId == 0)
             {
                 await this.databaseContext.Set<WorkoutTemplate>().AddAsync(template);

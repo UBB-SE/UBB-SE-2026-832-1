@@ -17,6 +17,7 @@ public sealed class CreateWorkoutViewModel : INotifyPropertyChanged
     private string? selectedNewExercise;
     private double newExerciseSets = 3;
     private double newExerciseReps = 10;
+    private string errorMessage = string.Empty;
 
     public int ClientId { get; set; }
 
@@ -62,6 +63,19 @@ public sealed class CreateWorkoutViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(NewExerciseReps));
         }
     }
+
+    public string ErrorMessage
+    {
+        get => this.errorMessage;
+        set
+        {
+            this.errorMessage = value;
+            OnPropertyChanged(nameof(ErrorMessage));
+            OnPropertyChanged(nameof(HasError));
+        }
+    }
+
+    public bool HasError => !string.IsNullOrEmpty(this.errorMessage);
 
     public IRelayCommand AddExerciseCommand { get; }
     public IRelayCommand<TemplateExercise> RemoveExerciseCommand { get; }
@@ -125,8 +139,16 @@ public sealed class CreateWorkoutViewModel : INotifyPropertyChanged
 
     private async Task SaveWorkoutAsync(WorkoutTemplate template)
     {
-        await this.createWorkoutService.SaveTrainerWorkoutAsync(template);
-        WorkoutSaved?.Invoke();
+        try
+        {
+            this.ErrorMessage = string.Empty;
+            await this.createWorkoutService.SaveTrainerWorkoutAsync(template);
+            WorkoutSaved?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            this.ErrorMessage = $"Failed to save workout: {ex.Message}";
+        }
     }
 
     private async Task LoadAvailableExercisesAsync()
