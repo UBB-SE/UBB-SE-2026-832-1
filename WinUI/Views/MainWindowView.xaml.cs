@@ -19,7 +19,8 @@ public sealed partial class MainWindowView : Page
         var userSession = new UserSession();
         ViewModel.AddTab("Home", typeof(MainView));
         ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
-ViewModel.AddTab("Inventory", typeof(InventoryView));
+        ViewModel.AddTab("Progress", typeof(DailyLogView));
+        ViewModel.AddTab("Inventory", typeof(InventoryView));
         ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
         ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
         if (userSession.IsClient)

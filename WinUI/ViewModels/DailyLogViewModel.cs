@@ -17,16 +17,51 @@ public partial class DailyLogViewModel : ObservableObject
     private readonly IDailyLogService dailyLogService;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DailyCaloriesDisplay))]
+    [NotifyPropertyChangedFor(nameof(DailyProteinDisplay))]
+    [NotifyPropertyChangedFor(nameof(DailyCarbohydratesDisplay))]
+    [NotifyPropertyChangedFor(nameof(DailyFatDisplay))]
+    [NotifyPropertyChangedFor(nameof(DailyCaloriesPercentage))]
+    [NotifyPropertyChangedFor(nameof(DailyProteinPercentage))]
+    [NotifyPropertyChangedFor(nameof(DailyCarbohydratesPercentage))]
+    [NotifyPropertyChangedFor(nameof(DailyFatPercentage))]
     private DailyLogTotalsDto todayTotals = new();
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(WeeklyCaloriesDisplay))]
+    [NotifyPropertyChangedFor(nameof(WeeklyProteinDisplay))]
+    [NotifyPropertyChangedFor(nameof(WeeklyCarbohydratesDisplay))]
+    [NotifyPropertyChangedFor(nameof(WeeklyFatDisplay))]
+    [NotifyPropertyChangedFor(nameof(WeeklyCaloriesPercentage))]
+    [NotifyPropertyChangedFor(nameof(WeeklyProteinPercentage))]
+    [NotifyPropertyChangedFor(nameof(WeeklyCarbohydratesPercentage))]
+    [NotifyPropertyChangedFor(nameof(WeeklyFatPercentage))]
     private DailyLogTotalsDto weekTotals = new();
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DailyCaloriesDisplay))]
+    [NotifyPropertyChangedFor(nameof(DailyProteinDisplay))]
+    [NotifyPropertyChangedFor(nameof(DailyCarbohydratesDisplay))]
+    [NotifyPropertyChangedFor(nameof(DailyFatDisplay))]
+    [NotifyPropertyChangedFor(nameof(DailyCaloriesPercentage))]
+    [NotifyPropertyChangedFor(nameof(DailyProteinPercentage))]
+    [NotifyPropertyChangedFor(nameof(DailyCarbohydratesPercentage))]
+    [NotifyPropertyChangedFor(nameof(DailyFatPercentage))]
+    [NotifyPropertyChangedFor(nameof(WeeklyCaloriesDisplay))]
+    [NotifyPropertyChangedFor(nameof(WeeklyProteinDisplay))]
+    [NotifyPropertyChangedFor(nameof(WeeklyCarbohydratesDisplay))]
+    [NotifyPropertyChangedFor(nameof(WeeklyFatDisplay))]
+    [NotifyPropertyChangedFor(nameof(WeeklyCaloriesPercentage))]
+    [NotifyPropertyChangedFor(nameof(WeeklyProteinPercentage))]
+    [NotifyPropertyChangedFor(nameof(WeeklyCarbohydratesPercentage))]
+    [NotifyPropertyChangedFor(nameof(WeeklyFatPercentage))]
     private UserDataDto? nutritionTargets;
 
     [ObservableProperty]
     private double burnedCalories;
+
+    [ObservableProperty]
+    private double weekBurnedCalories;
 
     [ObservableProperty]
     private ObservableCollection<FoodItemDto> foodSearchResults = new();
@@ -48,6 +83,38 @@ public partial class DailyLogViewModel : ObservableObject
         this.dailyLogService = dailyLogService ?? throw new ArgumentNullException(nameof(dailyLogService));
     }
 
+    public string DailyCaloriesDisplay => FormatCalorieDisplay(TodayTotals?.TotalCalories ?? 0, NutritionTargets?.CalorieNeeds ?? 0);
+
+    public string DailyProteinDisplay => FormatMacroDisplay(TodayTotals?.TotalProtein ?? 0, NutritionTargets?.ProteinNeeds ?? 0, "g");
+
+    public string DailyCarbohydratesDisplay => FormatMacroDisplay(TodayTotals?.TotalCarbohydrates ?? 0, NutritionTargets?.CarbohydrateNeeds ?? 0, "g");
+
+    public string DailyFatDisplay => FormatMacroDisplay(TodayTotals?.TotalFat ?? 0, NutritionTargets?.FatNeeds ?? 0, "g");
+
+    public double DailyCaloriesPercentage => CalculatePercentage(TodayTotals?.TotalCalories ?? 0, NutritionTargets?.CalorieNeeds ?? 0);
+
+    public double DailyProteinPercentage => CalculatePercentage(TodayTotals?.TotalProtein ?? 0, NutritionTargets?.ProteinNeeds ?? 0);
+
+    public double DailyCarbohydratesPercentage => CalculatePercentage(TodayTotals?.TotalCarbohydrates ?? 0, NutritionTargets?.CarbohydrateNeeds ?? 0);
+
+    public double DailyFatPercentage => CalculatePercentage(TodayTotals?.TotalFat ?? 0, NutritionTargets?.FatNeeds ?? 0);
+
+    public string WeeklyCaloriesDisplay => FormatCalorieDisplay(WeekTotals?.TotalCalories ?? 0, (NutritionTargets?.CalorieNeeds ?? 0) * 7);
+
+    public string WeeklyProteinDisplay => FormatMacroDisplay(WeekTotals?.TotalProtein ?? 0, (NutritionTargets?.ProteinNeeds ?? 0) * 7, "g");
+
+    public string WeeklyCarbohydratesDisplay => FormatMacroDisplay(WeekTotals?.TotalCarbohydrates ?? 0, (NutritionTargets?.CarbohydrateNeeds ?? 0) * 7, "g");
+
+    public string WeeklyFatDisplay => FormatMacroDisplay(WeekTotals?.TotalFat ?? 0, (NutritionTargets?.FatNeeds ?? 0) * 7, "g");
+
+    public double WeeklyCaloriesPercentage => CalculatePercentage(WeekTotals?.TotalCalories ?? 0, (NutritionTargets?.CalorieNeeds ?? 0) * 7);
+
+    public double WeeklyProteinPercentage => CalculatePercentage(WeekTotals?.TotalProtein ?? 0, (NutritionTargets?.ProteinNeeds ?? 0) * 7);
+
+    public double WeeklyCarbohydratesPercentage => CalculatePercentage(WeekTotals?.TotalCarbohydrates ?? 0, (NutritionTargets?.CarbohydrateNeeds ?? 0) * 7);
+
+    public double WeeklyFatPercentage => CalculatePercentage(WeekTotals?.TotalFat ?? 0, (NutritionTargets?.FatNeeds ?? 0) * 7);
+
     public async Task LoadDailySummaryAsync(int userId)
     {
         try
@@ -59,6 +126,7 @@ public partial class DailyLogViewModel : ObservableObject
             WeekTotals = await this.dailyLogService.GetCurrentWeekTotalsAsync(userId);
             NutritionTargets = await this.dailyLogService.GetNutritionTargetsAsync(userId);
             BurnedCalories = await this.dailyLogService.GetTodayBurnedCaloriesAsync(userId);
+            WeekBurnedCalories = await this.dailyLogService.GetWeekBurnedCaloriesAsync(userId);
         }
         catch (Exception exception)
         {
@@ -126,5 +194,29 @@ public partial class DailyLogViewModel : ObservableObject
         {
             IsLoading = false;
         }
+    }
+
+    private string FormatCalorieDisplay(double consumed, int goal)
+    {
+        int consumedInt = (int)Math.Round(consumed);
+        int percentage = (int)CalculatePercentage(consumed, goal);
+        return $"{consumedInt} / {goal} kcal ({percentage}%)";
+    }
+
+    private string FormatMacroDisplay(double consumed, int goal, string unit)
+    {
+        int consumedInt = (int)Math.Round(consumed);
+        int percentage = (int)CalculatePercentage(consumed, goal);
+        return $"{consumedInt} / {goal} {unit} ({percentage}%)";
+    }
+
+    private double CalculatePercentage(double consumed, int goal)
+    {
+        if (goal <= 0)
+        {
+            return 0.0;
+        }
+
+        return Math.Min((consumed / goal) * 100, 100);
     }
 }
