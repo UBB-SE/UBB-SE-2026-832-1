@@ -69,6 +69,12 @@ public sealed class MealPlanService : IMealPlanService
     public async Task SaveMealsToDailyLogAsync(int mealPlanId, int userId)
     {
         var response = await this.httpClient.PostAsync($"{ApiBaseUrl.BASE_URL}/api/mealplans/{mealPlanId}/log/{userId}", null);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            throw new InvalidOperationException("Today's meal plan has already been saved to your daily log.");
+        }
+
         response.EnsureSuccessStatusCode();
     }
 
@@ -77,6 +83,12 @@ public sealed class MealPlanService : IMealPlanService
         var response = await this.httpClient.PostAsJsonAsync(
             $"{ApiBaseUrl.BASE_URL}/api/dailylog/user/{userId}/log",
             new { MealId = foodItemId, Calories = calories });
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            throw new InvalidOperationException("This meal has already been saved to your daily log today.");
+        }
+
         response.EnsureSuccessStatusCode();
     }
 }
