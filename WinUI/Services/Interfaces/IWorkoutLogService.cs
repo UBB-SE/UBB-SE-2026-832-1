@@ -1,6 +1,6 @@
 using ClassLibrary.DTOs;
 
-namespace WinUI.Services;
+namespace WinUI.Services.Interfaces;
 
 public interface IWorkoutLogService
 {

@@ -29,8 +29,17 @@ public sealed class CreateWorkoutService : ICreateWorkoutService
             Name = workoutTemplate.Name,
             Type = workoutTemplate.Type.ToString(),
             ClientId = workoutTemplate.Client.ClientId,
+            Exercises = workoutTemplate.Exercises.Select(exercise => new TemplateExerciseDataTransferObject
+            {
+                Name = exercise.Name,
+                MuscleGroup = exercise.MuscleGroup.ToString(),
+                TargetSets = exercise.TargetSets,
+                TargetReps = exercise.TargetReps,
+                TargetWeight = exercise.TargetWeight,
+            }).ToList(),
         };
 
-        await this.httpClient.PostAsJsonAsync($"{ApiUrl}/{Route}/save-workout", dto);
+        var response = await this.httpClient.PostAsJsonAsync($"{ApiUrl}/{Route}/save-workout", dto);
+        response.EnsureSuccessStatusCode();
     }
 }

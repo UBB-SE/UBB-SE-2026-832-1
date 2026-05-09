@@ -81,6 +81,7 @@ public static class DatabaseInitializer
             dbContext.SaveChanges();
         }
 
+
         // CLIENTS
         if (!dbContext.Clients.Any())
         {
@@ -664,7 +665,61 @@ public static class DatabaseInitializer
                 }
             };
 
-            dbContext.WorkoutTemplates.AddRange(pushTemplate, pullTemplate);
+            var hiitTemplate = new WorkoutTemplate
+            {
+                Client = client,
+                Name = "HIIT Fat Burner",
+                Type = WorkoutType.PREBUILT,
+                Exercises = new List<TemplateExercise>
+                {
+                    new TemplateExercise { Name = "Burpees", MuscleGroup = MuscleGroup.CARDIO, TargetSets = 4, TargetReps = 15 },
+                    new TemplateExercise { Name = "Mountain Climbers", MuscleGroup = MuscleGroup.CARDIO, TargetSets = 4, TargetReps = 20 },
+                    new TemplateExercise { Name = "Jump Squats", MuscleGroup = MuscleGroup.LEGS, TargetSets = 4, TargetReps = 15 }
+                }
+            };
+
+            var massTemplate = new WorkoutTemplate
+            {
+                Client = client,
+                Name = "Full Body Mass",
+                Type = WorkoutType.PREBUILT,
+                Exercises = new List<TemplateExercise>
+                {
+                    new TemplateExercise { Name = "Bench Press", MuscleGroup = MuscleGroup.CHEST, TargetSets = 4, TargetReps = 8 },
+                    new TemplateExercise { Name = "Deadlift", MuscleGroup = MuscleGroup.BACK, TargetSets = 4, TargetReps = 6 },
+                    new TemplateExercise { Name = "Squat", MuscleGroup = MuscleGroup.LEGS, TargetSets = 4, TargetReps = 8 },
+                    new TemplateExercise { Name = "Overhead Press", MuscleGroup = MuscleGroup.SHOULDERS, TargetSets = 3, TargetReps = 8 }
+                }
+            };
+
+            var powerTemplate = new WorkoutTemplate
+            {
+                Client = client,
+                Name = "Full Body Power",
+                Type = WorkoutType.PREBUILT,
+                Exercises = new List<TemplateExercise>
+                {
+                    new TemplateExercise { Name = "Power Clean", MuscleGroup = MuscleGroup.BACK, TargetSets = 5, TargetReps = 3 },
+                    new TemplateExercise { Name = "Squat", MuscleGroup = MuscleGroup.LEGS, TargetSets = 5, TargetReps = 5 },
+                    new TemplateExercise { Name = "Bench Press", MuscleGroup = MuscleGroup.CHEST, TargetSets = 5, TargetReps = 5 }
+                }
+            };
+
+            var enduranceTemplate = new WorkoutTemplate
+            {
+                Client = client,
+                Name = "Endurance Circuit",
+                Type = WorkoutType.PREBUILT,
+                Exercises = new List<TemplateExercise>
+                {
+                    new TemplateExercise { Name = "Push Ups", MuscleGroup = MuscleGroup.CHEST, TargetSets = 3, TargetReps = 20 },
+                    new TemplateExercise { Name = "Pull Ups", MuscleGroup = MuscleGroup.BACK, TargetSets = 3, TargetReps = 12 },
+                    new TemplateExercise { Name = "Plank", MuscleGroup = MuscleGroup.CORE, TargetSets = 3, TargetReps = 60 },
+                    new TemplateExercise { Name = "Lunges", MuscleGroup = MuscleGroup.LEGS, TargetSets = 3, TargetReps = 20 }
+                }
+            };
+
+            dbContext.WorkoutTemplates.AddRange(pushTemplate, pullTemplate, hiitTemplate, massTemplate, powerTemplate, enduranceTemplate);
         }
 
         dbContext.SaveChanges();

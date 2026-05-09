@@ -1,4 +1,5 @@
 using ClassLibrary.DTOs;
+using WinUI.Services.Interfaces;
 
 namespace WinUI.Services;
 
