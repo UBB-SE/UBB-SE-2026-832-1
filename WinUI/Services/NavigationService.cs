@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using WinUI.Views.CalendarIntegration;
 using WinUI.Views;
 
 namespace WinUI.Services;

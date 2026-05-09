@@ -2,15 +2,50 @@ namespace WinUI.Services;
 
 public sealed class UserSession : IUserSession
 {
-    public int CurrentClientId { get; set; } = 1;
+    public const string CLIENT_ROLE = "Client";
+
+    private static int currentClientId = 1;
+    private static string currentRole = "Client";
+
+    public int CurrentClientId
+    {
+        get => currentClientId;
+        set => currentClientId = value;
+    }
+
+    public string CurrentRole
+    {
+        get => currentRole;
+        set => currentRole = value;
+    }
+
+    public string CurrentUserRole
+    {
+        get => currentRole;
+        set => currentRole = value;
+    }
+
+    public bool IsClient => currentRole == CLIENT_ROLE;
 
     public static int? UserId { get; set; }
 
-    public static string Role { get; set; } = string.Empty;
+    public static string Role
+    {
+        get => currentRole;
+        set => currentRole = value;
+    }
+
+    public static void SetCurrentSession(int userId, string role)
+    {
+        UserId = userId;
+        currentClientId = userId;
+        currentRole = role;
+    }
 
     public static void Clear()
     {
         UserId = null;
-        Role = string.Empty;
+        currentRole = string.Empty;
+        currentClientId = 1;
     }
 }

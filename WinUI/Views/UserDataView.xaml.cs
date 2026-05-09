@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using System;
+using Microsoft.UI.Xaml.Controls;
 using WinUI.ViewModels;
 
 namespace WinUI.Views;
@@ -11,5 +12,11 @@ public sealed partial class UserDataView : Page
     {
         this.InitializeComponent();
         this.ViewModel = new UserDataViewModel();
+        this.ViewModel.DataSavedSuccessful += OnDataSavedSuccessful;
+    }
+
+    private void OnDataSavedSuccessful(object? sender, EventArgs e)
+    {
+        this.Frame.Navigate(typeof(MainWindowView));
     }
 }

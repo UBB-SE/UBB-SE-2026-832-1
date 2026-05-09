@@ -2,6 +2,7 @@ using ClassLibrary.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using WinUI.Services;
+using WinUI.Services.Interfaces;
 namespace WinUI.Extensions;
 
 public static class ServiceCollectionExtensions
@@ -19,6 +20,7 @@ public static class ServiceCollectionExtensions
         {
             client.BaseAddress = new Uri($"{ApiBaseUrl.BASE_URL}/api/");
         });
+        services.AddHttpClient<IMealPlanService, MealPlanService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IDailyLogServiceProxy, DailyLogServiceProxy>();
         services.AddScoped<IWorkoutLogService, WorkoutLogService>();

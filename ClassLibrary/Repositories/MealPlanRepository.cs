@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
     {
         return await dbContext.MealPlans
             .AsNoTracking()
+            .Include(mealPlan => mealPlan.User)
             .FirstOrDefaultAsync(mealPlan => mealPlan.MealPlanId == id);
     }
 
@@ -21,6 +23,7 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
     {
         return await dbContext.MealPlans
             .AsNoTracking()
+            .Include(mealPlan => mealPlan.User)
             .Where(mealPlan => mealPlan.User.UserId == userId)
             .ToListAsync();
     }
@@ -57,10 +60,15 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
 
         if (!exists)
         {
+            var mealPlanRef = await dbContext.MealPlans.FindAsync(mealPlanId)
+                ?? throw new InvalidOperationException($"MealPlan with id {mealPlanId} not found.");
+            var foodItemRef = await dbContext.FoodItems.FindAsync(foodItemId)
+                ?? throw new InvalidOperationException($"FoodItem with id {foodItemId} not found.");
+
             dbContext.MealPlanFoodItems.Add(new MealPlanFoodItem
             {
-                MealPlan = new MealPlan { MealPlanId = mealPlanId },
-                FoodItem = new FoodItem { FoodItemId = foodItemId },
+                MealPlan = mealPlanRef,
+                FoodItem = foodItemRef,
             });
             await dbContext.SaveChangesAsync();
         }
@@ -135,6 +143,35 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
                 foodItemIngredient => EF.Property<int>(foodItemIngredient, "FoodItemId"),
                 (_, foodItemIngredient) => EF.Property<int>(foodItemIngredient, "IngredientId"))
             .ToListAsync();
+    }
+
+    public async Task<MealPlan?> GetTodaysMealPlanAsync(int userId)
+    {
+        var today = DateTime.Today;
+        return await dbContext.MealPlans
+            .AsNoTracking()
+            .Include(mealPlan => mealPlan.User)
+            .Where(mealPlan => mealPlan.User.UserId == userId && mealPlan.CreatedAt.Date == today)
+            .OrderByDescending(mealPlan => mealPlan.CreatedAt)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<int> CreateMealPlanAsync(int userId, string goalType)
+    {
+        var userRef = new User { UserId = userId };
+        dbContext.Attach(userRef);
+
+        var mealPlan = new MealPlan
+        {
+            User = userRef,
+            CreatedAt = DateTime.Now,
+            GoalType = goalType,
+        };
+
+        dbContext.MealPlans.Add(mealPlan);
+        await dbContext.SaveChangesAsync();
+
+        return mealPlan.MealPlanId;
     }
 
 }

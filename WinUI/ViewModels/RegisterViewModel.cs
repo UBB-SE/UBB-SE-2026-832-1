@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using WinUI.Services;
 
@@ -17,10 +16,19 @@ public partial class RegisterViewModel : ObservableObject
     [ObservableProperty]
     private string password = string.Empty;
 
-    [ObservableProperty]
-    private string selectedRole = "Client";
+    private bool isTrainer;
+    public bool IsTrainer
+    {
+        get => isTrainer;
+        set => SetProperty(ref isTrainer, value);
+    }
 
-    public ObservableCollection<string> Roles { get; } = new() { "Client", "Nutritionist", "Trainer" };
+    private bool isNutritionist;
+    public bool IsNutritionist
+    {
+        get => isNutritionist;
+        set => SetProperty(ref isNutritionist, value);
+    }
 
     public event EventHandler? RegistrationSuccessful;
     public event EventHandler? NavigateToUserData;
@@ -45,14 +53,24 @@ public partial class RegisterViewModel : ObservableObject
             return;
         }
 
-        var user = await this.userService.RegisterAsync(this.Username, this.Password, this.SelectedRole);
+        string role = "Client";
+        if (this.IsTrainer)
+        {
+            role = "Trainer";
+        }
+        else if (this.IsNutritionist)
+        {
+            role = "Nutritionist";
+        }
+
+        var user = await this.userService.RegisterAsync(this.Username, this.Password, role);
 
         if (user != null)
         {
             UserSession.UserId = user.Id;
-            UserSession.Role = this.SelectedRole;
+            UserSession.Role = role;
 
-            if (this.SelectedRole == "Client")
+            if (role == "Client")
             {
                 this.NavigateToUserData?.Invoke(this, EventArgs.Empty);
             }
