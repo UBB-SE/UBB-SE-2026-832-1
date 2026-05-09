@@ -1,7 +1,6 @@
 using ClassLibrary.Models;
 using WinUI.Services;
-using WinUI.Services.CalendarIntegration;
-using WinUI.Services.CalendarIntegration.Interfaces;
+using WinUI.Services.Interfaces;
 using WinUI.ViewModels.CalendarIntegration;
 using WinUserSession = WinUI.Services.UserSession;
 

@@ -1,9 +1,9 @@
 using System.Net.Http.Json;
 using ClassLibrary.DTOs;
 using ClassLibrary.Models;
-using WinUI.Services.CalendarIntegration.Interfaces;
+using WinUI.Services.Interfaces;
 
-namespace WinUI.Services.CalendarIntegration;
+namespace WinUI.Services;
 
 public sealed class CalendarWorkoutCatalogService : ICalendarWorkoutCatalogService
 {
