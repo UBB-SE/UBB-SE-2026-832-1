@@ -4,12 +4,18 @@ namespace WinUI.Services;
 
 public sealed class UserSession : IUserSession
 {
+public const string CLIENT_ROLE = "User";
+
     private static int currentClientId = 1;
     private static string currentRole = "Client";
 
     public int CurrentClientId => currentClientId;
 
     public string CurrentRole => currentRole;
+
+    public string CurrentUserRole { get; set; } = currentRole;
+
+    public bool IsClient => string.Equals(this.CurrentUserRole, CLIENT_ROLE, System.StringComparison.OrdinalIgnoreCase);
 
     public static void SetCurrentSession(int clientId, string role)
     {

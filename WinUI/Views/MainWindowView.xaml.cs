@@ -1,6 +1,10 @@
 using System.Collections.Specialized;
 using Microsoft.UI.Xaml.Controls;
+using WinUI.Services;
 using WinUI.ViewModels;
+using WinUI.Views.ShoppingList;
+using WinUI.Views.PantryView;
+using WinUI.Views.WorkoutLog;
 
 namespace WinUI.Views;
 
@@ -12,11 +16,17 @@ public sealed partial class MainWindowView : Page
     {
         ViewModel = new MainWindowViewModel();
         InitializeComponent();
+        var userSession = new UserSession();
         ViewModel.AddTab("Home", typeof(MainView));
         ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
-        ViewModel.AddTab("Inventory", typeof(InventoryView));
-        ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
-        ViewModel.AddTab("Calendar Integration", typeof(CalendarIntegration.CalendarIntegrationPage));
+ViewModel.AddTab("Inventory", typeof(InventoryView));
+        ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
+        ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
+        if (userSession.IsClient)
+        {
+            ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
+            ViewModel.AddTab("Calendar Integration", typeof(CalendarIntegration.CalendarIntegrationPage));
+        }
         ViewModel.Tabs.CollectionChanged += OnTabsCollectionChanged;
         PopulateTabs();
         mainTabView.SelectionChanged += OnTabSelectionChanged;

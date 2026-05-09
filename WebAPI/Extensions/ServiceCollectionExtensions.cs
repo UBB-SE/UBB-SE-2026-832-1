@@ -19,7 +19,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IClientService, ClientService>();
         services.AddScoped<IFoodItemService, FoodItemService>();
-        services.AddScoped<IMealPlanService, MealPlanService>();
+        services.AddScoped<IMealPlanService>(sp => new MealPlanService(
+            sp.GetRequiredService<IMealPlanRepository>(),
+            sp.GetRequiredService<IFoodItemRepository>(),
+            sp.GetRequiredService<IUserService>(),
+            sp.GetRequiredService<IDailyLogService>()));
         services.AddScoped<IReminderService, ReminderService>();
         services.AddScoped<IInventoryService, InventoryService>();
         services.AddScoped<IShoppingListService, ShoppingListService>();
@@ -31,6 +35,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<ICalendarWorkoutCatalogService, CalendarWorkoutCatalogService>();
+        services.AddScoped<ITrainerService, TrainerService>();
+        services.AddScoped<ICalendarExportService, CalendarExportService>();
         services.AddSingleton<IAchievementUnlockedBus, AchievementUnlockedBus>();
 
         return services;

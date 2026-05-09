@@ -28,7 +28,7 @@
                 <StackPanel Spacing="12" MaxWidth="400" HorizontalAlignment="Left" Margin="0,16,0,0">
                     <TextBox
                         Header="Username"
-                        Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         PlaceholderText="Enter your username"/>
 
                     <PasswordBox
@@ -49,7 +49,7 @@
                     <StackPanel Spacing="12" MaxWidth="400" HorizontalAlignment="Left" Margin="0,16,0,0">
                         <TextBox
                             Header="Username"
-                            Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             PlaceholderText="Choose a username"/>
 
                         <PasswordBox

@@ -29,7 +29,7 @@ public sealed partial class CalendarIntegrationPage : Page
 
     private async void CalendarIntegrationPage_Loaded(object sender, RoutedEventArgs eventArgs)
     {
-        bool hasClientRole = string.Equals(this.userSession.CurrentRole, CLIENT_ROLE, StringComparison.OrdinalIgnoreCase);
+        bool hasClientRole = this.userSession.IsClient;
         if (!hasClientRole || this.userSession.CurrentClientId <= 0)
         {
             this.viewModel.SetErrorStatus("Calendar integration is available only for client users.");
