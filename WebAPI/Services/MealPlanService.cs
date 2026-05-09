@@ -145,11 +145,47 @@ public sealed class MealPlanService : IMealPlanService
 
     public async Task<int> GenerateMealPlanAsync(int userId)
     {
+        const int DEFAULT_CALORIE_TARGET = 2000;
+        const int MIN_MEALS = 3;
+        const int MAX_MEALS = 5;
+        const double LOWER_TOLERANCE = 0.85;
+        const double UPPER_TOLERANCE = 1.15;
+
         var userData = await this.userService.GetUserDataAsync(userId);
         string goalType = userData?.Goal ?? "maintenance";
+        int calorieTarget = (userData?.CalorieNeeds > 0) ? userData.CalorieNeeds : DEFAULT_CALORIE_TARGET;
 
         var allFoodItems = await this.foodItemRepository.GetAllAsync();
-        var selected = allFoodItems.Take(3).ToList();
+        var shuffled = allFoodItems.OrderBy(_ => Random.Shared.Next()).ToList();
+
+        var selected = new List<FoodItem>();
+        int runningCalories = 0;
+
+        foreach (var item in shuffled)
+        {
+            if (selected.Count >= MAX_MEALS)
+            {
+                break;
+            }
+
+            int projected = runningCalories + item.Calories;
+
+            if (projected <= calorieTarget * UPPER_TOLERANCE)
+            {
+                selected.Add(item);
+                runningCalories += item.Calories;
+
+                if (selected.Count >= MIN_MEALS && runningCalories >= calorieTarget * LOWER_TOLERANCE)
+                {
+                    break;
+                }
+            }
+        }
+
+        if (selected.Count == 0)
+        {
+            selected = shuffled.Take(MIN_MEALS).ToList();
+        }
 
         int planId = await this.mealPlanRepository.CreateMealPlanAsync(userId, goalType);
 

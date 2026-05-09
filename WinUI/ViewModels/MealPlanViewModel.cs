@@ -201,6 +201,14 @@ public partial class MealPlanViewModel : ObservableObject
                 await GenerateNewMealPlanAsync(userId);
             }
         }
+        catch (Exception ex)
+        {
+            ErrorDialogTitle = ErrorGeneratingMealPlanTitle;
+            ErrorDialogMessage = ex.Message;
+            ShowErrorDialog = true;
+            StatusMessage = ex.Message;
+            HasMeals = false;
+        }
         finally
         {
             IsBusy = false;
@@ -259,6 +267,7 @@ public partial class MealPlanViewModel : ObservableObject
             ErrorDialogMessage = ex.Message;
             ShowErrorDialog = true;
             HasMeals = false;
+            StatusMessage = ex.Message;
         }
     }
 

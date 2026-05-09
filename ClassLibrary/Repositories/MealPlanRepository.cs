@@ -60,10 +60,15 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
 
         if (!exists)
         {
+            var mealPlanRef = await dbContext.MealPlans.FindAsync(mealPlanId)
+                ?? throw new InvalidOperationException($"MealPlan with id {mealPlanId} not found.");
+            var foodItemRef = await dbContext.FoodItems.FindAsync(foodItemId)
+                ?? throw new InvalidOperationException($"FoodItem with id {foodItemId} not found.");
+
             dbContext.MealPlanFoodItems.Add(new MealPlanFoodItem
             {
-                MealPlan = new MealPlan { MealPlanId = mealPlanId },
-                FoodItem = new FoodItem { FoodItemId = foodItemId },
+                MealPlan = mealPlanRef,
+                FoodItem = foodItemRef,
             });
             await dbContext.SaveChangesAsync();
         }
