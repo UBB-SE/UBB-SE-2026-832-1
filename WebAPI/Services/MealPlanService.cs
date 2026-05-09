@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
+using WebApi.IServices;
 using WebAPI.IServices;
 
 namespace WebAPI.Services;
@@ -11,10 +13,20 @@ public sealed class MealPlanService : IMealPlanService
     private const double DEFAULT_TOLERANCE = 0.10;
 
     private readonly IMealPlanRepository mealPlanRepository;
+    private readonly IFoodItemRepository foodItemRepository;
+    private readonly IUserService userService;
+    private readonly IDailyLogService dailyLogService;
 
-    public MealPlanService(IMealPlanRepository mealPlanRepository)
+    public MealPlanService(
+        IMealPlanRepository mealPlanRepository,
+        IFoodItemRepository foodItemRepository,
+        IUserService userService,
+        IDailyLogService dailyLogService)
     {
         this.mealPlanRepository = mealPlanRepository;
+        this.foodItemRepository = foodItemRepository;
+        this.userService = userService;
+        this.dailyLogService = dailyLogService;
     }
 
     public async Task<MealPlanDto?> GetByIdAsync(int id)
@@ -110,6 +122,133 @@ public sealed class MealPlanService : IMealPlanService
             Description = foodItem.Description,
             ImageUrl = foodItem.ImageUrl,
         };
+    }
+
+    public async Task<MealPlanDto?> GetTodaysMealPlanAsync(int userId)
+    {
+        var todaysPlan = await this.mealPlanRepository.GetTodaysMealPlanAsync(userId);
+        if (todaysPlan is null)
+        {
+            return null;
+        }
+
+        var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(todaysPlan.MealPlanId);
+        return new MealPlanDto
+        {
+            MealPlanId = todaysPlan.MealPlanId,
+            UserId = userId,
+            CreatedAt = todaysPlan.CreatedAt,
+            GoalType = todaysPlan.GoalType,
+            FoodItems = MapToFoodItemDtos(foodItems),
+        };
+    }
+
+    public async Task<int> GenerateMealPlanAsync(int userId)
+    {
+        const int DEFAULT_CALORIE_TARGET = 2000;
+        const int MAX_MEALS = 3;
+        const double LOWER_TOLERANCE = 0.85;
+        const double UPPER_TOLERANCE = 1.15;
+
+        var userData = await this.userService.GetUserDataAsync(userId);
+        string goalType = userData?.Goal ?? "maintenance";
+        int calorieTarget = (userData?.CalorieNeeds > 0) ? userData.CalorieNeeds : DEFAULT_CALORIE_TARGET;
+
+        var allFoodItems = await this.foodItemRepository.GetAllAsync();
+        var shuffled = allFoodItems.OrderBy(_ => Random.Shared.Next()).ToList();
+
+        int lowerPerMeal = (int)(calorieTarget * LOWER_TOLERANCE / MAX_MEALS);
+        int upperPerMeal = (int)(calorieTarget * UPPER_TOLERANCE / MAX_MEALS);
+
+        var inRange = shuffled
+            .Where(foodItem => foodItem.Calories >= lowerPerMeal && foodItem.Calories <= upperPerMeal)
+            .ToList();
+
+        List<FoodItem> selected;
+
+        if (inRange.Count >= MAX_MEALS)
+        {
+            selected = inRange.Take(MAX_MEALS).ToList();
+        }
+        else
+        {
+            selected = SelectWithBudgetConstraints(shuffled, calorieTarget, MAX_MEALS, LOWER_TOLERANCE, UPPER_TOLERANCE);
+
+            if (selected.Count < MAX_MEALS)
+            {
+                selected = shuffled.Take(MAX_MEALS).ToList();
+            }
+        }
+
+        int planId = await this.mealPlanRepository.CreateMealPlanAsync(userId, goalType);
+
+        foreach (var item in selected)
+        {
+            await this.mealPlanRepository.AddFoodItemToPlanAsync(planId, item.FoodItemId);
+        }
+
+        return planId;
+    }
+
+    private static List<FoodItem> SelectWithBudgetConstraints(
+        List<FoodItem> shuffled,
+        int calorieTarget,
+        int maxMeals,
+        double lowerTolerance,
+        double upperTolerance)
+    {
+        int lowerBound = (int)(calorieTarget * lowerTolerance);
+        int upperBound = (int)(calorieTarget * upperTolerance);
+        int maxSingleMealCalories = shuffled.Max(foodItem => foodItem.Calories);
+
+        var selected = new List<FoodItem>();
+        int runningCalories = 0;
+
+        for (int slot = 0; slot < maxMeals; slot++)
+        {
+            int remainingSlots = maxMeals - slot - 1;
+            int maxAllowed = upperBound - runningCalories;
+            int minNeeded = Math.Max(0, lowerBound - runningCalories - remainingSlots * maxSingleMealCalories);
+
+            var candidate = shuffled.FirstOrDefault(foodItem =>
+                !selected.Contains(foodItem) &&
+                foodItem.Calories >= minNeeded &&
+                foodItem.Calories <= maxAllowed);
+
+            if (candidate == null)
+            {
+                break;
+            }
+
+            selected.Add(candidate);
+            runningCalories += candidate.Calories;
+        }
+
+        return selected;
+    }
+
+    public async Task<string> GetUserGoalAsync(int userId)
+    {
+        var userData = await this.userService.GetUserDataAsync(userId);
+        return userData?.Goal ?? "maintenance";
+    }
+
+    public async Task SaveMealsToDailyLogAsync(int mealPlanId, int userId)
+    {
+        var foodItems = await this.mealPlanRepository.GetFoodItemsForPlanAsync(mealPlanId);
+
+        foreach (var item in foodItems)
+        {
+            if (await this.dailyLogService.HasFoodItemLoggedTodayAsync(userId, item.FoodItemId))
+            {
+                throw new InvalidOperationException("Today's meal plan has already been saved to your daily log.");
+            }
+        }
+
+        foreach (var item in foodItems)
+        {
+            await this.dailyLogService.LogFoodItemAsync(userId, new LogMealRequestDto { MealId = item.FoodItemId, Calories = item.Calories });
+        }
     }
 
     private static List<FoodItemDto> MapToFoodItemDtos(IReadOnlyList<FoodItem> foodItems)

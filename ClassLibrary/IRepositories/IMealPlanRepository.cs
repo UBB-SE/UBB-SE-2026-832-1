@@ -27,4 +27,8 @@ public interface IMealPlanRepository
     Task RemoveIngredientFromFoodItemAsync(int foodItemId, int ingredientId);
 
     Task<IReadOnlyList<int>> GetIngredientIdsForMealPlanAsync(int mealPlanId);
+
+    Task<MealPlan?> GetTodaysMealPlanAsync(int userId);
+
+    Task<int> CreateMealPlanAsync(int userId, string goalType);
 }

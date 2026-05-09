@@ -18,6 +18,9 @@
   <ItemGroup>
     <None Remove="Views\MealsPage.xaml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Views\NutritionistChatView\NutritionistChatView.xaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
@@ -28,6 +31,12 @@
 
   <ItemGroup>
     <Page Update="Views\MealsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\ChatView\NutritionistChatView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

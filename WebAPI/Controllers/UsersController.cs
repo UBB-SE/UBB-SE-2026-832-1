@@ -69,7 +69,7 @@ public sealed class UsersController : ControllerBase
     [HttpPost("data")]
     public async Task<IActionResult> AddUserData([FromBody] ClassLibrary.DTOs.UserDataDto userData)
     {
-        await userService.UpdateUserDataAsync(userData);
+        await userService.AddUserDataAsync(userData);
         return Ok();
     }
 

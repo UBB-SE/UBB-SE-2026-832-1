@@ -73,7 +73,23 @@ public sealed class UserRepository : IUserRepository
 
     public async Task UpdateUserDataAsync(UserData data)
     {
-        databaseContext.UserData.Update(data);
+        var existing = await databaseContext.UserData.FindAsync(data.UserDataId);
+        if (existing == null)
+        {
+            return;
+        }
+
+        existing.Weight = data.Weight;
+        existing.Height = data.Height;
+        existing.Age = data.Age;
+        existing.Gender = data.Gender;
+        existing.Goal = data.Goal;
+        existing.BodyMassIndex = data.BodyMassIndex;
+        existing.CalorieNeeds = data.CalorieNeeds;
+        existing.ProteinNeeds = data.ProteinNeeds;
+        existing.CarbohydrateNeeds = data.CarbohydrateNeeds;
+        existing.FatNeeds = data.FatNeeds;
+
         await databaseContext.SaveChangesAsync();
     }
 }

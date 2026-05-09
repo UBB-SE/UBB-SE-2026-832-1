@@ -1,4 +1,5 @@
-﻿using ClassLibrary.DTOs;
+﻿using System.Net.Http.Json;
+using ClassLibrary.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,37 +16,47 @@ namespace WinUI.Services
 
         
         public MealService(IMealRepository mealRepository)
-        {
+    {
             _mealRepository = mealRepository;
-        }
+    }
 
         public async Task<IEnumerable<FoodItemDto>> GetFilteredMealsAsync(MealFilterDto filter, int userId)
-        {
-         
+    {
+        string query =
+            $"searchTerm={Uri.EscapeDataString(filter.SearchTerm ?? string.Empty)}" +
+            $"&isVegan={filter.IsVegan}" +
+            $"&isKeto={filter.IsKeto}" +
+            $"&isGlutenFree={filter.IsGlutenFree}" +
+            $"&isLactoseFree={filter.IsLactoseFree}" +
+            $"&isNutFree={filter.IsNutFree}" +
+            $"&isFavoriteOnly={filter.IsFavoriteOnly}";
+
             var meals = await _mealRepository.GetFilteredMealsAsync(filter, userId);
 
             return meals.Select(m => new FoodItemDto
-            {
+        {
                 FoodItemId = m.MealId,
                 Name = m.Name,
                 IsVegan = m.IsVegan
             });
         }
 
-        
+        return foodItemDataTransferObjects.Select(MapFoodItem).ToList();
+    }
+
         public async Task<FoodItemDto?> GetByIdAsync(int id)
-        {
+    {
             var m = await _mealRepository.GetByIdAsync(id);
             if (m == null) return null;
 
             return new FoodItemDto { FoodItemId = m.MealId, Name = m.Name };
-        }
+    }
 
         public async Task ToggleFavoriteAsync(FavoriteRequestDto request)
-        {
+    {
             
             await _mealRepository.SetFavoriteAsync(request.UserId, request.MealId, request.IsFavorite);
-        }
+    }
 
         public async Task<string> GetFormattedIngredientsAsync(int mealId)
         {

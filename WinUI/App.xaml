@@ -1,13 +1,28 @@
 <Application
     x:Class="WinUI.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:WinUI.Converters">
 
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+            <converters:StringToBoolConverter x:Key="StringToBool" />
+            <converters:BoolNegateConverter x:Key="BoolNegate" />
+            <converters:NullToVisibilityConverter x:Key="NullToVisibility" />
+
+            <converters:BoolToVisibilityChatConverter x:Key="BoolToVisibilityChatConverter"/>
+            <converters:IntZeroToVisibilityConverter x:Key="IntZeroToVisibilityConverter" />
+            <converters:RoleToHorizontalAlignmentConverter x:Key="RoleToHorizontalAlignmentConverter" />
+            <converters:RoleToBackgroundConverter x:Key="RoleToBackgroundConverter" />
+            <converters:UnansweredToHighlightConverter x:Key="UnansweredToHighlightConverter" />
+            <converters:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter" />
+            <converters:UnansweredToForegroundConverter x:Key="UnansweredToForegroundConverter" />
+            
         </ResourceDictionary>
     </Application.Resources>
 
