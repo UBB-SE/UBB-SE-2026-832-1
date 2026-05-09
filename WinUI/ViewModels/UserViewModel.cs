@@ -101,6 +101,7 @@ public partial class UserViewModel : ObservableObject
             {
                 this.LoggedInUserId = registered.Id;
                 this.LoggedInUsername = registered.Username;
+                UserSession.SetCurrentSession(registered.Id, registered.Role);
                 this.LoginSuccess?.Invoke(this, EventArgs.Empty);
             }
             else
@@ -135,6 +136,7 @@ public partial class UserViewModel : ObservableObject
 
             this.LoggedInUserId = registered.Id;
             this.LoggedInUsername = registered.Username;
+            UserSession.SetCurrentSession(registered.Id, registered.Role);
 
             var userDataDto = new UserDataDto
             {
@@ -175,6 +177,7 @@ public partial class UserViewModel : ObservableObject
             {
                 this.LoggedInUserId = user.Id;
                 this.LoggedInUsername = user.Username;
+                UserSession.SetCurrentSession(user.Id, user.Role);
                 this.LoginSuccess?.Invoke(this, EventArgs.Empty);
             }
             else
