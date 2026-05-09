@@ -113,12 +113,57 @@ internal static class DataTransferObjectToDomainModelMappers
             Duration = workoutLogDataTransferObject.Duration,
             SourceTemplateId = workoutLogDataTransferObject.SourceTemplateId,
             Type = ParseWorkoutType(workoutLogDataTransferObject.Type),
+            Exercises = workoutLogDataTransferObject.Exercises.Select(MapLoggedExercise).ToList(),
             TotalCaloriesBurned = workoutLogDataTransferObject.TotalCaloriesBurned,
             AverageMetabolicEquivalent = workoutLogDataTransferObject.AverageMetabolicEquivalent,
             IntensityTag = workoutLogDataTransferObject.IntensityTag,
             Rating = workoutLogDataTransferObject.Rating ?? 0,
             TrainerNotes = workoutLogDataTransferObject.TrainerNotes,
         };
+    }
+
+    private static LoggedExercise MapLoggedExercise(LoggedExerciseDataTransferObject dto)
+    {
+        return new LoggedExercise
+        {
+            LoggedExerciseId = dto.LoggedExerciseId,
+            ExerciseName = dto.ExerciseName,
+            ParentTemplateExerciseId = dto.ParentTemplateExerciseId ?? 0,
+            Sets = dto.Sets.Select(MapLoggedSet).ToList(),
+            TargetMuscles = ParseMuscleGroup(dto.TargetMuscles),
+            MetabolicEquivalent = dto.MetabolicEquivalent,
+            ExerciseCaloriesBurned = dto.ExerciseCaloriesBurned,
+            PerformanceRatio = dto.PerformanceRatio,
+            IsSystemAdjusted = dto.IsSystemAdjusted,
+            AdjustmentNote = dto.AdjustmentNote,
+            WorkoutLog = null!,
+        };
+    }
+
+    private static LoggedSet MapLoggedSet(LoggedSetDataTransferObject dto)
+    {
+        return new LoggedSet
+        {
+            LoggedSetId = dto.LoggedSetId,
+            ExerciseName = dto.ExerciseName,
+            SetIndex = dto.SetIndex,
+            SetNumber = dto.SetNumber,
+            TargetReps = dto.TargetReps,
+            ActualReps = dto.ActualReps,
+            TargetWeight = dto.TargetWeight,
+            ActualWeight = dto.ActualWeight,
+            WorkoutLog = null!,
+        };
+    }
+
+    private static MuscleGroup ParseMuscleGroup(string muscleGroup)
+    {
+        if (Enum.TryParse<MuscleGroup>(muscleGroup, ignoreCase: true, out var parsed))
+        {
+            return parsed;
+        }
+
+        return MuscleGroup.OTHER;
     }
 
     public static WorkoutTemplate MapWorkoutTemplate(WorkoutTemplateDataTransferObject workoutTemplateDataTransferObject)
@@ -129,7 +174,20 @@ internal static class DataTransferObjectToDomainModelMappers
             Client = MapClient(workoutTemplateDataTransferObject.Client, workoutTemplateDataTransferObject.ClientId),
             Name = workoutTemplateDataTransferObject.Name,
             Type = ParseWorkoutType(workoutTemplateDataTransferObject.Type),
-            Exercises = [],
+            Exercises = workoutTemplateDataTransferObject.Exercises.Select(MapTemplateExercise).ToList(),
+        };
+    }
+
+    private static TemplateExercise MapTemplateExercise(TemplateExerciseDataTransferObject dto)
+    {
+        return new TemplateExercise
+        {
+            Name = dto.Name,
+            MuscleGroup = ParseMuscleGroup(dto.MuscleGroup),
+            TargetSets = dto.TargetSets,
+            TargetReps = dto.TargetReps,
+            TargetWeight = dto.TargetWeight,
+            WorkoutTemplate = null!,
         };
     }
 

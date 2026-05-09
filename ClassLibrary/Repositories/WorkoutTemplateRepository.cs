@@ -29,6 +29,7 @@ public sealed class WorkoutTemplateRepository : IWorkoutTemplateRepository
             .AsNoTracking()
             .Where(workoutTemplate => workoutTemplate.Client.ClientId == clientId)
             .Include(workoutTemplate => workoutTemplate.Client)
+            .Include(workoutTemplate => workoutTemplate.Exercises)
             .OrderBy(workoutTemplate => workoutTemplate.WorkoutTemplateId)
             .ToListAsync();
     }
