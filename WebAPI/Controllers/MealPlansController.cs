@@ -54,4 +54,37 @@ public sealed class MealPlansController : ControllerBase
         var foodItems = await this.mealPlanService.GetFoodItemsForPlanAsync(mealPlanId);
         return this.Ok(foodItems);
     }
+
+    [HttpGet("user/{userId:int}/today")]
+    public async Task<IActionResult> GetTodaysMealPlan(int userId)
+    {
+        var plan = await this.mealPlanService.GetTodaysMealPlanAsync(userId);
+        if (plan is null)
+        {
+            return this.NotFound();
+        }
+
+        return this.Ok(plan);
+    }
+
+    [HttpPost("user/{userId:int}/generate")]
+    public async Task<IActionResult> GenerateMealPlan(int userId)
+    {
+        var planId = await this.mealPlanService.GenerateMealPlanAsync(userId);
+        return this.Ok(planId);
+    }
+
+    [HttpGet("user/{userId:int}/goal")]
+    public async Task<IActionResult> GetUserGoal(int userId)
+    {
+        var goal = await this.mealPlanService.GetUserGoalAsync(userId);
+        return this.Ok(goal);
+    }
+
+    [HttpPost("{mealPlanId:int}/log/{userId:int}")]
+    public async Task<IActionResult> SaveMealsToDailyLog(int mealPlanId, int userId)
+    {
+        await this.mealPlanService.SaveMealsToDailyLogAsync(mealPlanId, userId);
+        return this.NoContent();
+    }
 }

@@ -25,14 +25,6 @@ public sealed partial class WorkoutHistoryPage : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        if (e.NavigationMode == NavigationMode.Back)
-        {
-            ViewModel.LoadLogsCommand.Execute(ClientId);
-        }
-    }
-
-    private void Page_Loaded(object sender, RoutedEventArgs e)
-    {
         ViewModel.LoadLogsCommand.Execute(ClientId);
     }
 

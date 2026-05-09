@@ -128,7 +128,6 @@ public sealed class AppDbContext : DbContext
 
             entity.HasOne(dailyLog => dailyLog.Meal)
                 .WithMany()
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
             entity.Property(dailyLog => dailyLog.LoggedAt).IsRequired();

@@ -4,7 +4,7 @@ public sealed class UserSession : IUserSession
 {
     public const string CLIENT_ROLE = "User";
 
-    public int CurrentClientId { get; set; } = 1;
+    public int CurrentClientId { get; set; } = 2;
 
     public static int? UserId { get; set; }
 
