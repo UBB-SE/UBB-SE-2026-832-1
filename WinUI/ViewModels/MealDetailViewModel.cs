@@ -3,7 +3,7 @@ using ClassLibrary.Filters;
 using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
+using WinUI.IServices;
 
 namespace WinUI.ViewModels;
 
@@ -11,7 +11,7 @@ public partial class MealDetailViewModel : ObservableObject
 {
     private const int PAGE_SIZE = 8;
     private readonly IMealService mealService;
-    private readonly UserSession userSession;
+    private readonly IUserSession userSession;
     private readonly List<FoodItem> allMeals = [];
 
     [ObservableProperty]

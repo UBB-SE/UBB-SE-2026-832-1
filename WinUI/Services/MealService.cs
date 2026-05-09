@@ -41,8 +41,8 @@ namespace WinUI.Services
             });
         }
 
-        return foodItemDataTransferObjects.Select(MapFoodItem).ToList();
-    }
+       
+    
 
         public async Task<FoodItemDto?> GetByIdAsync(int id)
     {
