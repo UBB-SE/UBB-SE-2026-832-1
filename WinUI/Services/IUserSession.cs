@@ -1,4 +1,4 @@
-namespace WinUI.Services;
+﻿namespace WinUI.Services;
 
 public interface IUserSession
 {

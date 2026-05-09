@@ -2,12 +2,12 @@
 using ClassLibrary.DTOs;
 namespace WinUI.Services;
 
-public sealed class ReminderService : IReminderService
+public sealed class RemindersService : IRemindersService
 {
 
     private readonly HttpClient httpClient;
 
-    public ReminderService(HttpClient httpClient)
+    public RemindersService(HttpClient httpClient)
     {
         this.httpClient = httpClient;
     }

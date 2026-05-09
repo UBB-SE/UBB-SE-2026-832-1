@@ -210,4 +210,58 @@ internal static class DataTransferObjectToDomainModelMappers
 
         return WorkoutType.CUSTOM;
     }
+
+    public static IReadOnlyList<Conversation> MapConversations(IReadOnlyList<ConversationDto>? conversationDtos)
+    {
+        if (conversationDtos is null || conversationDtos.Count == 0)
+        {
+            return Array.Empty<Conversation>();
+        }
+
+        return conversationDtos.Select(MapConversation).ToList();
+    }
+
+    public static IReadOnlyList<Message> MapMessages(IReadOnlyList<MessageDto>? messageDtos)
+    {
+        if (messageDtos is null || messageDtos.Count == 0)
+        {
+            return Array.Empty<Message>();
+        }
+
+        return messageDtos.Select(MapMessage).ToList();
+    }
+
+    public static Conversation MapConversation(ConversationDto conversationDto)
+    {
+        return new Conversation
+        {
+            Id = conversationDto.ConversationId,
+            HasUnanswered = conversationDto.HasUnanswered,
+            User = new User
+            {
+                UserId = conversationDto.UserId,
+                Username = conversationDto.UserName
+            },
+            Messages = []
+        };
+    }
+
+    public static Message MapMessage(MessageDto messageDto)
+    {
+        return new Message
+        {
+            Id = messageDto.MessageId,
+            SentAt = messageDto.SentAt,
+            TextContent = messageDto.TextContent,
+            Sender = new User
+            {
+                Username = messageDto.SenderUsername,
+                Role = messageDto.SenderRole
+            },
+            Conversation = new Conversation
+            {
+                Id = messageDto.ConversationId
+            }
+        };
+    }
 }

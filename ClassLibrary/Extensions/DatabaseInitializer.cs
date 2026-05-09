@@ -722,6 +722,103 @@ public static class DatabaseInitializer
             dbContext.WorkoutTemplates.AddRange(pushTemplate, pullTemplate, hiitTemplate, massTemplate, powerTemplate, enduranceTemplate);
         }
 
+        // CHATS & MESSAGES
+        if (!dbContext.Conversations.Any())
+        {
+            var nutritionist = dbContext.Users.First(u => u.Username == "nutritionist");
+
+            var conversation = new Conversation
+            {
+                User = testUser!,
+                HasUnanswered = true
+            };
+            dbContext.Conversations.Add(conversation);
+
+            dbContext.Messages.AddRange(
+                new Message
+                {
+                    Conversation = conversation,
+                    Sender = testUser!,
+                    TextContent = "Hi!",
+                    SentAt = DateTime.UtcNow.AddHours(-2)
+                },
+                new Message
+                {
+                    Conversation = conversation,
+                    Sender = nutritionist,
+                    TextContent = "banana",
+                    SentAt = DateTime.UtcNow.AddHours(-1)
+                },
+                new Message
+                {
+                    Conversation = conversation,
+                    Sender = testUser!,
+                    TextContent = "Thanks!",
+                    SentAt = DateTime.UtcNow.AddMinutes(-5)
+                }
+            );
+
+            var saraUser = new User
+            {
+                Username = "healthy_sara",
+                Password = "password123",
+                Role = "User"
+            };
+            dbContext.Users.Add(saraUser);
+            dbContext.SaveChanges();
+
+            var resolvedConversation = new Conversation
+            {
+                User = saraUser,
+                HasUnanswered = false
+            };
+            dbContext.Conversations.Add(resolvedConversation);
+            dbContext.SaveChanges();
+
+            dbContext.Messages.AddRange(
+                new Message
+                {
+                    Conversation = resolvedConversation,
+                    Sender = saraUser,
+                    TextContent = "no",
+                    SentAt = DateTime.UtcNow.AddDays(-1)
+                },
+                new Message
+                {
+                    Conversation = resolvedConversation,
+                    Sender = nutritionist,
+                    TextContent = "Yes!yesyes",
+                    SentAt = DateTime.UtcNow.AddDays(-1).AddHours(2)
+                }
+            );
+
+            dbContext.SaveChanges();
+
+            var newClient = new User
+            {
+                Username = "new_client",
+                Password = "password123",
+                Role = "User"
+            };
+            dbContext.Users.Add(newClient);
+            dbContext.SaveChanges();
+
+            var newConvo = new Conversation
+            {
+                User = newClient,
+                HasUnanswered = true
+            };
+            dbContext.Conversations.Add(newConvo);
+
+            dbContext.Messages.Add(new Message
+            {
+                Conversation = newConvo,
+                Sender = newClient,
+                TextContent = "Hello! I just joined and need a meal plan.",
+                SentAt = DateTime.UtcNow
+            });
+        }
+
         dbContext.SaveChanges();
     }
 }
