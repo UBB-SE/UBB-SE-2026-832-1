@@ -113,13 +113,13 @@ namespace WebAPI.Services
             var item = await shoppingRepository.GetByIdAsync(itemId);
             if (item == null) return false;
 
-            var userId = item.User?.UserId ?? 0;
+            var userId = item.UserId;
             if (userId <= 0) return false;
 
             await inventoryRepository.AddAsync(new Inventory
             {
                 UserId = userId,
-                IngredientId = item.Ingredient.IngredientId,
+                IngredientId = item.IngredientId,
                 QuantityGrams = item.QuantityGrams > 0 ? (int)item.QuantityGrams : 100
             });
 
