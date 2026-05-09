@@ -84,7 +84,14 @@ public sealed class MealPlansController : ControllerBase
     [HttpPost("{mealPlanId:int}/log/{userId:int}")]
     public async Task<IActionResult> SaveMealsToDailyLog(int mealPlanId, int userId)
     {
-        await this.mealPlanService.SaveMealsToDailyLogAsync(mealPlanId, userId);
-        return this.NoContent();
+        try
+        {
+            await this.mealPlanService.SaveMealsToDailyLogAsync(mealPlanId, userId);
+            return this.NoContent();
+        }
+        catch (InvalidOperationException)
+        {
+            return this.Conflict();
+        }
     }
 }
