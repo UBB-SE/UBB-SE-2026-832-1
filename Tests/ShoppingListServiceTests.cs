@@ -20,7 +20,7 @@ public sealed class ShoppingListServiceTests
         this.mealPlanRepo.Object);
 
     [Fact]
-    public async Task AddItemAsync_SetsUserIdAndIngredientIdDirectly()
+    public async Task AddItemAsync_SetsNavigationPropertiesCorrectly()
     {
         this.ingredientRepo
             .Setup(repo => repo.GetOrCreateIngredientIdByNameAsync("Milk"))
@@ -41,24 +41,22 @@ public sealed class ShoppingListServiceTests
         await service.AddItemAsync(3, request);
 
         Assert.NotNull(captured);
-        Assert.Equal(3, captured.UserId);
-        Assert.Equal(15, captured.IngredientId);
+        Assert.NotNull(captured.User);
+        Assert.Equal(3, captured.User.UserId);
+        Assert.NotNull(captured.Ingredient);
+        Assert.Equal(15, captured.Ingredient.IngredientId);
         Assert.Equal(500, captured.QuantityGrams);
-        Assert.Null(captured.User);
-        Assert.Null(captured.Ingredient);
     }
 
     [Fact]
-    public async Task AddItemAsync_DoesNotCreateStubNavigationEntities()
+    public async Task AddItemAsync_ReturnsDto()
     {
         this.ingredientRepo
             .Setup(repo => repo.GetOrCreateIngredientIdByNameAsync("Eggs"))
             .ReturnsAsync(22);
 
-        ShoppingItem? captured = null;
         this.shoppingRepo
-            .Setup(repo => repo.AddAsync(It.IsAny<ShoppingItem>()))
-            .Callback<ShoppingItem>(item => captured = item);
+            .Setup(repo => repo.AddAsync(It.IsAny<ShoppingItem>()));
 
         var request = new AddShoppingItemRequest
         {
@@ -67,15 +65,15 @@ public sealed class ShoppingListServiceTests
         };
 
         var service = this.CreateService();
-        await service.AddItemAsync(1, request);
+        var result = await service.AddItemAsync(1, request);
 
-        Assert.NotNull(captured);
-        Assert.Null(captured.User);
-        Assert.Null(captured.Ingredient);
+        Assert.NotNull(result);
+        Assert.Equal("Eggs", result.IngredientName);
+        Assert.Equal(6, result.QuantityGrams);
     }
 
     [Fact]
-    public async Task GenerateShoppingListFromMealPlanAsync_SetsUserIdAndIngredientIdDirectly()
+    public async Task GenerateShoppingListFromMealPlanAsync_SetsNavigationPropertiesCorrectly()
     {
         var mealPlan = new MealPlan { MealPlanId = 10 };
         this.mealPlanRepo
@@ -103,9 +101,9 @@ public sealed class ShoppingListServiceTests
         await service.GenerateShoppingListFromMealPlanAsync(5);
 
         Assert.NotNull(captured);
-        Assert.Equal(5, captured.UserId);
-        Assert.Equal(99, captured.IngredientId);
-        Assert.Null(captured.User);
-        Assert.Null(captured.Ingredient);
+        Assert.NotNull(captured.User);
+        Assert.Equal(5, captured.User.UserId);
+        Assert.NotNull(captured.Ingredient);
+        Assert.Equal(99, captured.Ingredient.IngredientId);
     }
 }

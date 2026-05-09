@@ -19,6 +19,16 @@ public sealed class ShoppingListRepository : IShoppingListRepository
 
     public async Task AddAsync(ShoppingItem item)
     {
+        if (item.User != null)
+        {
+            databaseContext.Entry(item.User).State = EntityState.Unchanged;
+        }
+
+        if (item.Ingredient != null)
+        {
+            databaseContext.Entry(item.Ingredient).State = EntityState.Unchanged;
+        }
+
         await databaseContext.ShoppingItems.AddAsync(item);
         await databaseContext.SaveChangesAsync();
     }
@@ -45,8 +55,8 @@ public sealed class ShoppingListRepository : IShoppingListRepository
             .Include(shoppingItem => shoppingItem.Ingredient)
             .FirstOrDefaultAsync(
                 shoppingItem =>
-                    shoppingItem.UserId == userId &&
-                    shoppingItem.IngredientId == ingredientId);
+                    shoppingItem.User.UserId == userId &&
+                    shoppingItem.Ingredient.IngredientId == ingredientId);
     }
 
     public async Task<IReadOnlyList<ShoppingItem>> GetAllByUserIdAsync(int userId)
@@ -54,7 +64,7 @@ public sealed class ShoppingListRepository : IShoppingListRepository
         return await databaseContext.ShoppingItems
             .AsNoTracking()
             .Include(shoppingItem => shoppingItem.Ingredient)
-            .Where(shoppingItem => shoppingItem.UserId == userId)
+            .Where(shoppingItem => shoppingItem.User.UserId == userId)
             .ToListAsync();
     }
 

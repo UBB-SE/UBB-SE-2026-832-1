@@ -60,8 +60,8 @@ namespace WebAPI.Services
                 {
                     var item = new ShoppingItem
                     {
-                        UserId = userId,
-                        IngredientId = ingredientId,
+                        User = new User { UserId = userId },
+                        Ingredient = new Ingredient { IngredientId = ingredientId },
                         QuantityGrams = totalNeeded,
                         IsChecked = false
                     };
@@ -93,8 +93,8 @@ namespace WebAPI.Services
 
             var item = new ShoppingItem
             {
-                UserId = userId,
-                IngredientId = ingredientId,
+                User = new User { UserId = userId },
+                Ingredient = new Ingredient { IngredientId = ingredientId },
                 QuantityGrams = request.Quantity
             };
 
@@ -113,13 +113,13 @@ namespace WebAPI.Services
             var item = await shoppingRepository.GetByIdAsync(itemId);
             if (item == null) return false;
 
-            var userId = item.UserId;
+            var userId = item.User?.UserId ?? 0;
             if (userId <= 0) return false;
 
             await inventoryRepository.AddAsync(new Inventory
             {
                 UserId = userId,
-                IngredientId = item.IngredientId,
+                IngredientId = item.Ingredient.IngredientId,
                 QuantityGrams = item.QuantityGrams > 0 ? (int)item.QuantityGrams : 100
             });
 
