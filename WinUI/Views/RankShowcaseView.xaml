@@ -156,6 +156,7 @@
                                     VerticalAlignment="Center">
                                     <Border
                                         x:Load="{x:Bind IsUnlocked, Mode=OneWay}"
+                                        x:Name="UnlockedBadge"
                                         Background="{ThemeResource AccentFillColorDefaultBrush}"
                                         CornerRadius="22">
                                         <FontIcon
@@ -167,6 +168,7 @@
                                     </Border>
                                     <Border
                                         x:Load="{x:Bind IsLocked, Mode=OneWay}"
+                                        x:Name="LockedBadge"
                                         Background="{ThemeResource CardStrokeColorDefaultBrush}"
                                         CornerRadius="22">
                                         <FontIcon
