@@ -60,8 +60,8 @@ namespace WebAPI.Services
                 {
                     var item = new ShoppingItem
                     {
-                        User = new User { UserId = userId },
-                        Ingredient = new Ingredient { IngredientId = ingredientId },
+                        UserId = userId,
+                        IngredientId = ingredientId,
                         QuantityGrams = totalNeeded,
                         IsChecked = false
                     };
@@ -93,8 +93,8 @@ namespace WebAPI.Services
 
             var item = new ShoppingItem
             {
-                User = new User { UserId = userId },
-                Ingredient = new Ingredient { IngredientId = ingredientId },
+                UserId = userId,
+                IngredientId = ingredientId,
                 QuantityGrams = request.Quantity
             };
 
