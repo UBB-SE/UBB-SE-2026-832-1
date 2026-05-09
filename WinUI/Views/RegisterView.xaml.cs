@@ -14,7 +14,8 @@ public sealed partial class RegisterView : Page
         this.InitializeComponent();
         this.ViewModel = new UserViewModel(new UserService());
 
-        this.ViewModel.RegistrationValid += (s, e) => this.Frame.Navigate(typeof(UserDataView));
+        this.ViewModel.RegistrationValid += (s, e) =>
+        this.Frame.Navigate(typeof(UserDataView), this.ViewModel);
         this.ViewModel.LoginSuccess += (s, e) => this.Frame.Navigate(typeof(MainWindowView));
         this.ViewModel.NavigateToLogin += (s, e) => this.Frame.Navigate(typeof(LoginView));
     }

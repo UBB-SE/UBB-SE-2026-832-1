@@ -5,52 +5,84 @@
     Background="#F5F5F5">
 
     <Grid>
-        <Border Width="450" Background="White" CornerRadius="8" Padding="40" 
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                BorderBrush="#CCCCCC" BorderThickness="1">
+        <Border Width="450"
+                Background="White"
+                CornerRadius="8"
+                Padding="40"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                BorderBrush="#CCCCCC"
+                BorderThickness="1">
+
             <StackPanel Spacing="16">
-                <TextBlock Text="User Data" FontSize="28" FontWeight="SemiBold" 
-                           Foreground="Black" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+                <TextBlock Text="User Data"
+                           FontSize="28"
+                           FontWeight="SemiBold"
+                           Foreground="Black"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
 
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Weight (kg)" Foreground="Black" />
-                    <NumberBox Value="{x:Bind ViewModel.Weight, Mode=TwoWay}" 
-                               Foreground="Black" BorderBrush="#999999" SpinButtonPlacementMode="Hidden" />
+                    <TextBlock Text="Weight (kg)" Foreground="Black"/>
+
+                    <NumberBox Value="{Binding Weight, Mode=TwoWay}"
+                               Foreground="Black"
+                               BorderBrush="#999999"
+                               SpinButtonPlacementMode="Hidden"/>
                 </StackPanel>
 
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Height (cm)" Foreground="Black" />
-                    <NumberBox Value="{x:Bind ViewModel.Height, Mode=TwoWay}" 
-                               Foreground="Black" BorderBrush="#999999" SpinButtonPlacementMode="Hidden" />
+                    <TextBlock Text="Height (cm)" Foreground="Black"/>
+
+                    <NumberBox Value="{Binding Height, Mode=TwoWay}"
+                               Foreground="Black"
+                               BorderBrush="#999999"
+                               SpinButtonPlacementMode="Hidden"/>
                 </StackPanel>
 
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Birthdate" Foreground="Black" />
-                    <CalendarDatePicker Date="{x:Bind ViewModel.SelectedDate, Mode=TwoWay}" 
-                                        Foreground="Black" BorderBrush="#999999" HorizontalAlignment="Stretch" />
+                    <TextBlock Text="Birthdate" Foreground="Black"/>
+
+                    <CalendarDatePicker Date="{Binding SelectedDate, Mode=TwoWay}"
+                                        Foreground="Black"
+                                        BorderBrush="#999999"
+                                        HorizontalAlignment="Stretch"/>
                 </StackPanel>
 
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Gender" Foreground="Black" />
-                    <ComboBox ItemsSource="{x:Bind ViewModel.GenderOptions}"
-                              SelectedItem="{x:Bind ViewModel.Gender, Mode=TwoWay}"
-                              PlaceholderText="Select Gender" 
-                              Foreground="Black" BorderBrush="#999999" HorizontalAlignment="Stretch" />
+                    <TextBlock Text="Gender" Foreground="Black"/>
+
+                    <ComboBox ItemsSource="{Binding GenderOptions}"
+                              SelectedItem="{Binding Gender, Mode=TwoWay}"
+                              PlaceholderText="Select Gender"
+                              Foreground="Black"
+                              BorderBrush="#999999"
+                              HorizontalAlignment="Stretch"/>
                 </StackPanel>
 
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Health Goal" Foreground="Black" />
-                    <ComboBox ItemsSource="{x:Bind ViewModel.GoalOptions}"
-                              SelectedItem="{x:Bind ViewModel.Goal, Mode=TwoWay}"
-                              PlaceholderText="Select a goal" 
-                              Foreground="Black" BorderBrush="#999999" HorizontalAlignment="Stretch" />
+                    <TextBlock Text="Health Goal" Foreground="Black"/>
+
+                    <ComboBox ItemsSource="{Binding GoalOptions}"
+                              SelectedItem="{Binding Goal, Mode=TwoWay}"
+                              PlaceholderText="Select a goal"
+                              Foreground="Black"
+                              BorderBrush="#999999"
+                              HorizontalAlignment="Stretch"/>
                 </StackPanel>
 
-                <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}" 
-                           Foreground="Red" HorizontalAlignment="Center" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding StatusMessage}"
+                           Foreground="Red"
+                           HorizontalAlignment="Center"
+                           TextWrapping="Wrap"/>
 
-                <Button Content="Save Details" Command="{x:Bind ViewModel.SaveDataCommand}" 
-                        Background="#0066CC" Foreground="White" HorizontalAlignment="Stretch" Margin="0,20,0,0"/>
+                <Button Content="Save Details"
+                        Command="{Binding SaveDataCommand}"
+                        Background="#0066CC"
+                        Foreground="White"
+                        HorizontalAlignment="Stretch"
+                        Margin="0,20,0,0"/>
             </StackPanel>
         </Border>
     </Grid>

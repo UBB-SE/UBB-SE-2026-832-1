@@ -24,7 +24,6 @@ public sealed class UserRepository : IUserRepository
     public async Task<User?> GetByIdAsync(int id)
     {
         return await databaseContext.Users
-            .AsNoTracking()
             .FirstOrDefaultAsync(user => user.UserId == id);
     }
 

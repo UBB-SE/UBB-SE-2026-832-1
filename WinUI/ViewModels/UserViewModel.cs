@@ -130,7 +130,25 @@ public partial class UserViewModel : ObservableObject
 
         if (role == ROLE_USER)
         {
+            var registered = await this.userService.RegisterAsync(
+                this.UserName,
+                this.Password,
+                ROLE_USER);
+
+            if (registered == null)
+            {
+                this.StatusMessage = ERROR_REGISTRATION_FAILED;
+                return;
+            }
+
+            this.LoggedInUserId = registered.Id;
+            this.LoggedInUsername = registered.Username;
+            UserSession.SetCurrentSession(
+       registered.Id,
+       registered.Role);
+
             this.RegistrationValid?.Invoke(this, EventArgs.Empty);
+            return;
         }
         else
         {
@@ -164,20 +182,10 @@ public partial class UserViewModel : ObservableObject
                 return;
             }
 
-            var registered = await this.userService.RegisterAsync(this.UserName, this.Password, ROLE_USER);
-            if (registered == null)
-            {
-                this.StatusMessage = ERROR_REGISTRATION_FAILED;
-                return;
-            }
-
-            this.LoggedInUserId = registered.Id;
-            this.LoggedInUsername = registered.Username;
-            UserSession.SetCurrentSession(registered.Id, registered.Role);
 
             var userDataDto = new UserDataDto
             {
-                UserId = registered.Id,
+                UserId = this.LoggedInUserId!.Value,
                 Weight = this.Weight,
                 Height = this.Height,
                 Age = age,
