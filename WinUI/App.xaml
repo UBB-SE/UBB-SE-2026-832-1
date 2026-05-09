@@ -16,6 +16,7 @@
             <converters:RoleToBackgroundConverter x:Key="RoleToBackgroundConverter" />
             <converters:UnansweredToHighlightConverter x:Key="UnansweredToHighlightConverter" />
             <converters:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter" />
+            <converters:UnansweredToForegroundConverter x:Key="UnansweredToForegroundConverter" />
             
         </ResourceDictionary>
     </Application.Resources>

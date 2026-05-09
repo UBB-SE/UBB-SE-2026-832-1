@@ -179,4 +179,15 @@ namespace WinUI.Converters
             return value is Visibility v && v == Visibility.Visible;
         }
     }
+
+    public class UnansweredToForegroundConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            bool shouldHighlight = value is bool b && b;
+            return shouldHighlight ? new SolidColorBrush(Microsoft.UI.Colors.Black) : DependencyProperty.UnsetValue;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
+    }
 }

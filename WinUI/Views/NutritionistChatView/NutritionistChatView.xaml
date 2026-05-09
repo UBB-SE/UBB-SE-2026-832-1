@@ -29,8 +29,14 @@
                         <DataTemplate>
                             <Border Background="{Binding ShouldHighlight, Converter={StaticResource UnansweredToHighlightConverter}}" CornerRadius="6" Margin="4" Padding="4">
                                 <StackPanel Margin="6">
-                                    <TextBlock Text="{Binding User.Username}" FontWeight="{Binding HasUnanswered, Converter={StaticResource BoolToFontWeightConverter}}" />
-                                    <TextBlock Text="{Binding HasUnanswered, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}" FontSize="10" Opacity="0.6" />
+                                    <TextBlock Text="{Binding User.Username}" 
+                                       Foreground="{Binding ShouldHighlight, Converter={StaticResource UnansweredToForegroundConverter}}"
+                                       FontWeight="{Binding HasUnanswered, Converter={StaticResource BoolToFontWeightConverter}}" />
+
+                                    <TextBlock Text="Needs reply" 
+                                       Visibility="{Binding HasUnanswered, Converter={StaticResource BoolToVisibilityConverter}}" 
+                                       Foreground="{Binding ShouldHighlight, Converter={StaticResource UnansweredToForegroundConverter}}"
+                                       FontSize="10" Opacity="0.8" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>

@@ -49,7 +49,7 @@ public class ChatRepository : IChatRepository
     {
         return await context.Conversations
             .Include(conversation => conversation.User)
-            .Where(conversation => conversation.Messages.Any(message => EF.Property<int>(message.Sender, "Id") == nutritionistId))
+            .Where(conversation => conversation.Messages.Any(message => message.Sender.UserId == nutritionistId))
             .OrderByDescending(conversation => conversation.HasUnanswered)
             .ThenByDescending(conversation => conversation.Id)
             .Distinct()
@@ -60,7 +60,7 @@ public class ChatRepository : IChatRepository
     {
         var conversation = await context.Conversations
             .Include(conversationItem => conversationItem.User)
-            .FirstOrDefaultAsync(conversationItem => EF.Property<int>(conversationItem.User, "Id") == userId);
+            .FirstOrDefaultAsync(conversationItem => conversationItem.User.UserId == userId);
 
         if (conversation != null)
         {
@@ -90,7 +90,7 @@ public class ChatRepository : IChatRepository
         return await context.Messages
             .Include(message => message.Sender)
             .Include(message => message.Conversation)
-            .Where(message => EF.Property<int>(message.Conversation, "Id") == conversationId)
+            .Where(message => message.Conversation.Id == conversationId)
             .OrderBy(message => message.SentAt)
             .ToListAsync();
     }

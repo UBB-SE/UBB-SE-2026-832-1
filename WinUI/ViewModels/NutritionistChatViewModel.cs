@@ -141,9 +141,7 @@
                 Conversations.Add(new ConversationViewModel(conversationItem, this.userSession));
             }
 
-            if (this.userSession.Role != NutritionistRole
-                && currentConversationId == null
-                && Conversations.Count > 0)
+            if (currentConversationId == null && Conversations.Count > 0)
             {
                 SelectedConversation = Conversations[0];
             }
@@ -260,6 +258,7 @@
 
             InputText = string.Empty;
             await LoadMessagesForConversationAsync(currentConversationId.Value);
+            await LoadConversationsAsync();
         }
     }
 }
