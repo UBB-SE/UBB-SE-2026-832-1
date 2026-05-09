@@ -21,12 +21,30 @@ public sealed class ShoppingListRepository : IShoppingListRepository
     {
         if (item.User != null)
         {
-            databaseContext.Entry(item.User).State = EntityState.Unchanged;
+            var trackedUser = databaseContext.Set<User>().Local
+                .FirstOrDefault(u => u.UserId == item.User.UserId);
+            if (trackedUser != null)
+            {
+                item.User = trackedUser;
+            }
+            else
+            {
+                databaseContext.Entry(item.User).State = EntityState.Unchanged;
+            }
         }
 
         if (item.Ingredient != null)
         {
-            databaseContext.Entry(item.Ingredient).State = EntityState.Unchanged;
+            var trackedIngredient = databaseContext.Set<Ingredient>().Local
+                .FirstOrDefault(i => i.IngredientId == item.Ingredient.IngredientId);
+            if (trackedIngredient != null)
+            {
+                item.Ingredient = trackedIngredient;
+            }
+            else
+            {
+                databaseContext.Entry(item.Ingredient).State = EntityState.Unchanged;
+            }
         }
 
         await databaseContext.ShoppingItems.AddAsync(item);
