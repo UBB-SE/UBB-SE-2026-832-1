@@ -16,7 +16,7 @@
     <WindowsPackageType>None</WindowsPackageType>
   </PropertyGroup>
   <ItemGroup>
-    <Page Remove="views\MealsPage.xaml" />
+    <None Remove="Views\MealsPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,8 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Views\MealsPage.xaml">
+    <Page Update="Views\MealsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </None>
+    </Page>
   </ItemGroup>
 </Project>

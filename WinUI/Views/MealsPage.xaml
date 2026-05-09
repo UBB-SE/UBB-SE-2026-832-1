@@ -61,7 +61,7 @@
                         <Button Grid.Column="1" 
                                 Command="{Binding ElementName=listMeals, Path=DataContext.ToggleFavoriteCommand}"
                                 CommandParameter="{Binding}"
-                                Content="{x:Bind IsFavoriteIcon}" 
+                                 
                                 Foreground="Gold" Background="Transparent"/>
                     </Grid>
                 </DataTemplate>
@@ -75,3 +75,5 @@
         </StackPanel>
     </Grid>
 </Page>
+
+<!-- Content="{x:Bind IsFavoriteIcon}" use this in the Button to display the favorite icon when it works-->

@@ -1,6 +1,7 @@
 using ClassLibrary.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
+using WinUI.IServices;
 using WinUI.Services;
 
 namespace WinUI.Extensions;
@@ -23,7 +24,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IWorkoutLogService, WorkoutLogService>();
         services.AddScoped<IWorkoutLogServiceProxy, WorkoutLogServiceProxy>();
         services.AddHttpClient<IShoppingListService, ShoppingListService>();
-       
+        services.AddScoped<IMealService, MealService>();
+
         return services;
     }
 }

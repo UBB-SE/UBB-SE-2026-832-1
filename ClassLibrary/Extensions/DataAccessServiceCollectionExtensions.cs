@@ -33,6 +33,7 @@ public static class DataAccessServiceCollectionExtensions
         services.AddScoped<IShoppingListRepository, ShoppingListRepository>();
         services.AddScoped<IWorkoutAnalyticsRepository, WorkoutAnalyticsRepository>();
         services.AddScoped<ITrainerRepository, TrainerRepository>();
+        services.AddScoped<IMealRepository, MealRepository>();
 
         return services;
     }
