@@ -32,6 +32,20 @@ public sealed class WorkoutLogRepository : IWorkoutLogRepository
         {
             throw new ArgumentNullException(nameof(log));
         }
+        if (log.Client != null)
+        {
+            // 1. Attach the client so EF knows it already exists
+            this.databaseContext.Clients.Attach(log.Client);
+
+            // 2. Explicitly mark it as Unchanged so no INSERT/UPDATE happens for the Client
+            this.databaseContext.Entry(log.Client).State = EntityState.Unchanged;
+
+            // 3. If there is a User object inside Client, mark that Unchanged too
+            if (log.Client.User != null)
+            {
+                this.databaseContext.Entry(log.Client.User).State = EntityState.Unchanged;
+            }
+        }
 
         await this.databaseContext.WorkoutLogs.AddAsync(log);
         await this.databaseContext.SaveChangesAsync();
