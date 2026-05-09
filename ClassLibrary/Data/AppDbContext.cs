@@ -106,7 +106,6 @@ public sealed class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey("NutritionPlanId");
 
-        // ✅ TRECHO CORRIGIDO (EXATAMENTE O QUE O REVIEWER PEDIU)
         modelBuilder.Entity<Meal>()
             .Property(meal => meal.Ingredients)
             .HasConversion(
@@ -162,7 +161,13 @@ public sealed class AppDbContext : DbContext
                 .HasForeignKey("ClientId")
                 .IsRequired();
         });
-
+        modelBuilder.Entity<Client>(entity =>
+        {
+            entity.HasOne(client => client.User)
+                .WithOne(user => user.Client)
+                .HasForeignKey<Client>("UserId")
+                .IsRequired();
+        });
         modelBuilder.Entity<ShoppingItem>(entity =>
         {
             entity.HasOne(shoppingItem => shoppingItem.User)
