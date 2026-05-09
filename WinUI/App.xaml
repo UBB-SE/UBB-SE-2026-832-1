@@ -14,6 +14,15 @@
             <converters:StringToBoolConverter x:Key="StringToBool" />
             <converters:BoolNegateConverter x:Key="BoolNegate" />
             <converters:NullToVisibilityConverter x:Key="NullToVisibility" />
+
+            <converters:BoolToVisibilityChatConverter x:Key="BoolToVisibilityChatConverter"/>
+            <converters:IntZeroToVisibilityConverter x:Key="IntZeroToVisibilityConverter" />
+            <converters:RoleToHorizontalAlignmentConverter x:Key="RoleToHorizontalAlignmentConverter" />
+            <converters:RoleToBackgroundConverter x:Key="RoleToBackgroundConverter" />
+            <converters:UnansweredToHighlightConverter x:Key="UnansweredToHighlightConverter" />
+            <converters:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter" />
+            <converters:UnansweredToForegroundConverter x:Key="UnansweredToForegroundConverter" />
+            
         </ResourceDictionary>
     </Application.Resources>
 

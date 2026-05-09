@@ -27,6 +27,7 @@ ViewModel.AddTab("Inventory", typeof(InventoryView));
             ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
             ViewModel.AddTab("Calendar Integration", typeof(CalendarIntegration.CalendarIntegrationPage));
         }
+        ViewModel.AddTab("Chat", typeof(ChatView.NutritionistChatView));
         ViewModel.Tabs.CollectionChanged += OnTabsCollectionChanged;
         PopulateTabs();
         mainTabView.SelectionChanged += OnTabSelectionChanged;

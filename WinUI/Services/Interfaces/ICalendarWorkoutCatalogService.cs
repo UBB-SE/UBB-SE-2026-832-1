@@ -1,6 +1,6 @@
 using ClassLibrary.Models;
 
-namespace WinUI.Services.CalendarIntegration.Interfaces;
+namespace WinUI.Services.Interfaces;
 
 public interface ICalendarWorkoutCatalogService
 {
