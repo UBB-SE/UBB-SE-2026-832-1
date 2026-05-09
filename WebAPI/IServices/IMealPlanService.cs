@@ -17,4 +17,12 @@ public interface IMealPlanService
     (int TotalCalories, int TotalProtein, int TotalCarbohydrates, int TotalFat) CalculateTotalNutrition(IReadOnlyList<FoodItemDto> foodItems);
 
     bool ValidateMealPlan(IReadOnlyList<FoodItemDto> foodItems, int targetCalories, int targetProtein, int targetCarbohydrates, int targetFat, double tolerance = 0.10);
+
+    Task<MealPlanDto?> GetTodaysMealPlanAsync(int userId);
+
+    Task<int> GenerateMealPlanAsync(int userId);
+
+    Task<string> GetUserGoalAsync(int userId);
+
+    Task SaveMealsToDailyLogAsync(int mealPlanId, int userId);
 }

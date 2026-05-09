@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
         {
             client.BaseAddress = new Uri($"{ApiBaseUrl.BASE_URL}/api/");
         });
+        services.AddHttpClient<IMealPlanService, MealPlanService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IDailyLogServiceProxy, DailyLogServiceProxy>();
         services.AddScoped<IWorkoutLogService, WorkoutLogService>();
