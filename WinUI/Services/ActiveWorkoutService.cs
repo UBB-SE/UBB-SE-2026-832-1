@@ -67,6 +67,11 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
             exercise.Sets.Add(set);
         }
 
+        if (workoutLog.WorkoutLogId == 0)
+        {
+            return true;
+        }
+
         var modifyWorkoutResponse = await this.httpClient.PutAsJsonAsync($"{clientRoute}/modify-workout", MapToWorkoutLogDataTransferObject(workoutLog));
         return modifyWorkoutResponse.IsSuccessStatusCode;
     }

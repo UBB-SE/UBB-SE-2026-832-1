@@ -323,6 +323,19 @@ public sealed class ClientService : IClientService
             Client = MapClient(template.Client),
             Name = template.Name,
             Type = template.Type.ToString(),
+            Exercises = template.Exercises.Select(MapTemplateExercise).ToList(),
+        };
+    }
+
+    private static TemplateExerciseDataTransferObject MapTemplateExercise(TemplateExercise exercise)
+    {
+        return new TemplateExerciseDataTransferObject
+        {
+            Name = exercise.Name,
+            MuscleGroup = exercise.MuscleGroup.ToString(),
+            TargetSets = exercise.TargetSets,
+            TargetReps = exercise.TargetReps,
+            TargetWeight = exercise.TargetWeight,
         };
     }
 
