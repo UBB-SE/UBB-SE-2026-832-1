@@ -9,4 +9,8 @@ public sealed class UserSession : IUserSession
     public string CurrentUserRole { get; set; } = CLIENT_ROLE;
 
     public bool IsClient => string.Equals(this.CurrentUserRole, CLIENT_ROLE, System.StringComparison.OrdinalIgnoreCase);
+
+    public int? UserId { get; set; }
+
+    public string Role { get; set; }
 }

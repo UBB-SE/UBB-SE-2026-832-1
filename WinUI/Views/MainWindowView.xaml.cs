@@ -25,6 +25,7 @@ public sealed partial class MainWindowView : Page
             ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
         }
         ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
+        ViewModel.AddTab("Chat", typeof(ChatView.NutritionistChatView));
         ViewModel.Tabs.CollectionChanged += OnTabsCollectionChanged;
         PopulateTabs();
         mainTabView.SelectionChanged += OnTabSelectionChanged;

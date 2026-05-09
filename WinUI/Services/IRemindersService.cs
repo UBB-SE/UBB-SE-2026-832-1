@@ -2,7 +2,7 @@
 
 namespace WinUI.Services
 {
-    public interface IReminderService
+    public interface IRemindersService
     {
         Task DeleteReminderAsync(int id);
         Task<ReminderDto?> GetNextReminderAsync(int userId);
