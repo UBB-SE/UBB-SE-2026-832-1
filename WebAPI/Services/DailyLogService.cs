@@ -71,11 +71,6 @@ public sealed class DailyLogService : IDailyLogService
         return await this.dailyLogRepository.HasAnyLogsAsync(userId);
     }
 
-    public async Task<bool> HasFoodItemLoggedTodayAsync(int userId, int foodItemId)
-    {
-        return await this.dailyLogRepository.HasFoodItemLoggedTodayAsync(userId, foodItemId);
-    }
-
     public async Task<DailyLogTotalsDto> GetTodayTotalsAsync(int userId)
     {
         var start = DateTime.Today;
@@ -133,11 +128,6 @@ public sealed class DailyLogService : IDailyLogService
 
     public async Task LogFoodItemAsync(int userId, LogMealRequestDto request)
     {
-        if (await this.dailyLogRepository.HasFoodItemLoggedTodayAsync(userId, request.MealId))
-        {
-            throw new InvalidOperationException("This meal has already been saved to your daily log today.");
-        }
-
         var foodItem = await this.foodItemRepository.GetByIdAsync(request.MealId);
 
         if (foodItem is null)

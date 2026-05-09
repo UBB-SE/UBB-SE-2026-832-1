@@ -73,14 +73,7 @@ public sealed class DailyLogController : ControllerBase
     [HttpPost("user/{userId:int}/log")]
     public async Task<IActionResult> LogFoodItem(int userId, [FromBody] LogMealRequestDto request)
     {
-        try
-        {
-            await this.dailyLogService.LogFoodItemAsync(userId, request);
-            return this.NoContent();
-        }
-        catch (InvalidOperationException)
-        {
-            return this.Conflict();
-        }
+        await this.dailyLogService.LogFoodItemAsync(userId, request);
+        return this.NoContent();
     }
 }

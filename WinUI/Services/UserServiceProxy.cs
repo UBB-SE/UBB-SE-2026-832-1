@@ -71,7 +71,6 @@ public sealed class UserServiceProxy : IUserServiceProxy
 
     public async Task UpdateUserDataAsync(UserDataDto userDataDto)
     {
-        var response = await this.httpClient.PutAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/users/data", userDataDto);
-        response.EnsureSuccessStatusCode();
+        await this.httpClient.PutAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/users/data", userDataDto);
     }
 }
