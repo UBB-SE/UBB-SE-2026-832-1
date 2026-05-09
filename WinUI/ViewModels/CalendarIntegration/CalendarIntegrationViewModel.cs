@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using ClassLibrary.Models;
 using Microsoft.UI.Xaml.Controls;
 using WinUI.Services;
-using WinUI.Services.CalendarIntegration.Interfaces;
+using WinUI.Services.Interfaces;
 
 namespace WinUI.ViewModels.CalendarIntegration;
 

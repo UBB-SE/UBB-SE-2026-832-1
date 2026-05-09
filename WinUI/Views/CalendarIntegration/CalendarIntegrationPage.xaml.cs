@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using WinUI.Services;
-using WinUI.Services.CalendarIntegration;
 using WinUI.ViewModels.CalendarIntegration;
 using Windows.Storage.Pickers;
 

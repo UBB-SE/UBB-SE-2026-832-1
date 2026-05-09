@@ -32,14 +32,18 @@
 
                 <StackPanel Spacing="8">
                     <TextBlock Text="Gender" Foreground="Black" />
-                    <TextBox Text="{x:Bind ViewModel.Gender, Mode=TwoWay}" 
-                             Foreground="Black" BorderBrush="#999999" HorizontalAlignment="Stretch" />
+                    <ComboBox ItemsSource="{x:Bind ViewModel.GenderOptions}"
+                              SelectedItem="{x:Bind ViewModel.Gender, Mode=TwoWay}"
+                              PlaceholderText="Select Gender" 
+                              Foreground="Black" BorderBrush="#999999" HorizontalAlignment="Stretch" />
                 </StackPanel>
 
                 <StackPanel Spacing="8">
                     <TextBlock Text="Health Goal" Foreground="Black" />
-                    <TextBox Text="{x:Bind ViewModel.Goal, Mode=TwoWay}" 
-                             Foreground="Black" BorderBrush="#999999" HorizontalAlignment="Stretch" />
+                    <ComboBox ItemsSource="{x:Bind ViewModel.GoalOptions}"
+                              SelectedItem="{x:Bind ViewModel.Goal, Mode=TwoWay}"
+                              PlaceholderText="Select a goal" 
+                              Foreground="Black" BorderBrush="#999999" HorizontalAlignment="Stretch" />
                 </StackPanel>
 
                 <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}" 

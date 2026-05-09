@@ -34,6 +34,9 @@ public partial class UserViewModel : ObservableObject
     [ObservableProperty] private string gender = string.Empty;
     [ObservableProperty] private string goal = string.Empty;
 
+    public List<string> GenderOptions { get; } = new() { "female", "male" };
+    public List<string> GoalOptions { get; } = new() { "cut", "bulk", "maintenance", "well-being" };
+
     private bool isTrainer;
     public bool IsTrainer
     {
