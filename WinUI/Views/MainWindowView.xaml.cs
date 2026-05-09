@@ -19,12 +19,14 @@ public sealed partial class MainWindowView : Page
         var userSession = new UserSession();
         ViewModel.AddTab("Home", typeof(MainView));
         ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
+ViewModel.AddTab("Inventory", typeof(InventoryView));
         ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
+        ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
         if (userSession.IsClient)
         {
             ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
+            ViewModel.AddTab("Calendar Integration", typeof(CalendarIntegration.CalendarIntegrationPage));
         }
-        ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
         ViewModel.Tabs.CollectionChanged += OnTabsCollectionChanged;
         PopulateTabs();
         mainTabView.SelectionChanged += OnTabSelectionChanged;
