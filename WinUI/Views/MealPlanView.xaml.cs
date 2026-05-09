@@ -63,7 +63,7 @@ public sealed partial class MealPlanView : Page
 
         var httpClient = new HttpClient();
         this.userSession = new UserSession();
-        this.mealPlanService = new MealPlanService(new MealPlanServiceProxy(httpClient));
+        this.mealPlanService = new MealPlanService(httpClient);
         this.userService = new UserService(new UserServiceProxy(httpClient));
         this.viewModel = new MealPlanViewModel(this.mealPlanService, this.userSession);
         this.DataContext = this.viewModel;
