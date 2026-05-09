@@ -45,8 +45,8 @@ public sealed class ShoppingListRepository : IShoppingListRepository
             .Include(shoppingItem => shoppingItem.Ingredient)
             .FirstOrDefaultAsync(
                 shoppingItem =>
-                    shoppingItem.User.UserId == userId &&
-                    shoppingItem.Ingredient.IngredientId == ingredientId);
+                    shoppingItem.UserId == userId &&
+                    shoppingItem.IngredientId == ingredientId);
     }
 
     public async Task<IReadOnlyList<ShoppingItem>> GetAllByUserIdAsync(int userId)
@@ -54,7 +54,7 @@ public sealed class ShoppingListRepository : IShoppingListRepository
         return await databaseContext.ShoppingItems
             .AsNoTracking()
             .Include(shoppingItem => shoppingItem.Ingredient)
-            .Where(shoppingItem => shoppingItem.User.UserId == userId)
+            .Where(shoppingItem => shoppingItem.UserId == userId)
             .ToListAsync();
     }
 
