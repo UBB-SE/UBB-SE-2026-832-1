@@ -10,11 +10,6 @@ using ClassLibrary.Models;
 
 namespace WinUI.Services;
 
-public interface IUserSession
-{
-    int CurrentClientId { get; }
-}
-
 public interface ICalendarIntegrationService
 {
     Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId, CancellationToken cancellationToken = default);

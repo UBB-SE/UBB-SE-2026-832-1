@@ -1,6 +1,7 @@
 using ClassLibrary.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System.Net.Http;
 using WinUI.Services;
 using WinUI.ViewModels;
 
@@ -14,18 +15,10 @@ namespace WinUI.Views.ChatView
         {
             this.InitializeComponent();
             this.ViewModel = new NutritionistChatViewModel(
-            new ChatService(new HttpClient())
+                new ChatService(new HttpClient()),
+                new UserSession()
             );
             this.DataContext = ViewModel;
-        }
-
-        private async void ConversationsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (sender is ListView lv && lv.SelectedItem is Conversation conv)
-            {
-                ViewModel.SelectedConversation = conv;
-                await ViewModel.LoadMessagesForConversationAsync(conv.Id);
-            }
         }
 
         private void MessagesItems_SizeChanged(object sender, SizeChangedEventArgs e)

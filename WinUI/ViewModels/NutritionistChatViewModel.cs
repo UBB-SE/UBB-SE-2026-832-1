@@ -12,13 +12,13 @@
     using System.Threading.Tasks;
     using WinUI.Services;
     using WinUI.ViewModels;
-    using UserSession = ClassLibrary.Models.UserSession;
 
     public partial class NutritionistChatViewModel : ObservableObject
     {
         private readonly IChatService chatService;
         private CancellationTokenSource? autoRefreshCancellationTokenSource;
         private int? currentConversationId;
+        private readonly IUserSession userSession;
 
         private const int MaxMessageLength = 1000;
         private const int AutoRefreshSeconds = 5;
@@ -33,7 +33,7 @@
         private static readonly Regex AllowedMessageRegex = new Regex("^[a-zA-Z0-9 .,!?'\\-()]+$", RegexOptions.Compiled);
 
         [ObservableProperty]
-        private ObservableCollection<Conversation> conversations;
+        private ObservableCollection<ConversationViewModel> conversations;
 
         [ObservableProperty]
         private ObservableCollection<MessageViewModel> messages;
@@ -51,7 +51,7 @@
         private bool isNutritionistView;
 
         [ObservableProperty]
-        private Conversation? selectedConversation;
+        private ConversationViewModel? selectedConversation;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsEmptyPlaceholderVisible))]
@@ -63,15 +63,16 @@
 
         public bool IsEmptyPlaceholderVisible => !IsNutritionistUser && !HasMessages;
 
-        public NutritionistChatViewModel(IChatService chatService)
+        public NutritionistChatViewModel(IChatService chatService, IUserSession userSession)
         {
-            Conversations = new ObservableCollection<Conversation>();
+            Conversations = new ObservableCollection<ConversationViewModel>();
             Messages = new ObservableCollection<MessageViewModel>();
+            this.userSession = userSession;
             InputText = string.Empty;
             StatusMessage = string.Empty;
 
             this.chatService = chatService;
-            IsNutritionistUser = UserSession.Role == NutritionistRole;
+            IsNutritionistUser = this.userSession.Role == NutritionistRole;
 
             _ = LoadConversationsAsync();
 
@@ -81,7 +82,7 @@
 
         partial void OnInputTextChanged(string value)
         {
-            if (UserSession.Role == NutritionistRole && currentConversationId == null)
+            if (this.userSession.Role == NutritionistRole && currentConversationId == null)
             {
                 CanSend = false;
                 StatusMessage = StatusSelectConversation;
@@ -117,17 +118,17 @@
         {
             IEnumerable<Conversation> fetchedConversations;
 
-            if (UserSession.Role == NutritionistRole)
+            if (this.userSession.Role == NutritionistRole)
             {
                 fetchedConversations = IsNutritionistView
                     ? await chatService.GetConversationsWithUserMessagesAsync()
-                    : await chatService.GetConversationsWhereNutritionistRespondedAsync(UserSession.UserId ?? InvalidUserId);
+                    : await chatService.GetConversationsWhereNutritionistRespondedAsync(this.userSession.UserId ?? InvalidUserId);
 
                 fetchedConversations ??= Enumerable.Empty<Conversation>();
             }
             else
             {
-                var conversation = await chatService.GetOrCreateConversationForUserAsync(UserSession.UserId ?? InvalidUserId);
+                var conversation = await chatService.GetOrCreateConversationForUserAsync(this.userSession.UserId ?? InvalidUserId);
 
                 fetchedConversations = conversation != null
                     ? new[] { conversation }
@@ -137,10 +138,10 @@
             Conversations.Clear();
             foreach (var conversationItem in fetchedConversations)
             {
-                Conversations.Add(conversationItem);
+                Conversations.Add(new ConversationViewModel(conversationItem, this.userSession));
             }
 
-            if (UserSession.Role != NutritionistRole
+            if (this.userSession.Role != NutritionistRole
                 && currentConversationId == null
                 && Conversations.Count > 0)
             {
@@ -175,7 +176,7 @@
             HasMessages = Messages.Count > 0;
         }
 
-        partial void OnSelectedConversationChanged(Conversation? value)
+        partial void OnSelectedConversationChanged(ConversationViewModel? value)
         {
             if (value != null)
             {
@@ -232,24 +233,24 @@
 
             if (currentConversationId == null)
             {
-                if (UserSession.Role == NutritionistRole)
+                if (this.userSession.Role == NutritionistRole)
                 {
                     StatusMessage = StatusNutritionistCannotStartConversation;
                     return;
                 }
 
-                if (UserSession.UserId == null) return;
+                if (this.userSession.UserId == null) return;
 
-                var conversation = await chatService.GetOrCreateConversationForUserAsync(UserSession.UserId.Value);
+                var conversation = await chatService.GetOrCreateConversationForUserAsync(this.userSession.UserId.Value);
                 if (conversation == null) return;
 
                 currentConversationId = conversation.Id;
             }
 
-            if (UserSession.UserId == null) return;
+            if (this.userSession.UserId == null) return;
 
-            int senderId = UserSession.UserId.Value;
-            bool isNutritionist = UserSession.Role == NutritionistRole;
+            int senderId = this.userSession.UserId.Value;
+            bool isNutritionist = this.userSession.Role == NutritionistRole;
 
             await chatService.AddMessageAsync(
                 currentConversationId.Value,
