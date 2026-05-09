@@ -7,7 +7,7 @@ namespace WinUI.Services;
 public sealed class ActiveWorkoutService : IActiveWorkoutService
 {
     private readonly HttpClient httpClient;
-    private const string baseAddress = "https://localhost:7197/api";
+    private const string baseAddress = ApiBaseUrl.BASE_URL + "/api";
     private const string clientRoute = baseAddress + "/client";
 
     public ActiveWorkoutService(HttpClient httpClient)
@@ -65,6 +65,11 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
         {
             set.Exercise = exercise;
             exercise.Sets.Add(set);
+        }
+
+        if (workoutLog.WorkoutLogId == 0)
+        {
+            return true;
         }
 
         var modifyWorkoutResponse = await this.httpClient.PutAsJsonAsync($"{clientRoute}/modify-workout", MapToWorkoutLogDataTransferObject(workoutLog));

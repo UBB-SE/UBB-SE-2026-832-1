@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using WinUI.Views.CalendarIntegration;
 using WinUI.Views;
 
 namespace WinUI.Services;
@@ -35,7 +36,7 @@ public sealed class NavigationService : INavigationService
 
     public void NavigateToRankShowcase()
     {
-        // TODO: Navigate to RankShowcasePage once it is implemented
+        frame?.Navigate(typeof(RankShowcaseView));
     }
 
     public void NavigateToActiveWorkout(int clientId = 0)

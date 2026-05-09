@@ -8,7 +8,7 @@ namespace WinUI.Services;
 public sealed class AchievementsService : IAchievementsService
 {
     private readonly HttpClient httpClient;
-    private const string baseAddress = "https://localhost:7197/api";
+    private const string baseAddress = ApiBaseUrl.BASE_URL + "/api";
     private const string clientRoute = "client";
 
     public AchievementsService(HttpClient httpClient)

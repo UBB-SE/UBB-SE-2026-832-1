@@ -243,6 +243,7 @@ public sealed class TrainerService : ITrainerService
             Client = new Client { ClientId = templateDto.ClientId },
             Name = templateDto.Name,
             Type = workoutType,
+            Exercises = templateDto.Exercises.Select(MapToTemplateExercise).ToList(),
         };
     }
 

@@ -10,11 +10,6 @@ using ClassLibrary.Models;
 
 namespace WinUI.Services;
 
-public interface IUserSession
-{
-    int CurrentClientId { get; }
-}
-
 public interface ICalendarIntegrationService
 {
     Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId, CancellationToken cancellationToken = default);
@@ -25,7 +20,7 @@ public interface ICalendarIntegrationService
 public sealed class CalendarIntegrationService : ICalendarIntegrationService
 {
     private readonly HttpClient httpClient;
-    private const string apiBaseAddress = "https://localhost:7197";
+    private const string apiBaseAddress = ApiBaseUrl.BASE_URL;
     private const string clientRoutePrefix = "api/client";
 
     public CalendarIntegrationService(HttpClient httpClient)
