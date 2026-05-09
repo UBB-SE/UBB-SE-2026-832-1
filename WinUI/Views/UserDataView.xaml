@@ -4,41 +4,50 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Background="#F5F5F5">
 
-	<Grid>
-		<Border Width="450" Background="White" CornerRadius="8" Padding="40"
+    <Grid>
+        <Border Width="450" Background="White" CornerRadius="8" Padding="40" 
                 HorizontalAlignment="Center" VerticalAlignment="Center"
-                BorderBrush="#E0E0E0" BorderThickness="1">
-			<StackPanel Spacing="16">
-				<TextBlock Text="User Data" FontSize="28" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                BorderBrush="#CCCCCC" BorderThickness="1">
+            <StackPanel Spacing="16">
+                <TextBlock Text="User Data" FontSize="28" FontWeight="SemiBold" 
+                           Foreground="Black" HorizontalAlignment="Center" Margin="0,0,0,10"/>
 
-				<StackPanel Spacing="8">
-					<TextBlock Text="Weight (kg)" />
-					<NumberBox Value="{x:Bind ViewModel.Weight, Mode=TwoWay}" PlaceholderText="0" SpinButtonPlacementMode="Hidden" />
-				</StackPanel>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Weight (kg)" Foreground="Black" />
+                    <NumberBox Value="{x:Bind ViewModel.Weight, Mode=TwoWay}" 
+                               Foreground="Black" BorderBrush="#999999" SpinButtonPlacementMode="Hidden" />
+                </StackPanel>
 
-				<StackPanel Spacing="8">
-					<TextBlock Text="Height (cm)" />
-					<NumberBox Value="{x:Bind ViewModel.Height, Mode=TwoWay}" PlaceholderText="0" SpinButtonPlacementMode="Hidden" />
-				</StackPanel>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Height (cm)" Foreground="Black" />
+                    <NumberBox Value="{x:Bind ViewModel.Height, Mode=TwoWay}" 
+                               Foreground="Black" BorderBrush="#999999" SpinButtonPlacementMode="Hidden" />
+                </StackPanel>
 
-				<StackPanel Spacing="8">
-					<TextBlock Text="Birthdate" />
-					<CalendarDatePicker Date="{x:Bind ViewModel.Birthdate, Mode=TwoWay}" HorizontalAlignment="Stretch" />
-				</StackPanel>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Birthdate" Foreground="Black" />
+                    <CalendarDatePicker Date="{x:Bind ViewModel.SelectedDate, Mode=TwoWay}" 
+                                        Foreground="Black" BorderBrush="#999999" HorizontalAlignment="Stretch" />
+                </StackPanel>
 
-				<StackPanel Spacing="8">
-					<TextBlock Text="Gender" />
-					<ComboBox ItemsSource="{x:Bind ViewModel.Genders}" SelectedItem="{x:Bind ViewModel.SelectedGender, Mode=TwoWay}" PlaceholderText="Select gender" HorizontalAlignment="Stretch" />
-				</StackPanel>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Gender" Foreground="Black" />
+                    <TextBox Text="{x:Bind ViewModel.Gender, Mode=TwoWay}" 
+                             Foreground="Black" BorderBrush="#999999" HorizontalAlignment="Stretch" />
+                </StackPanel>
 
-				<StackPanel Spacing="8">
-					<TextBlock Text="Health Goal" />
-					<ComboBox ItemsSource="{x:Bind ViewModel.Goals}" SelectedItem="{x:Bind ViewModel.SelectedGoal, Mode=TwoWay}" PlaceholderText="Select health goal" HorizontalAlignment="Stretch" />
-				</StackPanel>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Health Goal" Foreground="Black" />
+                    <TextBox Text="{x:Bind ViewModel.Goal, Mode=TwoWay}" 
+                             Foreground="Black" BorderBrush="#999999" HorizontalAlignment="Stretch" />
+                </StackPanel>
 
-				<Button Content="Save Details" Command="{x:Bind ViewModel.SaveDataCommand}"
+                <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}" 
+                           Foreground="Red" HorizontalAlignment="Center" TextWrapping="Wrap" />
+
+                <Button Content="Save Details" Command="{x:Bind ViewModel.SaveDataCommand}" 
                         Background="#0066CC" Foreground="White" HorizontalAlignment="Stretch" Margin="0,20,0,0"/>
-			</StackPanel>
-		</Border>
-	</Grid>
+            </StackPanel>
+        </Border>
+    </Grid>
 </Page>

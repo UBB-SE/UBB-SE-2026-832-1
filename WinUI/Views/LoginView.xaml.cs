@@ -1,28 +1,20 @@
 ﻿using System;
 using Microsoft.UI.Xaml.Controls;
+using WinUI.Services;
 using WinUI.ViewModels;
 
 namespace WinUI.Views;
 
 public sealed partial class LoginView : Page
 {
-    public LoginViewModel ViewModel { get; }
+    public UserViewModel ViewModel { get; }
 
     public LoginView()
     {
         this.InitializeComponent();
-        this.ViewModel = new LoginViewModel();
-        this.ViewModel.LoginSuccessful += OnLoginSuccessful;
-        this.ViewModel.NavigateToRegister += OnNavigateToRegister;
-    }
+        this.ViewModel = new UserViewModel(new UserService());
 
-    private void OnLoginSuccessful(object? sender, EventArgs e)
-    {
-        this.Frame.Navigate(typeof(MainWindowView));
-    }
-
-    private void OnNavigateToRegister(object? sender, EventArgs e)
-    {
-        this.Frame.Navigate(typeof(RegisterView));
+        this.ViewModel.LoginSuccess += (s, e) => this.Frame.Navigate(typeof(MainWindowView));
+        this.ViewModel.NavigateToRegister += (s, e) => this.Frame.Navigate(typeof(RegisterView));
     }
 }

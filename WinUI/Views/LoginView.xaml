@@ -4,30 +4,34 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Background="#F5F5F5">
 
-	<Grid>
-		<Border Width="400" Background="White" CornerRadius="8" Padding="40"
+    <Grid>
+        <Border Width="400" Background="White" CornerRadius="8" Padding="40" 
                 HorizontalAlignment="Center" VerticalAlignment="Center"
-                BorderBrush="#E0E0E0" BorderThickness="1">
-			<StackPanel Spacing="20">
-				<TextBlock Text="Login" FontSize="28" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                BorderBrush="#CCCCCC" BorderThickness="1">
+            <StackPanel Spacing="20">
+                <TextBlock Text="Login" FontSize="28" FontWeight="SemiBold" 
+                           Foreground="Black" HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
-				<StackPanel Spacing="8">
-					<TextBlock Text="Username" />
-					<TextBox Text="{x:Bind ViewModel.Username, Mode=TwoWay}" PlaceholderText="Enter your username" />
-				</StackPanel>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Username" Foreground="Black" />
+                    <TextBox Text="{x:Bind ViewModel.UserName, Mode=TwoWay}" PlaceholderText="Enter your username" Foreground="Black" BorderBrush="#999999" />
+                             
+                </StackPanel>
 
-				<StackPanel Spacing="8">
-					<TextBlock Text="Password" />
-					<PasswordBox Password="{x:Bind ViewModel.Password, Mode=TwoWay}" PlaceholderText="Enter your password" />
-				</StackPanel>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Password" Foreground="Black" />
+                    <PasswordBox Password="{x:Bind ViewModel.Password, Mode=TwoWay}" 
+                                 PlaceholderText="Enter your password" 
+                                 Foreground="Black" BorderBrush="#999999" />
+                </StackPanel>
 
-				<Button Content="Login" Command="{x:Bind ViewModel.LoginCommand}"
+                <Button Content="Login" Command="{x:Bind ViewModel.LoginCommand}" 
                         Background="#0066CC" Foreground="White" HorizontalAlignment="Stretch" Margin="0,20,0,0"/>
 
-				<HyperlinkButton Content="Don't have an account? Create one."
-                                 Command="{x:Bind ViewModel.GoToRegisterCommand}"
-                                 HorizontalAlignment="Center" />
-			</StackPanel>
-		</Border>
-	</Grid>
+                <HyperlinkButton Content="Don't have an account? Create one." 
+                                 Command="{x:Bind ViewModel.GoToRegisterCommand}" 
+                                 Foreground="#0066CC" HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+    </Grid>
 </Page>

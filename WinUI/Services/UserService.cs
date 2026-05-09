@@ -10,7 +10,11 @@ public sealed class UserService : IUserService
     {
         this.serviceProxy = serviceProxy;
     }
-
+    public UserService()
+    {
+        var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000/") };
+        this.serviceProxy = new UserServiceProxy(httpClient);
+    }
     public Task<IReadOnlyList<UserDto>> GetUsersAsync()
     {
         return this.serviceProxy.GetUsersAsync();
