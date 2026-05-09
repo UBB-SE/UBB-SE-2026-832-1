@@ -1,0 +1,424 @@
+<Page
+    x:Class="WinUI.Views.TrainerDashboardView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:ClassLibrary.Models"
+    xmlns:extensions="using:WinUI.Extensions"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <extensions:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Page.Resources>
+
+    <Grid Padding="32">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Client List Dashboard" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+            <StackPanel Grid.Row="1" Spacing="8" Margin="0,0,0,16">
+                <TextBlock Text="Trainer tools" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                <Button Content="Open selected client profile" Command="{Binding OpenClientProfileCommand}"/>
+                <Button Content="Workout logs (client app)" Command="{Binding OpenWorkoutLogsCommand}"/>
+                <Button Content="Calendar" Command="{Binding OpenCalendarCommand}"/>
+            </StackPanel>
+
+            <ListView Grid.Row="2" ItemsSource="{Binding AssignedClients}" SelectedItem="{Binding SelectedClient, Mode=TwoWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Client">
+                        <StackPanel Margin="0,8,0,16" Padding="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8">
+                            <TextBlock Text="{Binding FullName}" FontSize="30" FontWeight="SemiBold"/>
+                            <TextBlock Text="Active Trainee" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,4,0,0"/>
+                            <TextBlock Text="{Binding ClientId}" FontSize="12" Foreground="{ThemeResource TextFillColorTertiaryBrush}" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+
+            <Border Grid.Column="1" Margin="16,0,0,0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="350"/>
+                        <RowDefinition Height="550"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="History" FontSize="24" FontWeight="SemiBold" Padding="5" Margin="10"/>
+                            <ListView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding SelectedClientLogs, Mode=OneWay}" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Margin="10"
+                                     SelectedItem="{Binding SelectedWorkoutLog, Mode=TwoWay}" >
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:WorkoutLog">
+                                        <StackPanel Orientation="Horizontal" Spacing="16">
+                                            <TextBlock Text="{Binding WorkoutLog, Converter={StaticResource BooleanToVisibilityConverter}}" FontWeight="Bold"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+
+                        </Grid>
+
+
+                        <Grid Grid.Column="1">
+
+                            <Grid>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+
+                                <ListView
+                                      Grid.Row="0"
+                                      ItemsSource="{Binding CurrentWorkoutDetails, Mode=OneWay}"
+                                      SelectionMode="None">
+
+                                    <ListView.Header>
+                                        <Grid ColumnDefinitions="2*, 1*, 4*" Padding="12,8" Background="{ThemeResource LayerFillColorDefaultBrush}">
+                                            <TextBlock Text="Exercise Name" Grid.Column="0" Foreground="Gray" FontSize="12"/>
+                                            <TextBlock Text="Group" Grid.Column="1" Foreground="Gray" FontSize="12"/>
+                                            <TextBlock Text="Sets (Reps / Weight)" Grid.Column="2" Foreground="Gray" FontSize="12" Margin="12,0,0,0"/>
+                                        </Grid>
+                                    </ListView.Header>
+
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="2*, 1*, 4*" Padding="0,8">
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+
+                                                <Border Grid.Column="1" Background="#FFE0E0" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding MuscleGroup}" Foreground="#802020" FontSize="11"/>
+                                                </Border>
+
+                                                <ItemsControl Grid.Column="2" ItemsSource="{Binding Sets}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel Orientation="Horizontal" Spacing="15"/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:LoggedSet">
+                                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                                <TextBlock Text="{Binding ActualReps}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="×" Foreground="Gray" VerticalAlignment="Center" FontSize="10"/>
+                                                                <TextBlock Text="{Binding ActualWeight}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center"/>
+
+                                                                <TextBlock Text="|" Foreground="#20FFFFFF" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+
+                                <Grid Grid.Row="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="16" CornerRadius="8">
+
+                                    <Grid ColumnSpacing="24" Visibility="{Binding IsFeedbackFormVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" Spacing="8" VerticalAlignment="Top">
+                                            <TextBlock Text="Trainer Feedback" FontSize="14" FontWeight="SemiBold"/>
+                                            <RatingControl Value="{Binding SelectedWorkoutLog.Rating, Mode=TwoWay, FallbackValue=-1}"/>
+                                            <TextBlock Text="{Binding FeedbackErrorText, Mode=OneWay}"
+                                                       Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                                       FontSize="12" TextWrapping="Wrap" MaxWidth="150" />
+                                        </StackPanel>
+
+                                        <Grid Grid.Column="1">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <TextBox Grid.Row="0"
+                                                     Text="{Binding SelectedWorkoutLog.TrainerNotes, Mode=TwoWay, FallbackValue=''}"
+                                                     PlaceholderText="Leave feedback or adjust the routine for next time..."
+                                                     TextWrapping="Wrap" AcceptsReturn="True" MinHeight="80"/>
+
+                                            <Button Grid.Row="1" Click="{Binding SaveCurrentFeedback}"
+                                                    Content="Save Feedback" Style="{ThemeResource AccentButtonStyle}"
+                                                    HorizontalAlignment="Right" Margin="0,8,0,0"/>
+                                        </Grid>
+                                    </Grid>
+
+                                    <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                Visibility="{Binding IsFeedbackFormVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}">
+                                        <FontIcon Glyph="&#xE73E;" FontSize="24" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
+                                        <TextBlock Text="Feedback saved successfully!" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    </StackPanel>
+
+                                </Grid>
+                            </Grid>
+
+                        </Grid>
+
+                    </Grid>
+
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Button Grid.Row="0" x:Name="OpenBuilderButton"
+                                Content="Assign New Workout"
+                                Click="OpenBuilderButton_Click"
+                                Margin="1,0,1,1"
+                                HorizontalAlignment="Stretch"
+                                Style="{ThemeResource AccentButtonStyle}"/>
+
+                        <Grid Grid.Row="1" Margin="0,20,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="Assigned Routines" FontSize="24" FontWeight="SemiBold" Margin="10,0,10,10"/>
+
+                            <ItemsView Grid.Row="1"
+                               ItemsSource="{Binding ClientAssignedWorkouts, Mode=OneWay}"
+                               SelectionMode="None"
+                               Margin="10,0,10,0">
+
+                                <ItemsView.Layout>
+                                    <LinedFlowLayout ItemsStretch="Fill" LineHeight="200" LineSpacing="15" MinItemSpacing="15"/>
+                                </ItemsView.Layout>
+
+                                <ItemsView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:WorkoutTemplate">
+                                        <ItemContainer DataContext="{Binding}" AutomationProperties.Name="{Binding Name}">
+                                            <Grid CornerRadius="12"
+                                                  Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                                  BorderThickness="1"
+                                                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                                  IsHitTestVisible="True"
+                                                  Tapped="Card_Tapped"
+                                                  Padding="16">
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Row="0" Text="{Binding Name}"
+                                                           FontSize="18" FontWeight="Bold"
+                                                           Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                                                           TextTrimming="CharacterEllipsis" Margin="0,0,30,8"/>
+
+                                                <ItemsControl Grid.Row="1" ItemsSource="{Binding Exercises}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:TemplateExercise">
+                                                            <Grid ColumnDefinitions="*, Auto" Margin="0,2">
+                                                                <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                                                           FontSize="11" Foreground="White" Opacity="0.8"
+                                                                           TextTrimming="CharacterEllipsis"/>
+                                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="8,0,0,0">
+                                                                    <TextBlock Text="{Binding TargetSets}" FontSize="11" Foreground="Gray"/>
+                                                                    <TextBlock Text="×" FontSize="10" Foreground="DimGray"/>
+                                                                    <TextBlock Text="{Binding TargetReps}" FontSize="11" Foreground="Gray"/>
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+
+                                                <TextBlock Grid.Row="2" Text="TRAINER ASSIGNED"
+                                                           FontSize="9" FontWeight="Black" Opacity="0.4"
+                                                           CharacterSpacing="100" Margin="0,12,0,0"/>
+
+                                                <Button HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                        Margin="-8,-8,-8,0" Padding="8"
+                                                        Background="Transparent" BorderThickness="0"
+                                                        Tapped="DeleteWorkout_Tapped">
+                                                    <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="Red" Opacity="0.7"/>
+                                                </Button>
+                                            </Grid>
+                                        </ItemContainer>
+                                    </DataTemplate>
+                                </ItemsView.ItemTemplate>
+                            </ItemsView>
+
+                            <Grid Grid.Row="2">
+
+                                <Border
+                                    Grid.Row="1"
+                                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="20"
+                                    Margin="0,12,0,0">
+                                    <StackPanel Spacing="16">
+
+                                        <StackPanel Spacing="2">
+                                            <TextBlock
+                                                Text="Assign Nutrition Plan"
+                                                FontSize="16"
+                                                FontWeight="SemiBold" />
+                                            <TextBlock
+                                                Text="Set the active date range for the client's diet plan."
+                                                FontSize="12"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </StackPanel>
+
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="24">
+
+                                            <StackPanel Grid.Column="0" Spacing="6">
+                                                <TextBlock
+                                                    Text="Start Date"
+                                                    FontSize="12"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <DatePicker
+                                                    Date="{Binding PlanStartDate, Mode=TwoWay}"
+                                                    HorizontalAlignment="Stretch" />
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1" Spacing="6">
+                                                <TextBlock
+                                                    Text="End Date"
+                                                    FontSize="12"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <DatePicker
+                                                    Date="{Binding PlanEndDate, Mode=TwoWay}"
+                                                    HorizontalAlignment="Stretch" />
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <TextBlock
+                                            Text="{Binding DateRangeError, Mode=OneWay}"
+                                            FontSize="12"
+                                            Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                            Visibility="{Binding HasDateRangeError, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                                            <Button
+                                                Grid.Column="0"
+                                                Content="Assign Plan"
+                                                Style="{StaticResource AccentButtonStyle}"
+                                                IsEnabled="{Binding CanAssignPlan, Mode=OneWay}"
+                                                Command="{Binding AssignNutritionPlanCommand}" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Text="{Binding AssignmentStatus, Mode=OneWay}"
+                                                FontSize="12"
+                                                Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                                VerticalAlignment="Center"
+                                                TextWrapping="Wrap" />
+                                        </Grid>
+
+                                    </StackPanel>
+                                </Border>
+
+                            </Grid>
+
+                        </Grid>
+
+                    </Grid>
+
+                </Grid>
+            </Border>
+
+        </ScrollViewer>
+
+        <ContentDialog x:Name="WorkoutBuilderDialog"
+                       Title="Assign New Routine"
+                       PrimaryButtonText="Save Routine"
+                       CloseButtonText="Cancel"
+                       DefaultButton="Primary"
+                       PrimaryButtonClick="WorkoutBuilderDialog_PrimaryButtonClick">
+
+            <StackPanel Spacing="16" Width="500">
+                <TextBox Header="Workout Name"
+                         Text="{Binding NewRoutineName, Mode=TwoWay}"
+                         PlaceholderText="e.g., Heavy Push Day - Block 1" />
+
+                <TextBlock Text="{Binding BuilderErrorText, Mode=OneWay}"
+                           Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                           FontSize="13" FontWeight="SemiBold"
+                           Visibility="{Binding HasBuilderError, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                <Rectangle Height="1" Fill="{ThemeResource ControlStrokeColorDefaultBrush}" Margin="0,8"/>
+
+                <TextBlock Text="Exercises in this Workout" FontWeight="SemiBold"/>
+
+                <ListView Height="150" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="4" Padding="4"
+                          ItemsSource="{Binding RoutineBuilderExercises, Mode=OneWay}" SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:TemplateExercise">
+                            <Grid ColumnDefinitions="*, Auto" Margin="0,4">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="(" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding TargetSets}" Foreground="Gray"/>
+                                    <TextBlock Text="×" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding TargetReps}" Foreground="Gray"/>
+                                    <TextBlock Text=")" Foreground="Gray"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="✕" Click="RemoveExercise_Click" Background="Transparent" Foreground="Red" Padding="8,4"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <Grid ColumnSpacing="8" RowSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ComboBox Grid.Row="0" Grid.Column="0" Header="Select Exercise" HorizontalAlignment="Stretch" PlaceholderText="Choose..."
+                              ItemsSource="{Binding FilteredAvailableExercises, Mode=OneWay}"
+                              SelectedItem="{Binding SelectedNewExercise, Mode=TwoWay}"/>
+
+                    <NumberBox Grid.Row="0" Grid.Column="1" Header="Sets" Minimum="1" Maximum="10" SpinButtonPlacementMode="Hidden" Value="{Binding NewExerciseSets, Mode=TwoWay}"/>
+                    <NumberBox Grid.Row="0" Grid.Column="2" Header="Reps" Minimum="1" Maximum="100" SpinButtonPlacementMode="Hidden" Value="{Binding NewExerciseReps, Mode=TwoWay}"/>
+                    <Button Grid.Row="1" Grid.ColumnSpan="3" Content="+ Add to Routine" HorizontalAlignment="Stretch"
+                            Click="{Binding AddExerciseToRoutine}"/>
+                </Grid>
+            </StackPanel>
+        </ContentDialog>
+
+    </Grid>
+
+</Page>
