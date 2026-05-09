@@ -76,4 +76,10 @@ public sealed partial class MainWindowView : Page
             Content = content ?? new TextBlock { Text = $"Could not load '{tab.Title}' ({tab.PageType.FullName})" }
         };
     }
+
+    private void LogoutButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        UserSession.Clear();
+        Frame.Navigate(typeof(LoginView));
+    }
 }

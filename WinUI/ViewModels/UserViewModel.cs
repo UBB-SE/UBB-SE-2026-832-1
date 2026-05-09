@@ -24,7 +24,7 @@ public partial class UserViewModel : ObservableObject
 
     private readonly IUserService? userService;
 
-    // Aquí volvemos al original con N mayúscula
+    
     [ObservableProperty] private string userName = string.Empty;
     [ObservableProperty] private string password = string.Empty;
     [ObservableProperty] private string statusMessage = string.Empty;
@@ -193,7 +193,14 @@ public partial class UserViewModel : ObservableObject
 
     [RelayCommand] private void GoToRegister() => this.NavigateToRegister?.Invoke(this, EventArgs.Empty);
     [RelayCommand] private void GoToLogin() => this.NavigateToLogin?.Invoke(this, EventArgs.Empty);
-
+    [RelayCommand]
+    private void Logout()
+    {
+        UserSession.Clear();
+        this.LoggedInUserId = null;
+        this.LoggedInUsername = null;
+        this.NavigateToLogin?.Invoke(this, EventArgs.Empty);
+    }
     private string GetSelectedRole()
     {
         if (this.IsTrainer) return ROLE_TRAINER;
