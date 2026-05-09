@@ -11,7 +11,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using WinUI.Services;
-    using WinUI.ViewModels;
 
     public partial class NutritionistChatViewModel : ObservableObject
     {
@@ -22,7 +21,6 @@
 
         private const int MaxMessageLength = 1000;
         private const int AutoRefreshSeconds = 5;
-        private const int InvalidUserId = 0;
         private const string NutritionistRole = "Nutritionist";
         private const string StatusSelectConversation = "Please select a conversation to respond.";
         private const string StatusMessageTooLong = "Message too long.";
@@ -72,7 +70,8 @@
             StatusMessage = string.Empty;
 
             this.chatService = chatService;
-            IsNutritionistUser = this.userSession.Role == NutritionistRole;
+
+            IsNutritionistUser = this.userSession.CurrentRole == NutritionistRole;
 
             _ = LoadConversationsAsync();
 
@@ -82,7 +81,7 @@
 
         partial void OnInputTextChanged(string value)
         {
-            if (this.userSession.Role == NutritionistRole && currentConversationId == null)
+            if (this.userSession.CurrentRole == NutritionistRole && currentConversationId == null)
             {
                 CanSend = false;
                 StatusMessage = StatusSelectConversation;
@@ -118,17 +117,17 @@
         {
             IEnumerable<Conversation> fetchedConversations;
 
-            if (this.userSession.Role == NutritionistRole)
+            if (this.userSession.CurrentRole == NutritionistRole)
             {
                 fetchedConversations = IsNutritionistView
                     ? await chatService.GetConversationsWithUserMessagesAsync()
-                    : await chatService.GetConversationsWhereNutritionistRespondedAsync(this.userSession.UserId ?? InvalidUserId);
+                    : await chatService.GetConversationsWhereNutritionistRespondedAsync(this.userSession.CurrentClientId);
 
                 fetchedConversations ??= Enumerable.Empty<Conversation>();
             }
             else
             {
-                var conversation = await chatService.GetOrCreateConversationForUserAsync(this.userSession.UserId ?? InvalidUserId);
+                var conversation = await chatService.GetOrCreateConversationForUserAsync(this.userSession.CurrentClientId);
 
                 fetchedConversations = conversation != null
                     ? new[] { conversation }
@@ -231,24 +230,20 @@
 
             if (currentConversationId == null)
             {
-                if (this.userSession.Role == NutritionistRole)
+                if (this.userSession.CurrentRole == NutritionistRole)
                 {
                     StatusMessage = StatusNutritionistCannotStartConversation;
                     return;
                 }
 
-                if (this.userSession.UserId == null) return;
-
-                var conversation = await chatService.GetOrCreateConversationForUserAsync(this.userSession.UserId.Value);
+                var conversation = await chatService.GetOrCreateConversationForUserAsync(this.userSession.CurrentClientId);
                 if (conversation == null) return;
 
                 currentConversationId = conversation.Id;
             }
 
-            if (this.userSession.UserId == null) return;
-
-            int senderId = this.userSession.UserId.Value;
-            bool isNutritionist = this.userSession.Role == NutritionistRole;
+            int senderId = this.userSession.CurrentClientId;
+            bool isNutritionist = this.userSession.CurrentRole == NutritionistRole;
 
             await chatService.AddMessageAsync(
                 currentConversationId.Value,

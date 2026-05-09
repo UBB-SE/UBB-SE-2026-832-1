@@ -3,6 +3,10 @@
 public interface IUserSession
 {
     int CurrentClientId { get; }
-    int? UserId { get; set; }
-    string Role { get; set; }
+
+    string CurrentRole { get; }
+
+    string CurrentUserRole { get; }
+
+    bool IsClient { get; }
 }

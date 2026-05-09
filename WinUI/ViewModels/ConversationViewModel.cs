@@ -18,6 +18,6 @@
         public User User => conversation.User;
         public bool HasUnanswered => conversation.HasUnanswered;
 
-        public bool ShouldHighlight => conversation.HasUnanswered && userSession.Role == "Nutritionist";
+        public bool ShouldHighlight => conversation.HasUnanswered && userSession.CurrentRole == "Nutritionist";
     }
 }
