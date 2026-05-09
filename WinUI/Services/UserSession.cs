@@ -4,7 +4,7 @@ namespace WinUI.Services;
 
 public sealed class UserSession : IUserSession
 {
-public const string CLIENT_ROLE = "User";
+public const string CLIENT_ROLE = "Client";
 
     private static int currentClientId = 1;
     private static string currentRole = "Client";
