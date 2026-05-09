@@ -111,19 +111,33 @@
                 <TextBlock Text="{x:Bind ViewModel.SelectedMeal.Name, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" />
                 <TextBlock Text="{x:Bind ViewModel.SelectedMeal.Description, Mode=OneWay}" TextWrapping="Wrap" />
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Border x:Load="{x:Bind ViewModel.IsSelectedMealVegan, Mode=OneWay}" Background="#2E7D32" CornerRadius="12" Padding="8,2">
+                    <Border x:Name="VeganBadge" 
+            x:Load="{x:Bind ViewModel.IsSelectedMealVegan, Mode=OneWay}" 
+            Background="#2E7D32" CornerRadius="12" Padding="8,2">
                         <TextBlock Text="Vegan" Foreground="White" FontSize="11" />
                     </Border>
-                    <Border x:Load="{x:Bind ViewModel.IsSelectedMealKeto, Mode=OneWay}" Background="#8E24AA" CornerRadius="12" Padding="8,2">
+
+                    <Border x:Name="KetoBadge" 
+            x:Load="{x:Bind ViewModel.IsSelectedMealKeto, Mode=OneWay}" 
+            Background="#8E24AA" CornerRadius="12" Padding="8,2">
                         <TextBlock Text="Keto" Foreground="White" FontSize="11" />
                     </Border>
-                    <Border x:Load="{x:Bind ViewModel.IsSelectedMealGlutenFree, Mode=OneWay}" Background="#EF6C00" CornerRadius="12" Padding="8,2">
+
+                    <Border x:Name="GlutenFreeBadge" 
+            x:Load="{x:Bind ViewModel.IsSelectedMealGlutenFree, Mode=OneWay}" 
+            Background="#EF6C00" CornerRadius="12" Padding="8,2">
                         <TextBlock Text="Gluten Free" Foreground="White" FontSize="11" />
                     </Border>
-                    <Border x:Load="{x:Bind ViewModel.IsSelectedMealLactoseFree, Mode=OneWay}" Background="#00838F" CornerRadius="12" Padding="8,2">
+
+                    <Border x:Name="LactoseFreeBadge" 
+            x:Load="{x:Bind ViewModel.IsSelectedMealLactoseFree, Mode=OneWay}" 
+            Background="#00838F" CornerRadius="12" Padding="8,2">
                         <TextBlock Text="Lactose Free" Foreground="White" FontSize="11" />
                     </Border>
-                    <Border x:Load="{x:Bind ViewModel.IsSelectedMealNutFree, Mode=OneWay}" Background="#5D4037" CornerRadius="12" Padding="8,2">
+
+                    <Border x:Name="NutFreeBadge" 
+            x:Load="{x:Bind ViewModel.IsSelectedMealNutFree, Mode=OneWay}" 
+            Background="#5D4037" CornerRadius="12" Padding="8,2">
                         <TextBlock Text="Nut Free" Foreground="White" FontSize="11" />
                     </Border>
                 </StackPanel>
