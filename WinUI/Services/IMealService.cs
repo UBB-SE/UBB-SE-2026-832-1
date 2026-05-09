@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebApi.IServices
+namespace WinUI.IServices
 {
     public interface IMealService
     {
-        Task<IEnumerable<FoodItemDto>> GetFilteredMealsAsync(MealFilterDto filter);
+        Task<IEnumerable<FoodItemDto>> GetFilteredMealsAsync(MealFilterDto filter, int userId);
         Task<FoodItemDto?> GetByIdAsync(int id);
-        Task ToggleFavoriteAsync(int userId, int mealId, bool isFavorite);
+        Task ToggleFavoriteAsync(FavoriteRequestDto request);
         Task<string> GetFormattedIngredientsAsync(int mealId);
     }
 }

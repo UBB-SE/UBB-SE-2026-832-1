@@ -11,6 +11,7 @@ namespace ClassLibrary.IRepositories
     public interface IMealRepository
     {
         Task<IEnumerable<Meal>> GetFilteredMealsAsync(MealFilterDto filter, int userId);
+        Task<List<IngredientDataTransferObject>> GetIngredientsForMealAsync(int mealId);
         Task<Meal?> GetByIdAsync(int id);
         Task SetFavoriteAsync(int userId, int mealId, bool isFavorite);
         Task AddAsync(Meal entity);

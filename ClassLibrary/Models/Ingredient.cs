@@ -13,4 +13,6 @@ public sealed class Ingredient
     public double CarbohydratesPer100g { get; set; }
 
     public double FatPer100g { get; set; }
+
+    public double Quantity { get; set; }
 }
