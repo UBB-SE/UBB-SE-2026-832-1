@@ -118,13 +118,19 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
             ApplySummary(summaryTask.Result);
             ApplyBuckets(bucketsTask.Result);
             ApplyHistory(historyTask.Result, clientId);
-
-            IsLoadingSummary = false;
-            IsLoadingChart = false;
-            IsLoadingHistory = false;
         }
         catch (OperationCanceledException)
         {
+            // Normal cancellation, no action needed
+        }
+        catch (Exception ex)
+        {
+            // Silently handle other exceptions to prevent crashes
+            // Set safe default values for UI
+            ShowEmptyState = true;
+            TotalWorkouts = 0;
+            ActiveTimeSevenDaysDisplay = "—";
+            PreferredWorkoutDisplay = "—";
         }
         finally
         {
@@ -149,6 +155,15 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
+            // Normal cancellation, no action needed
+        }
+        catch (Exception ex)
+        {
+            // Silently handle exceptions to prevent crashes
+            // Show empty state if loading fails
+            ShowEmptyState = true;
+            HistoryItems.Clear();
+            UpdatePaginationButtons();
         }
         finally
         {

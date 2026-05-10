@@ -14,27 +14,63 @@ public sealed class ClientDashboardService : IClientDashboardService
         this.httpClient = httpClient;
     }
 
-    public Task<DashboardSummary> GetDashboardSummaryAsync(int clientId)
+    public async Task<DashboardSummary> GetDashboardSummaryAsync(int clientId)
     {
-        return Task.FromResult(new DashboardSummary());
+        try
+        {
+            var result = await httpClient.GetFromJsonAsync<DashboardSummary>(
+                $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/dashboard-summary");
+            return result ?? new DashboardSummary();
+        }
+        catch
+        {
+            // Return safe empty data on error
+            return new DashboardSummary();
+        }
     }
 
-    public Task<IReadOnlyList<ConsistencyWeekBucket>> GetConsistencyLastFourWeeksAsync(int clientId)
+    public async Task<IReadOnlyList<ConsistencyWeekBucket>> GetConsistencyLastFourWeeksAsync(int clientId)
     {
-        return Task.FromResult<IReadOnlyList<ConsistencyWeekBucket>>([]);
+        try
+        {
+            var result = await httpClient.GetFromJsonAsync<List<ConsistencyWeekBucket>>(
+                $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/consistency-four-weeks");
+            return result ?? new List<ConsistencyWeekBucket>();
+        }
+        catch
+        {
+            // Return safe empty data on error
+            return new List<ConsistencyWeekBucket>();
+        }
     }
 
     public async Task<WorkoutHistoryPageResult> GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize)
     {
-        var items = await httpClient.GetFromJsonAsync<List<WorkoutHistoryRow>>(
-            $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/workout-history");
-        return new WorkoutHistoryPageResult { TotalCount = items?.Count ?? 0, Items = items ?? [] };
+        try
+        {
+            var result = await httpClient.GetFromJsonAsync<WorkoutHistoryPageResult>(
+                $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/workout-history?page={page}&pageSize={pageSize}");
+            return result ?? new WorkoutHistoryPageResult { TotalCount = 0, Items = new List<WorkoutHistoryRow>() };
+        }
+        catch
+        {
+            // Return safe empty data on error
+            return new WorkoutHistoryPageResult { TotalCount = 0, Items = new List<WorkoutHistoryRow>() };
+        }
     }
 
     public async Task<IReadOnlyList<AchievementDataTransferObject>> GetRecentAchievementsAsync(int clientId)
     {
-        var achievements = await httpClient.GetFromJsonAsync<List<AchievementDataTransferObject>>(
-            $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/achievements");
-        return achievements ?? [];
+        try
+        {
+            var result = await httpClient.GetFromJsonAsync<List<AchievementDataTransferObject>>(
+                $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/achievements");
+            return result ?? new List<AchievementDataTransferObject>();
+        }
+        catch
+        {
+            // Return safe empty data on error
+            return new List<AchievementDataTransferObject>();
+        }
     }
 }
