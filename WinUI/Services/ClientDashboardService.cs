@@ -74,7 +74,6 @@ public sealed class ClientDashboardService : IClientDashboardService
 
             var exercises = log.Exercises ?? new List<LoggedExerciseDataTransferObject>();
 
-            // Keep 0-calorie exercises visible in the breakdown.
             var exerciseCalories = exercises
                 .GroupBy(exercise => exercise.ExerciseName)
                 .Select(group => new ExerciseCalorieInfo
@@ -94,6 +93,21 @@ public sealed class ClientDashboardService : IClientDashboardService
                     ActualWeight = set.ActualWeight,
                 })
                 .ToList();
+
+            // If exercise calorie entries are missing, still show each exercise name with 0 kcal.
+            if (exerciseCalories.Count == 0)
+            {
+                exerciseCalories = sets
+                    .Select(set => set.ExerciseName)
+                    .Where(exerciseName => !string.IsNullOrWhiteSpace(exerciseName))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .Select(exerciseName => new ExerciseCalorieInfo
+                    {
+                        ExerciseName = exerciseName,
+                        CaloriesBurned = 0,
+                    })
+                    .ToList();
+            }
 
             return new WorkoutSessionDetail
             {

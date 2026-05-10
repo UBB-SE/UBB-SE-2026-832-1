@@ -97,12 +97,6 @@ public sealed partial class WorkoutHistoryItemViewModel : ObservableObject
         TotalCaloriesBurned = detail.TotalCaloriesBurned;
         OnPropertyChanged(nameof(TotalCaloriesBurned));
 
-        ExerciseCalories.Clear();
-        foreach (var calorie in detail.ExerciseCalories)
-        {
-            ExerciseCalories.Add(calorie);
-        }
-
         ExerciseSetGroups.Clear();
         var grouped = detail.Sets.GroupBy(set => set.ExerciseName).ToList();
         foreach (var group in grouped)
@@ -120,6 +114,24 @@ public sealed partial class WorkoutHistoryItemViewModel : ObservableObject
                 exerciseGroup.Sets.Add(setVm);
             }
             ExerciseSetGroups.Add(exerciseGroup);
+        }
+
+        ExerciseCalories.Clear();
+        foreach (var calorie in detail.ExerciseCalories)
+        {
+            ExerciseCalories.Add(calorie);
+        }
+
+        if (ExerciseCalories.Count == 0)
+        {
+            foreach (var group in grouped)
+            {
+                ExerciseCalories.Add(new ExerciseCalorieInfo
+                {
+                    ExerciseName = group.Key,
+                    CaloriesBurned = 0,
+                });
+            }
         }
     }
 
