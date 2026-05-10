@@ -23,7 +23,7 @@
     </Page.Transitions>
 
     <Grid>
-        <!-- Left-align content: narrow MaxWidth inside ScrollViewer is centered by default and leaves a huge gap next to the nav pane. -->
+        
         <ScrollViewer
             VerticalScrollBarVisibility="Auto"
             HorizontalScrollBarVisibility="Disabled"
@@ -39,7 +39,7 @@
                     </TransitionCollection>
                 </StackPanel.ChildrenTransitions>
 
-                <!-- Header row -->
+                
                 <Grid>
                     <TextBlock
                         Text="Analytics Dashboard"
@@ -57,10 +57,10 @@
 
 
 
-                <!-- KPI Summary Cards -->
+                
                 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="20">
 
-                    <!-- Total Workouts -->
+                    
                     <Border
                         Grid.Column="0"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -85,7 +85,7 @@
                         </Grid>
                     </Border>
 
-                    <!-- Active Time (7 Days) -->
+                    
                     <Border
                         Grid.Column="1"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -110,7 +110,7 @@
                         </Grid>
                     </Border>
 
-                    <!-- Preferred Workout -->
+                    
                     <Border
                         Grid.Column="2"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -137,7 +137,7 @@
                     </Border>
                 </Grid>
 
-                <!-- Consistency analytics -->
+                
                 <Border
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -170,12 +170,12 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Workout History -->
+                
                 <StackPanel Spacing="16">
                     <TextBlock Text="Workout History"
                                Style="{StaticResource SubtitleTextBlockStyle}" />
 
-                    <!-- Header Row for the history list -->
+                    
                     <Grid Padding="16,8" Margin="0,0,48,0" ColumnDefinitions="2*,*,*,Auto"
                           Visibility="{x:Bind ViewModel.ShowEmptyState, Mode=OneWay, Converter={StaticResource BoolToVisibility}, ConverterParameter=Invert}">
                         <TextBlock Text="WORKOUT" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -232,7 +232,7 @@
                                                 HorizontalAlignment="Center"
                                                 Margin="0,8" />
 
-                                            <!-- Total Calories Burned Summary -->
+                                            
                                             <Border Background="{ThemeResource AccentFillColorSecondaryBrush}"
                                                     CornerRadius="4"
                                                     Padding="16,12"
@@ -248,7 +248,7 @@
                                                 </StackPanel>
                                             </Border>
 
-                                            <!-- Calories by Exercise Section -->
+                                            
                                             <StackPanel Margin="44,0,0,16"
                                                        Visibility="{x:Bind IsLoadingDetail, Mode=OneWay, Converter={StaticResource BoolToVisibility}, ConverterParameter=Invert}">
                                                 <TextBlock Text="Calories by Exercise"
@@ -315,7 +315,7 @@
                         </ItemsRepeater.ItemTemplate>
                     </ItemsRepeater>
 
-                    <!-- Loading spinner for history -->
+                    
                     <ProgressRing
                         IsActive="{x:Bind ViewModel.IsLoadingHistory, Mode=OneWay}"
                         Visibility="{x:Bind ViewModel.IsLoadingHistory, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"
@@ -323,7 +323,7 @@
                         HorizontalAlignment="Center"
                         Margin="0,16" />
 
-                    <!-- Empty state -->
+                    
                     <StackPanel
                         Visibility="{x:Bind ViewModel.ShowEmptyState, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"
                         HorizontalAlignment="Center"
@@ -370,7 +370,7 @@
                         </ItemsControl>
                     </StackPanel>
 
-                    <!-- Pagination controls -->
+                    
                     <Grid
                         ColumnDefinitions="Auto,*,Auto"
                         Margin="0,16,0,0"
