@@ -334,7 +334,7 @@
                         Margin="0,16,0,0"
                         Visibility="{x:Bind ViewModel.ShowEmptyState, Mode=OneWay, Converter={StaticResource BoolToVisibility}, ConverterParameter=Invert}">
                         <Button Content="Previous"
-                                Command="{x:Bind ViewModel.PreviousPageAsyncCommand}"
+                                Command="{x:Bind ViewModel.PreviousPageCommand}"
                                 IsEnabled="{x:Bind ViewModel.CanGoPrevious, Mode=OneWay}">
                             <Button.ContentTemplate>
                                 <DataTemplate>
@@ -352,7 +352,7 @@
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center" />
                         <Button Grid.Column="2"
-                                Command="{x:Bind ViewModel.NextPageAsyncCommand}"
+                                Command="{x:Bind ViewModel.NextPageCommand}"
                                 IsEnabled="{x:Bind ViewModel.CanGoNext, Mode=OneWay}">
                             <Button.ContentTemplate>
                                 <DataTemplate>
