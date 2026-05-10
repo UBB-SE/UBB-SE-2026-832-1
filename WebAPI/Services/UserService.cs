@@ -9,10 +9,11 @@ namespace WebAPI.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository userRepository;
-
-    public UserService(IUserRepository userRepository)
+    private readonly IClientRepository clientRepository;
+    public UserService(IUserRepository userRepository, IClientRepository clientRepository)
     {
         this.userRepository = userRepository;
+        this.clientRepository = clientRepository;
     }
 
     public async Task<IReadOnlyList<UserDto>> GetUsersAsync()
@@ -61,6 +62,15 @@ public class UserService : IUserService
         };
 
         await this.userRepository.AddAsync(user);
+        if (role == "Client")
+        {
+            var client = new Client
+            {
+                ClientId = user.UserId
+            };
+
+            await this.clientRepository.AddAsync(client);
+        }
 
         return new UserDto
         {
