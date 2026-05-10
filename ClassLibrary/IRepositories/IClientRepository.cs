@@ -5,4 +5,5 @@ namespace ClassLibrary.IRepositories;
 public interface IClientRepository
 {
     Task<Client?> GetByIdAsync(int clientId);
+    Task AddAsync(Client client);
 }

@@ -7,4 +7,5 @@ public sealed class FoodItemIngredient
     public FoodItem FoodItem { get; set; } = default!;
 
     public Ingredient Ingredient { get; set; } = default!;
+    public double QuantityGrams { get; set; }
 }

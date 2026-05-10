@@ -332,6 +332,7 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
                 this.LastCompletedLog = this.activeLog;
                 this.workoutUiState.ProgressionHeadsUp = BuildProgressionHeadsUp(this.activeLog);
                 SaveWorkoutCalendar(this.activeLog);
+                AnalyticsDashboardRefreshBus.Shared.RequestRefresh();
                 this.IsWorkoutStarted = false;
                 this.ExerciseRows.Clear();
                 this.activeLog = new WorkoutLog { Date = DateTime.Now, Client = new Client { ClientId = clientId } };

@@ -31,4 +31,6 @@ public interface IMealPlanRepository
     Task<MealPlan?> GetTodaysMealPlanAsync(int userId);
 
     Task<int> CreateMealPlanAsync(int userId, string goalType);
+
+    Task<IReadOnlyList<FoodItemIngredient>> GetFoodItemIngredientsForMealPlanAsync(int mealPlanId);
 }

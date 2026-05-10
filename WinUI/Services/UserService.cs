@@ -1,48 +1,99 @@
 using ClassLibrary.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 
 namespace WinUI.Services;
 
 public sealed class UserService : IUserService
 {
-    private readonly IUserServiceProxy serviceProxy;
+    private readonly HttpClient httpClient;
+    private readonly IUserServiceProxy? legacyProxy;
+
+    public UserService()
+    {
+        this.httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000/") };
+    }
 
     public UserService(IUserServiceProxy serviceProxy)
     {
-        this.serviceProxy = serviceProxy;
+        this.legacyProxy = serviceProxy;
+        this.httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000/") };
     }
 
-    public Task<IReadOnlyList<UserDto>> GetUsersAsync()
+    public async Task<IReadOnlyList<UserDto>> GetUsersAsync()
     {
-        return this.serviceProxy.GetUsersAsync();
+        var users = await this.httpClient.GetFromJsonAsync<List<UserDto>>($"{ApiBaseUrl.BASE_URL}/api/users");
+        return users ?? new List<UserDto>();
     }
 
-    public Task<UserDto?> LoginAsync(string username, string password)
+    public async Task<UserDto?> LoginAsync(string username, string password)
     {
-        return this.serviceProxy.LoginAsync(username, password);
+        var request = new { Username = username, Password = password };
+        var response = await this.httpClient.PostAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/users/login", request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+
+        return await response.Content.ReadFromJsonAsync<UserDto>();
     }
 
-    public Task<UserDto?> RegisterAsync(string username, string password, string role)
+    public async Task<UserDto?> RegisterAsync(string username, string password, string role)
     {
-        return this.serviceProxy.RegisterAsync(username, password, role);
+        var request = new { Username = username, Password = password, Role = role };
+        var response = await this.httpClient.PostAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/users/register", request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+
+        var user = await response.Content.ReadFromJsonAsync<UserDto>();
+
+        if (user != null && role == "Client")
+        {
+            try
+            {
+                var clientRequest = new { Id = user.Id, UserId = user.Id };
+                await this.httpClient.PostAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/clients", clientRequest);
+            }
+            catch { }
+        }
+
+        return user;
     }
 
-    public Task<bool> CheckIfUsernameExistsAsync(string username)
+    public async Task<bool> CheckIfUsernameExistsAsync(string username)
     {
-        return this.serviceProxy.CheckIfUsernameExistsAsync(username);
+        return await this.httpClient.GetFromJsonAsync<bool>(
+            $"{ApiBaseUrl.BASE_URL}/api/users/exists/{Uri.EscapeDataString(username)}");
     }
 
-    public Task<UserDataDto?> GetUserDataAsync(int userId)
+    public async Task<UserDataDto?> GetUserDataAsync(int userId)
     {
-        return this.serviceProxy.GetUserDataAsync(userId);
+        try
+        {
+            return await this.httpClient.GetFromJsonAsync<UserDataDto>(
+                $"{ApiBaseUrl.BASE_URL}/api/users/{userId}/data");
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
     }
 
-    public Task AddUserDataAsync(UserDataDto userDataDto)
+    public async Task AddUserDataAsync(UserDataDto userDataDto)
     {
-        return this.serviceProxy.AddUserDataAsync(userDataDto);
+        await this.httpClient.PostAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/users/data", userDataDto);
     }
 
-    public Task UpdateUserDataAsync(UserDataDto userDataDto)
+    public async Task UpdateUserDataAsync(UserDataDto userDataDto)
     {
-        return this.serviceProxy.UpdateUserDataAsync(userDataDto);
+        var response = await this.httpClient.PutAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/users/data", userDataDto);
+        response.EnsureSuccessStatusCode();
     }
 }

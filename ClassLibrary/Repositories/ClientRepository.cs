@@ -19,4 +19,10 @@ public sealed class ClientRepository : IClientRepository
         return await this.databaseContext.Clients
             .FirstOrDefaultAsync(client => client.ClientId == clientId);
     }
+    public async Task AddAsync(Client client)
+    {
+        this.databaseContext.Clients.Add(client);
+
+        await this.databaseContext.SaveChangesAsync();
+    }
 }
