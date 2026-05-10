@@ -1,5 +1,4 @@
 using ClassLibrary.DTOs.Analytics;
-using ClassLibrary.Models.Analytics;
 
 namespace WinUI.Services;
 
@@ -61,8 +60,8 @@ public sealed class StubWorkoutAnalyticsStore : IWorkoutAnalyticsStore
         });
     }
 
-    public Task<WorkoutSessionDetail?> GetWorkoutSessionDetailAsync(long clientId, int workoutLogId, CancellationToken cancellationToken = default)
+    public Task<ClassLibrary.Models.Analytics.WorkoutSessionDetail?> GetWorkoutSessionDetailAsync(long clientId, int workoutLogId, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<WorkoutSessionDetail?>(null);
+        return Task.FromResult<ClassLibrary.Models.Analytics.WorkoutSessionDetail?>(null);
     }
-}
+

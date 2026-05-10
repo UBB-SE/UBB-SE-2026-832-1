@@ -1,5 +1,4 @@
 using ClassLibrary.DTOs.Analytics;
-using ClassLibrary.Models.Analytics;
 
 namespace WinUI.Services;
 
@@ -17,5 +16,5 @@ public interface IWorkoutAnalyticsStore
 
     Task<WorkoutHistoryPageResult> GetWorkoutHistoryPageAsync(long clientId, int pageIndex, int pageSize, CancellationToken cancellationToken = default);
 
-    Task<WorkoutSessionDetail?> GetWorkoutSessionDetailAsync(long clientId, int workoutLogId, CancellationToken cancellationToken = default);
+    Task<ClassLibrary.Models.Analytics.WorkoutSessionDetail?> GetWorkoutSessionDetailAsync(long clientId, int workoutLogId, CancellationToken cancellationToken = default);
 }
