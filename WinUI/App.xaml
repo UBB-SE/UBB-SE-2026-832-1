@@ -22,6 +22,7 @@
             <converters:UnansweredToHighlightConverter x:Key="UnansweredToHighlightConverter" />
             <converters:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter" />
             <converters:UnansweredToForegroundConverter x:Key="UnansweredToForegroundConverter" />
+            <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
             
         </ResourceDictionary>
     </Application.Resources>

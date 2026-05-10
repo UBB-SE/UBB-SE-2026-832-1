@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.Extensions.DependencyInjection;
 using WinUI.ViewModels;
 using ClassLibrary.DTOs;
 
@@ -9,10 +10,11 @@ public sealed partial class RemindersPage : Page
 {
     public RemindersViewModel ViewModel { get; }
 
-    public RemindersPage(RemindersViewModel viewModel)
+    public RemindersPage()
     {
         this.InitializeComponent();
-        this.ViewModel = viewModel;
+
+        this.ViewModel = App.Services.GetRequiredService<RemindersViewModel>();
         this.DataContext = this.ViewModel;
 
         this.Loaded += async (s, e) => await this.ViewModel.LoadRemindersAsync();

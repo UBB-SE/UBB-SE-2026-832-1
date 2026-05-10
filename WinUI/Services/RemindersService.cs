@@ -1,4 +1,54 @@
-﻿using System.Net.Http.Json;
+﻿using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using ClassLibrary.DTOs;
+using WinUI.Services.Interfaces;
+
+namespace WinUI.Services;
+
+public sealed class RemindersService : IRemindersService
+{
+    private readonly HttpClient httpClient;
+
+    public RemindersService(HttpClient httpClient)
+    {
+        this.httpClient = httpClient;
+    }
+
+    public async Task<IReadOnlyList<ReminderDto>> GetUserRemindersAsync(int userId)
+    {
+        var reminders = await this.httpClient.GetFromJsonAsync<List<ReminderDto>>($"api/reminder-management/user/{userId}");
+        return reminders ?? new List<ReminderDto>();
+    }
+
+    public async Task<ReminderDto?> GetNextReminderAsync(int userId)
+    {
+        return await this.httpClient.GetFromJsonAsync<ReminderDto>($"api/reminder-management/user/{userId}/next");
+    }
+
+    public async Task<bool> SaveReminderAsync(ReminderDto reminder)
+    {
+        var response = await this.httpClient.PostAsJsonAsync("api/reminder-management/save-reminder", reminder);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task DeleteReminderAsync(int id)
+    {
+        await this.httpClient.DeleteAsync($"api/reminder-management/{id}");
+    }
+
+    public async Task<ReminderDto?> GetReminderByIdAsync(int id)
+    {
+        return await this.httpClient.GetFromJsonAsync<ReminderDto>($"api/reminder-management/{id}");
+    }
+}
+
+
+
+
+
+/*using System.Net.Http.Json;
 using ClassLibrary.DTOs;
 namespace WinUI.Services;
 
@@ -39,4 +89,4 @@ public sealed class RemindersService : IRemindersService
         var response = await this.httpClient.DeleteAsync($"{ApiBaseUrl.BASE_URL}/api/reminders/{id}");
         response.EnsureSuccessStatusCode();
     }
-}
+}*/
