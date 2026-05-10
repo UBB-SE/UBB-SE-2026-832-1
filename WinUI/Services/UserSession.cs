@@ -1,35 +1,59 @@
-using System;
-
 namespace WinUI.Services;
 
 public sealed class UserSession : IUserSession
 {
-public const string CLIENT_ROLE = "Client";
+    public const string CLIENT_ROLE = "Client";
 
     private static int currentClientId = 1;
     private static string currentRole = "Nutritionist";
 
-    public int CurrentClientId => currentClientId;
-
-    public string CurrentRole => currentRole;
-
-    public string CurrentUserRole { get; set; } = currentRole;
-
-    public bool IsClient => string.Equals(this.CurrentUserRole, CLIENT_ROLE, System.StringComparison.OrdinalIgnoreCase);
-
-    public static void SetCurrentSession(int clientId, string role)
+    public int CurrentClientId
     {
-        currentClientId = clientId;
-        currentRole = NormalizeRole(role);
+        get => currentClientId;
+        set => currentClientId = value;
     }
 
-    private static string NormalizeRole(string role)
+    public string CurrentRole
     {
-        if (string.Equals(role, "User", StringComparison.OrdinalIgnoreCase))
-        {
-            return "Client";
-        }
+        get => currentRole;
+        set => currentRole = value;
+    }
 
-        return role;
+    public string CurrentUserRole
+    {
+        get => currentRole;
+        set => currentRole = value;
+    }
+
+    public bool IsClient => currentRole == CLIENT_ROLE;
+
+    public static int? UserId { get; set; }
+
+    public static int? ClientId { get; set; }
+
+    public static string Role
+    {
+        get => currentRole;
+        set => currentRole = value;
+    }
+
+    public static void SetCurrentSession(int userId, string role)
+    {
+        UserId = userId;
+        currentRole = role;
+
+        if (role == CLIENT_ROLE)
+        {
+            ClientId = userId;
+            currentClientId = userId;
+        }
+    }
+
+    public static void Clear()
+    {
+        UserId = null;
+        ClientId = null;
+        currentRole = string.Empty;
+        currentClientId = 0;
     }
 }
