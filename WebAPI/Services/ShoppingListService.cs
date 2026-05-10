@@ -29,44 +29,100 @@ namespace WebAPI.Services
 
         public async Task GenerateShoppingListFromMealPlanAsync(int userId)
         {
-            var mealPlans = await mealPlanRepository.GetByUserIdAsync(userId);
-            var latestMealPlan = mealPlans
-                .OrderByDescending(mp => mp.MealPlanId)
+            var latestMealPlan =
+                (await mealPlanRepository.GetByUserIdAsync(userId))
+                .OrderByDescending(
+                    mealPlan => mealPlan.MealPlanId)
                 .FirstOrDefault();
 
-            if (latestMealPlan == null) return;
+            if (latestMealPlan == null)
+            {
+                return;
+            }
 
-            var ingredientIds = await mealPlanRepository.GetIngredientIdsForMealPlanAsync(latestMealPlan.MealPlanId);
-            var inventoryItems = await inventoryRepository.GetAllByUserIdAsync(userId);
-            var existingShoppingItems = await shoppingRepository.GetAllByUserIdAsync(userId);
+            var foodItemIngredients =
+                await mealPlanRepository
+                    .GetFoodItemIngredientsForMealPlanAsync(
+                        latestMealPlan.MealPlanId);
+
+            var inventoryItems =
+                await inventoryRepository.GetAllByUserIdAsync(userId);
+
+            var existingShoppingItems =
+                await shoppingRepository.GetAllByUserIdAsync(userId);
 
             var inventoryByIngredientId = inventoryItems
-                .GroupBy(inv => inv.Ingredient.IngredientId)
-                .ToDictionary(g => g.Key, g => g.Sum(inv => (double)inv.QuantityGrams));
+                .GroupBy(
+                    inventoryItem =>
+                        inventoryItem.Ingredient.IngredientId)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Sum(
+                        inventoryItem =>
+                            (double)inventoryItem.QuantityGrams));
 
             var shoppingByIngredientId = existingShoppingItems
-                .GroupBy(si => si.Ingredient.IngredientId)
-                .ToDictionary(g => g.Key, g => g.Sum(si => si.QuantityGrams));
+                .GroupBy(
+                    shoppingItem =>
+                        shoppingItem.Ingredient.IngredientId)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Sum(
+                        shoppingItem =>
+                            shoppingItem.QuantityGrams));
 
-            const double requiredQty = 100.0;
-
-            foreach (var ingredientId in ingredientIds.Distinct())
-            {
-                var existingInventoryQty = inventoryByIngredientId.GetValueOrDefault(ingredientId, 0);
-                var existingShoppingQty = shoppingByIngredientId.GetValueOrDefault(ingredientId, 0);
-                var totalNeeded = requiredQty - (existingInventoryQty + existingShoppingQty);
-
-                if (totalNeeded > 0)
+            var requiredIngredients = foodItemIngredients
+                .GroupBy(
+                    foodItemIngredient =>
+                        foodItemIngredient.Ingredient.IngredientId)
+                .Select(group => new
                 {
-                    var item = new ShoppingItem
-                    {
-                        User = new User { UserId = userId },
-                        Ingredient = new Ingredient { IngredientId = ingredientId },
-                        QuantityGrams = totalNeeded,
-                        IsChecked = false
-                    };
-                    await shoppingRepository.AddAsync(item);
+                    IngredientId = group.Key,
+
+                    TotalRequiredGrams = group.Sum(
+                        foodItemIngredient =>
+                            foodItemIngredient.QuantityGrams)
+                });
+
+            foreach (var requiredIngredient in requiredIngredients)
+            {
+                var existingInventoryQty =
+                    inventoryByIngredientId.GetValueOrDefault(
+                        requiredIngredient.IngredientId,
+                        0);
+
+                var existingShoppingQty =
+                    shoppingByIngredientId.GetValueOrDefault(
+                        requiredIngredient.IngredientId,
+                        0);
+
+                var totalNeeded =
+                    requiredIngredient.TotalRequiredGrams
+                    - (existingInventoryQty + existingShoppingQty);
+
+                if (totalNeeded <= 0)
+                {
+                    continue;
                 }
+
+                var item = new ShoppingItem
+                {
+                    User = new User
+                    {
+                        UserId = userId
+                    },
+
+                    Ingredient = new Ingredient
+                    {
+                        IngredientId =
+                            requiredIngredient.IngredientId
+                    },
+
+                    QuantityGrams = totalNeeded,
+                    IsChecked = false
+                };
+
+                await shoppingRepository.AddAsync(item);
             }
         }
 
