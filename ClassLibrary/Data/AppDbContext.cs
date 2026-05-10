@@ -123,6 +123,7 @@ public sealed class AppDbContext : DbContext
         {
             entity.HasOne(dailyLog => dailyLog.User)
                 .WithMany()
+                .HasForeignKey(dailyLog => dailyLog.UserId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -218,7 +219,7 @@ public sealed class AppDbContext : DbContext
         {
             entity.HasOne(workoutLog => workoutLog.Client)
                 .WithMany(client => client.WorkoutLogs)
-                .HasForeignKey("ClientId")
+                .HasForeignKey(workoutLog => workoutLog.ClientId)
                 .IsRequired();
         });
 

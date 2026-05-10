@@ -49,12 +49,12 @@ public sealed class DailyLogService : IDailyLogService
         };
     }
 
-    private static UserDataDto MapToUserDataDto(UserData userData)
+    private static UserDataDto MapToUserDataDto(UserData userData, int userId)
     {
         return new UserDataDto
         {
             UserDataId = userData.UserDataId,
-            UserId = userData.User.UserId,
+            UserId = userId,
             Weight = userData.Weight,
             Height = userData.Height,
             Age = userData.Age,
@@ -110,7 +110,7 @@ public sealed class DailyLogService : IDailyLogService
             return null;
         }
 
-        return MapToUserDataDto(userData);
+        return MapToUserDataDto(userData, userId);
     }
 
     public async Task<double> GetTodayBurnedCaloriesAsync(int userId)
