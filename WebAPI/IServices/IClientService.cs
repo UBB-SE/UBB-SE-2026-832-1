@@ -1,4 +1,5 @@
 using ClassLibrary.DTOs;
+using ClassLibrary.DTOs.Analytics;
 
 namespace WebAPI.IServices;
 
@@ -11,6 +12,12 @@ public interface IClientService
     Task<NutritionPlanDataTransferObject?> GetActiveNutritionPlanAsync(int clientId);
 
     Task<IReadOnlyList<WorkoutLogDataTransferObject>> GetWorkoutHistoryAsync(int clientId);
+
+    Task<WorkoutHistoryPageResult> GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize);
+
+    Task<DashboardSummary> GetDashboardSummaryAsync(int clientId);
+
+    Task<IReadOnlyList<ConsistencyWeekBucket>> GetConsistencyLastFourWeeksAsync(int clientId);
 
     Task<bool> FinalizeWorkoutAsync(FinalizeWorkoutRequestDataTransferObject request);
 

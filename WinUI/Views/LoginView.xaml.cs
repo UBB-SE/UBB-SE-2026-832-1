@@ -11,8 +11,8 @@ public sealed partial class LoginView : Page
 
     public LoginView()
     {
-        this.InitializeComponent();
         this.ViewModel = new UserViewModel(new UserService());
+        this.InitializeComponent();
 
         this.ViewModel.LoginSuccess += (s, e) => this.Frame.Navigate(typeof(MainWindowView));
         this.ViewModel.NavigateToRegister += (s, e) => this.Frame.Navigate(typeof(RegisterView));
