@@ -1,4 +1,7 @@
-﻿using System.Net.Http.Json;
+﻿using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 using ClassLibrary.DTOs;
 
 namespace WinUI.Services;
@@ -29,6 +32,12 @@ public sealed class DailyLogService : IDailyLogService
         return totals ?? new DailyLogTotalsDto();
     }
 
+    public async Task<DailyLogTotalsDto> GetWeekTotalsAsync(int userId)
+    {
+        var totals = await this.httpClient.GetFromJsonAsync<DailyLogTotalsDto>($"{ApiBaseUrl.BASE_URL}/api/dailylog/user/{userId}/week");
+        return totals ?? new DailyLogTotalsDto();
+    }
+
     public async Task<UserDataDto?> GetNutritionTargetsAsync(int userId)
     {
         return await this.httpClient.GetFromJsonAsync<UserDataDto>($"{ApiBaseUrl.BASE_URL}/api/dailylog/user/{userId}/targets");
@@ -37,6 +46,11 @@ public sealed class DailyLogService : IDailyLogService
     public async Task<double> GetTodayBurnedCaloriesAsync(int userId)
     {
         return await this.httpClient.GetFromJsonAsync<double>($"{ApiBaseUrl.BASE_URL}/api/dailylog/user/{userId}/burned-calories");
+    }
+
+    public async Task<double> GetWeekBurnedCaloriesAsync(int userId)
+    {
+        return await this.httpClient.GetFromJsonAsync<double>($"{ApiBaseUrl.BASE_URL}/api/dailylog/user/{userId}/week-burned-calories");
     }
 
     public async Task<IReadOnlyList<FoodItemDto>> SearchFoodItemsAsync(string? searchTerm)

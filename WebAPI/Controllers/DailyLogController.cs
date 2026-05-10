@@ -56,6 +56,13 @@ public sealed class DailyLogController : ControllerBase
         return this.Ok(burnedCalories);
     }
 
+    [HttpGet("user/{userId:int}/week-burned-calories")]
+    public async Task<IActionResult> GetWeekBurnedCalories(int userId)
+    {
+        var burnedCalories = await this.dailyLogService.GetWeekBurnedCaloriesAsync(userId);
+        return this.Ok(burnedCalories);
+    }
+
     [HttpGet("fooditems/search")]
     public async Task<IActionResult> SearchFoodItems([FromQuery] string? searchTerm)
     {

@@ -24,7 +24,6 @@ public sealed class ClientDashboardService : IClientDashboardService
         }
         catch
         {
-            // Return safe empty data on error
             return new DashboardSummary();
         }
     }
@@ -39,7 +38,6 @@ public sealed class ClientDashboardService : IClientDashboardService
         }
         catch
         {
-            // Return safe empty data on error
             return new List<ConsistencyWeekBucket>();
         }
     }
@@ -54,8 +52,84 @@ public sealed class ClientDashboardService : IClientDashboardService
         }
         catch
         {
-            // Return safe empty data on error
             return new WorkoutHistoryPageResult { TotalCount = 0, Items = new List<WorkoutHistoryRow>() };
+        }
+    }
+
+    public async Task<WorkoutSessionDetail?> GetWorkoutSessionDetailAsync(int clientId, int workoutLogId)
+    {
+        try
+        {
+            var history = await httpClient.GetFromJsonAsync<List<WorkoutLogDataTransferObject>>(
+                $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/workout-history");
+
+            var log = history?.FirstOrDefault(item => item.WorkoutLogId == workoutLogId);
+            if (log == null)
+            {
+                return null;
+            }
+
+            var exercises = log.Exercises ?? new List<LoggedExerciseDataTransferObject>();
+
+            var exerciseCalories = exercises
+                .Where(exercise => !string.IsNullOrWhiteSpace(exercise.ExerciseName))
+                .GroupBy(exercise => exercise.ExerciseName)
+                .Select(group => new ExerciseCalorieInfo
+                {
+                    ExerciseName = group.Key,
+                    CaloriesBurned = Math.Max(0, group.Sum(exercise => exercise.ExerciseCaloriesBurned)),
+                })
+                .ToList();
+
+            var sets = exercises
+                .SelectMany(exercise => exercise.Sets)
+                .Select(set => new WorkoutSetRow
+                {
+                    ExerciseName = set.ExerciseName,
+                    SetIndex = set.SetIndex,
+                    ActualReps = set.ActualReps,
+                    ActualWeight = set.ActualWeight,
+                })
+                .ToList();
+
+            var caloriesByExercise = exerciseCalories
+                .ToDictionary(item => item.ExerciseName, item => item.CaloriesBurned, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var exerciseName in sets
+                .Select(set => set.ExerciseName)
+                .Where(exerciseName => !string.IsNullOrWhiteSpace(exerciseName))
+                .Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                if (!caloriesByExercise.ContainsKey(exerciseName))
+                {
+                    caloriesByExercise[exerciseName] = 0;
+                }
+            }
+
+            exerciseCalories = caloriesByExercise
+                .Select(pair => new ExerciseCalorieInfo
+                {
+                    ExerciseName = pair.Key,
+                    CaloriesBurned = pair.Value,
+                })
+                .OrderBy(item => item.ExerciseName, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            return new WorkoutSessionDetail
+            {
+                WorkoutLogId = log.WorkoutLogId,
+                WorkoutName = log.WorkoutName,
+                LogDate = log.Date,
+                DurationSeconds = (int)Math.Max(0, log.Duration.TotalSeconds),
+                TotalCaloriesBurned = log.TotalCaloriesBurned,
+                IntensityTag = log.IntensityTag,
+                ExerciseCalories = exerciseCalories,
+                Sets = sets,
+            };
+        }
+        catch
+        {
+            return null;
         }
     }
 
@@ -69,7 +143,6 @@ public sealed class ClientDashboardService : IClientDashboardService
         }
         catch
         {
-            // Return safe empty data on error
             return new List<AchievementDataTransferObject>();
         }
     }

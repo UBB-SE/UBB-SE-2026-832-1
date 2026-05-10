@@ -33,7 +33,7 @@ public sealed class DailyLogRepository : IDailyLogRepository
     {
         return await this.databaseContext.DailyLogs
             .AsNoTracking()
-            .AnyAsync(dailyLog => dailyLog.User.UserId == userId);
+            .AnyAsync(dailyLog => dailyLog.UserId == userId);
     }
 
     public async Task<bool> HasFoodItemLoggedTodayAsync(int userId, int foodItemId)
@@ -44,7 +44,7 @@ public sealed class DailyLogRepository : IDailyLogRepository
         return await this.databaseContext.DailyLogs
             .AsNoTracking()
             .AnyAsync(dailyLog =>
-                dailyLog.User.UserId == userId &&
+                dailyLog.UserId == userId &&
                 dailyLog.FoodItem != null &&
                 dailyLog.FoodItem.FoodItemId == foodItemId &&
                 dailyLog.LoggedAt >= todayUtc &&
@@ -55,7 +55,7 @@ public sealed class DailyLogRepository : IDailyLogRepository
     {
         var logs = await this.databaseContext.DailyLogs
             .AsNoTracking()
-            .Where(dailyLog => dailyLog.User.UserId == userId && dailyLog.LoggedAt >= startInclusive && dailyLog.LoggedAt < endExclusive)
+            .Where(dailyLog => dailyLog.UserId == userId && dailyLog.LoggedAt >= startInclusive && dailyLog.LoggedAt < endExclusive)
             .ToListAsync();
 
         if (logs.Count == 0)

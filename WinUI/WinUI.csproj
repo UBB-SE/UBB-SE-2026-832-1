@@ -34,8 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Views\Reminders\RemindersPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Folder Include="Views\MealSearch\" />
   </ItemGroup>
 </Project>

@@ -11,5 +11,7 @@ public interface IClientDashboardService
 
     Task<WorkoutHistoryPageResult> GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize);
 
+    Task<WorkoutSessionDetail?> GetWorkoutSessionDetailAsync(int clientId, int workoutLogId);
+
     Task<IReadOnlyList<AchievementDataTransferObject>> GetRecentAchievementsAsync(int clientId);
 }

@@ -1,58 +1,64 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using ClassLibrary.Filters;
+using ClassLibrary.Models;
 using WinUI.Services;
+using System.Collections.Generic;
 
-
-namespace WinUI.ViewModels;
-
-public partial class MealSearchViewModel : ObservableObject
+namespace WinUI.ViewModels
 {
-    private readonly IMealSearchService mealSearchService;
-
-    
-    [ObservableProperty]
-    private string searchQuery = string.Empty;
-
-    [ObservableProperty]
-    private bool isSearching;
-
-    
-    public ObservableCollection<object> MealSearchResults { get; } = new ObservableCollection<object>();
-
-    public MealSearchViewModel(IMealSearchService mealSearchService)
+    public partial class MealSearchViewModel : ObservableObject
     {
-        this.mealSearchService = mealSearchService;
-    }
+        private readonly IMealService _mealService;
 
-    [RelayCommand]
-    public async Task ExecuteMealSearchAsync()
-    {
-        if (string.IsNullOrWhiteSpace(searchQuery))
+        public ObservableCollection<FoodItem> Meals { get; private set; } = new ObservableCollection<FoodItem>();
+
+        public string SearchTerm { get; set; } = string.Empty;
+
+        public FoodItem? SelectedMeal { get; set; }
+
+        public MealSearchViewModel(IMealService mealService)
         {
-            return;
+            _mealService = mealService;
+            _ = LoadMealsAsync();
         }
 
-        try
+        public async Task LoadMealsAsync(string? filter = null)
         {
-            IsSearching = true;
-            MealSearchResults.Clear();
+            var list = await _mealService.SearchMealsAsync(new FoodItemFilter { SearchTerm = filter ?? "" });
+            Meals = new ObservableCollection<FoodItem>(list);
+            OnPropertyChanged(nameof(Meals));
+        }
 
-           
-            await mealSearchService.SearchMealsAsync();
+        public async Task<List<FoodItem>> SearchMealsAsync(FoodItemFilter filter)
+        {
+            var list = await _mealService.SearchMealsAsync(filter);
+            Meals = new ObservableCollection<FoodItem>(list);
+            OnPropertyChanged(nameof(Meals));
+            return new List<FoodItem>(list);
+        }
 
+        public async Task<string> GetMealIngredientsTextAsync(int mealId)
+        {
+            var lines = await _mealService.GetMealIngredientsAsync(mealId);
+            return lines.Count > 0 ? string.Join("\n", lines) : "No ingredients found.";
+        }
+
+        [RelayCommand]
+        public async Task SearchAsync()
+        {
+            await LoadMealsAsync(SearchTerm);
+        }
+
+        [RelayCommand]
+        public async Task ToggleFavoriteAsync(FoodItem meal)
+        {
+            if (meal == null) return;
             
-        }
-        catch (Exception error)
-        {
-          
-            Console.WriteLine(error.Message);
-        }
-        finally
-        {
-            IsSearching = false;
+            int userId = UserSession.UserId ?? 1;
+            await _mealService.ToggleFavoriteAsync(userId, meal.FoodItemId);
         }
     }
 }

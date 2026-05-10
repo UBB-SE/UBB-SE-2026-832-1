@@ -11,4 +11,6 @@ public interface IWorkoutLogRepository
     Task UpdateWorkoutLogAsync(WorkoutLog log);
 
     Task<double> GetClientWeightAsync(int clientId);
+
+    Task<double> GetTotalCaloriesBurnedForRangeAsync(int userId, DateTime startInclusive, DateTime endExclusive);
 }
