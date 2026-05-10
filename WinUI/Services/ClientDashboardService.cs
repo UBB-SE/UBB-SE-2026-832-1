@@ -75,6 +75,7 @@ public sealed class ClientDashboardService : IClientDashboardService
             var exercises = log.Exercises ?? new List<LoggedExerciseDataTransferObject>();
 
             var exerciseCalories = exercises
+                .Where(exercise => !string.IsNullOrWhiteSpace(exercise.ExerciseName))
                 .GroupBy(exercise => exercise.ExerciseName)
                 .Select(group => new ExerciseCalorieInfo
                 {
@@ -94,20 +95,28 @@ public sealed class ClientDashboardService : IClientDashboardService
                 })
                 .ToList();
 
-            // If exercise calorie entries are missing, still show each exercise name with 0 kcal.
-            if (exerciseCalories.Count == 0)
+            var caloriesByExercise = exerciseCalories
+                .ToDictionary(item => item.ExerciseName, item => item.CaloriesBurned, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var exerciseName in sets
+                .Select(set => set.ExerciseName)
+                .Where(exerciseName => !string.IsNullOrWhiteSpace(exerciseName))
+                .Distinct(StringComparer.OrdinalIgnoreCase))
             {
-                exerciseCalories = sets
-                    .Select(set => set.ExerciseName)
-                    .Where(exerciseName => !string.IsNullOrWhiteSpace(exerciseName))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .Select(exerciseName => new ExerciseCalorieInfo
-                    {
-                        ExerciseName = exerciseName,
-                        CaloriesBurned = 0,
-                    })
-                    .ToList();
+                if (!caloriesByExercise.ContainsKey(exerciseName))
+                {
+                    caloriesByExercise[exerciseName] = 0;
+                }
             }
+
+            exerciseCalories = caloriesByExercise
+                .Select(pair => new ExerciseCalorieInfo
+                {
+                    ExerciseName = pair.Key,
+                    CaloriesBurned = pair.Value,
+                })
+                .OrderBy(item => item.ExerciseName, StringComparer.OrdinalIgnoreCase)
+                .ToList();
 
             return new WorkoutSessionDetail
             {

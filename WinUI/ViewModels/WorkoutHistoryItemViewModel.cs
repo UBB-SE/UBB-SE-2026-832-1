@@ -117,21 +117,35 @@ public sealed partial class WorkoutHistoryItemViewModel : ObservableObject
         }
 
         ExerciseCalories.Clear();
-        foreach (var calorie in detail.ExerciseCalories)
+
+        var caloriesByExercise = detail.ExerciseCalories
+            .Where(calorie => !string.IsNullOrWhiteSpace(calorie.ExerciseName))
+            .GroupBy(calorie => calorie.ExerciseName)
+            .ToDictionary(
+                group => group.Key,
+                group => Math.Max(0, group.Sum(item => item.CaloriesBurned)),
+                StringComparer.OrdinalIgnoreCase);
+
+        foreach (var group in grouped)
         {
-            ExerciseCalories.Add(calorie);
+            if (string.IsNullOrWhiteSpace(group.Key))
+            {
+                continue;
+            }
+
+            if (!caloriesByExercise.ContainsKey(group.Key))
+            {
+                caloriesByExercise[group.Key] = 0;
+            }
         }
 
-        if (ExerciseCalories.Count == 0)
+        foreach (var pair in caloriesByExercise.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase))
         {
-            foreach (var group in grouped)
+            ExerciseCalories.Add(new ExerciseCalorieInfo
             {
-                ExerciseCalories.Add(new ExerciseCalorieInfo
-                {
-                    ExerciseName = group.Key,
-                    CaloriesBurned = 0,
-                });
-            }
+                ExerciseName = pair.Key,
+                CaloriesBurned = pair.Value,
+            });
         }
     }
 

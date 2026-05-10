@@ -107,7 +107,7 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
             return;
         }
 
-        if (item.ExerciseCalories.Count > 0 || item.ExerciseSetGroups.Count > 0)
+        if (item.ExerciseCalories.Count > 0 && item.ExerciseSetGroups.Count > 0)
         {
             return;
         }
