@@ -170,7 +170,7 @@ public partial class UserViewModel : ObservableObject
 
         try
         {
-            int age = NutritionCalculator.CalculateAge(this.SelectedDate);
+            int age = CalculateAge(this.SelectedDate);
             if (age <= 0)
             {
                 this.StatusMessage = ERROR_INVALID_BIRTHDATE;
@@ -211,5 +211,23 @@ public partial class UserViewModel : ObservableObject
         if (this.IsTrainer) return ROLE_TRAINER;
         if (this.IsNutritionist) return ROLE_NUTRITIONIST;
         return ROLE_USER;
+    }
+    public static int CalculateAge(DateTimeOffset? birthDate)
+    {
+        if (birthDate == null)
+        {
+            return 0;
+        }
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var birth = DateOnly.FromDateTime(birthDate.Value.Date);
+
+        int age = today.Year - birth.Year;
+        if (birth > today.AddYears(-age))
+        {
+            age--;
+        }
+
+        return age;
     }
 }

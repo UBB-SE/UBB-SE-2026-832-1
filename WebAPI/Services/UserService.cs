@@ -99,16 +99,26 @@ public class UserService : IUserService
 
     public async Task AddUserDataAsync(UserDataDto userDataDto)
     {
-        var user = await this.userRepository.GetByIdAsync(userDataDto.UserId);
+        var user =
+            await this.userRepository.GetByIdAsync(
+                userDataDto.UserId);
 
         if (user == null)
         {
             return;
         }
 
-        var userData = MapToUserData(userDataDto, user);
+        var userData =
+            MapToUserData(
+                userDataDto,
+                user);
 
-        await this.userRepository.AddUserDataAsync(userData);
+        var computedData =
+            NutritionCalculator.ComputeAllNutritionValues(
+                userData);
+
+        await this.userRepository.AddUserDataAsync(
+            computedData);
     }
 
     public async Task UpdateUserDataAsync(UserDataDto userDataDto)
