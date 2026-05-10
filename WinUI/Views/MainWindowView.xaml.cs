@@ -29,6 +29,7 @@ public sealed partial class MainWindowView : Page
             ViewModel.AddTab("Analytics Dashboard", typeof(ClientDashboardPage));
             ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
             ViewModel.AddTab("Calendar Integration", typeof(CalendarIntegration.CalendarIntegrationPage));
+            ViewModel.AddTab("Reminders", typeof(RemindersPage));
         }
 
         ViewModel.AddTab("Chat", typeof(ChatView.NutritionistChatView));
