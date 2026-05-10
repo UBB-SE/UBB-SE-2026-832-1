@@ -64,11 +64,11 @@ public sealed partial class ClientDashboardPage : Page
         await this.viewModel.LoadInitialAsync();
     }
 
-    private async void WorkoutItemExpander_Expanded(object sender, RoutedEventArgs e)
+    private async void WorkoutItemExpander_Expanding(Expander sender, ExpanderExpandingEventArgs e)
     {
         try
         {
-            if (sender is not Expander expander || expander.DataContext is not WorkoutHistoryItemViewModel item)
+            if (sender.DataContext is not WorkoutHistoryItemViewModel item)
             {
                 return;
             }
@@ -77,7 +77,7 @@ public sealed partial class ClientDashboardPage : Page
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"WorkoutItemExpander_Expanded error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"WorkoutItemExpander_Expanding error: {ex.Message}");
         }
     }
 
