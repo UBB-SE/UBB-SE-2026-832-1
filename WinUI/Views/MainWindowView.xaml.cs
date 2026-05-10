@@ -1,10 +1,11 @@
-using System;
 using System.Collections.Specialized;
 using Microsoft.UI.Xaml.Controls;
+using System.Collections.Specialized;
 using WinUI.Services;
 using WinUI.ViewModels;
-using WinUI.Views.ShoppingList;
 using WinUI.Views.PantryView;
+using WinUI.Views.Reminders;
+using WinUI.Views.ShoppingList;
 using WinUI.Views.WorkoutLog;
 
 namespace WinUI.Views;
@@ -27,6 +28,7 @@ public sealed partial class MainWindowView : Page
             ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
             ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
             ViewModel.AddTab("Progress", typeof(DailyLogView));
+            ViewModel.AddTab("Reminders", typeof(RemindersPage));
         }
 
         ViewModel.AddTab("Chat", typeof(ChatView.NutritionistChatView));
@@ -70,6 +72,7 @@ public sealed partial class MainWindowView : Page
     private static TabViewItem CreateTabViewItem(TabItemModel tab)
     {
         object? content = Activator.CreateInstance(tab.PageType);
+        
         return new TabViewItem
         {
             Header = tab.Title,

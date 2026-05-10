@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using WinUI.Services;
 using WinUI.Services.Interfaces;
+using WinUI.ViewModels;
 namespace WinUI.Extensions;
 
 public static class ServiceCollectionExtensions
@@ -27,6 +28,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IRemindersService, RemindersService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
+        services.AddHttpClient<IRemindersService, RemindersService>(client =>
+        {
+            client.BaseAddress = new Uri(ApiBaseUrl.BASE_URL);
+        });
+        services.AddTransient<RemindersViewModel>();
         services.AddHttpClient<IShoppingListService, ShoppingListService>();
        
         return services;

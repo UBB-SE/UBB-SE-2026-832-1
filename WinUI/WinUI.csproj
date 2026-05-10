@@ -17,6 +17,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\NutritionistChatView\NutritionistChatView.xaml" />
+    <None Remove="Views\Reminders\RemindersPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>

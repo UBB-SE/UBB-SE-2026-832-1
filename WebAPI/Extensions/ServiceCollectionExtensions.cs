@@ -25,6 +25,8 @@ public static class ServiceCollectionExtensions
             sp.GetRequiredService<IUserService>(),
             sp.GetRequiredService<IDailyLogService>()));
         services.AddScoped<IReminderService, ReminderService>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IReminderRepository, ReminderRepository>();
         services.AddScoped<IInventoryService, InventoryService>();
         services.AddScoped<IShoppingListService, ShoppingListService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
