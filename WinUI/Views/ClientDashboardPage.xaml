@@ -191,7 +191,6 @@
                             <DataTemplate x:DataType="vm:WorkoutHistoryItemViewModel">
                                 <Expander
                                     IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}"
-                                    Expanding="WorkoutItemExpander_Expanding"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"

@@ -64,23 +64,6 @@ public sealed partial class ClientDashboardPage : Page
         await this.viewModel.LoadInitialAsync();
     }
 
-    private async void WorkoutItemExpander_Expanding(Expander sender, ExpanderExpandingEventArgs e)
-    {
-        try
-        {
-            if (sender.DataContext is not WorkoutHistoryItemViewModel item)
-            {
-                return;
-            }
-
-            await this.viewModel.LoadWorkoutDetailAsync(item);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"WorkoutItemExpander_Expanding error: {ex.Message}");
-        }
-    }
-
     private void Page_Unloaded(object sender, RoutedEventArgs e)
     {
         this.refreshBus.RefreshRequested -= this.RefreshBus_RefreshRequested;

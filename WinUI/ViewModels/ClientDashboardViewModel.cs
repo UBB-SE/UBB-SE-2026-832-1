@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using ClassLibrary.DTOs;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -264,10 +265,30 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         ShowEmptyState = result.TotalCount == 0;
         UpdatePaginationButtons();
 
+        foreach (var item in HistoryItems)
+        {
+            item.PropertyChanged -= OnHistoryItemPropertyChanged;
+        }
+
         HistoryItems.Clear();
         foreach (var row in result.Items)
         {
-            HistoryItems.Add(WorkoutHistoryItemViewModel.FromWorkoutHistoryRow(row));
+            var item = WorkoutHistoryItemViewModel.FromWorkoutHistoryRow(row);
+            item.PropertyChanged += OnHistoryItemPropertyChanged;
+            HistoryItems.Add(item);
+        }
+    }
+
+    private void OnHistoryItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(WorkoutHistoryItemViewModel.IsExpanded))
+        {
+            return;
+        }
+
+        if (sender is WorkoutHistoryItemViewModel item && item.IsExpanded)
+        {
+            _ = LoadWorkoutDetailAsync(item);
         }
     }
 
