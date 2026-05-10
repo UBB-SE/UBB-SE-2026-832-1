@@ -35,6 +35,7 @@ public class ReminderRepository : IReminderRepository
     public async Task<Reminder?> GetNextReminderAsync(int userId)
     {
         return await dbContext.Reminders
+            .Include(r => r.User)
             .Where(reminder => reminder.User.UserId == userId)
             .OrderBy(reminder => reminder.Time)
             .FirstOrDefaultAsync();
