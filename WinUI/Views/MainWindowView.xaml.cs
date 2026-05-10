@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Specialized;
 using Microsoft.UI.Xaml.Controls;
 using WinUI.Services;
@@ -16,18 +17,22 @@ public sealed partial class MainWindowView : Page
     {
         ViewModel = new MainWindowViewModel();
         InitializeComponent();
-        var userSession = new UserSession();
+
         ViewModel.AddTab("Home", typeof(MainView));
         ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
-ViewModel.AddTab("Inventory", typeof(InventoryView));
+        ViewModel.AddTab("Inventory", typeof(InventoryView));
         ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
         ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
-        if (userSession.IsClient)
+
+        if (UserSession.Role == UserSession.CLIENT_ROLE || string.IsNullOrEmpty(UserSession.Role))
         {
             ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
             ViewModel.AddTab("Calendar Integration", typeof(CalendarIntegration.CalendarIntegrationPage));
         }
+
+        
         ViewModel.AddTab("Chat", typeof(ChatView.NutritionistChatView));
+
         ViewModel.Tabs.CollectionChanged += OnTabsCollectionChanged;
         PopulateTabs();
         mainTabView.SelectionChanged += OnTabSelectionChanged;
@@ -73,5 +78,11 @@ ViewModel.AddTab("Inventory", typeof(InventoryView));
             IsClosable = false,
             Content = content ?? new TextBlock { Text = $"Could not load '{tab.Title}' ({tab.PageType.FullName})" }
         };
+    }
+
+    private void LogoutButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        UserSession.Clear();
+        Frame.Navigate(typeof(LoginView));
     }
 }

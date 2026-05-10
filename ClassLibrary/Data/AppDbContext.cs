@@ -162,9 +162,11 @@ public sealed class AppDbContext : DbContext
         });
         modelBuilder.Entity<Client>(entity =>
         {
+            entity.HasKey(client => client.ClientId);
+
             entity.HasOne(client => client.User)
                 .WithOne(user => user.Client)
-                .HasForeignKey<Client>("UserId")
+                .HasForeignKey<Client>(client => client.ClientId)
                 .IsRequired();
         });
         modelBuilder.Entity<ShoppingItem>(entity =>
