@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using ClassLibrary.DTOs;
 using WinUI.Services.Interfaces;
 
@@ -5,20 +6,24 @@ namespace WinUI.Services;
 
 public sealed class WorkoutLogService : IWorkoutLogService
 {
-    private readonly IWorkoutLogServiceProxy serviceProxy;
+    private readonly HttpClient httpClient;
 
-    public WorkoutLogService(IWorkoutLogServiceProxy serviceProxy)
+    public WorkoutLogService(HttpClient httpClient)
     {
-        this.serviceProxy = serviceProxy;
+        this.httpClient = httpClient;
     }
 
-    public Task<IReadOnlyList<WorkoutLogDataTransferObject>> GetWorkoutHistoryAsync(int clientId)
+    public async Task<IReadOnlyList<WorkoutLogDataTransferObject>> GetWorkoutHistoryAsync(int clientId)
     {
-        return this.serviceProxy.GetWorkoutHistoryAsync(clientId);
+        var history = await this.httpClient.GetFromJsonAsync<List<WorkoutLogDataTransferObject>>(
+            $"{ApiBaseUrl.BASE_URL}/api/client/{clientId}/workout-history");
+        return history ?? [];
     }
 
-    public Task<double> GetClientWeightAsync(int clientId)
+    public async Task<double> GetClientWeightAsync(int clientId)
     {
-        return this.serviceProxy.GetClientWeightAsync(clientId);
+        var userData = await this.httpClient.GetFromJsonAsync<UserDataDto>(
+            $"{ApiBaseUrl.BASE_URL}/api/users/{clientId}/data");
+        return userData?.Weight ?? 0;
     }
 }
