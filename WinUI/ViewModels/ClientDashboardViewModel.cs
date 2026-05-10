@@ -17,37 +17,37 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
     private ObservableCollection<ConsistencyWeekBucket> consistencyBuckets = new();
 
     [ObservableProperty]
-    public partial int TotalWorkouts { get; set; }
+    private int totalWorkouts;
 
     [ObservableProperty]
-    public partial string ActiveTimeSevenDaysDisplay { get; set; } = "0:00";
+    private string activeTimeSevenDaysDisplay = "0:00";
 
     [ObservableProperty]
-    public partial string PreferredWorkoutDisplay { get; set; } = "-";
+    private string preferredWorkoutDisplay = "-";
 
     [ObservableProperty]
-    public partial int CurrentPage { get; set; }
+    private int currentPage;
 
     [ObservableProperty]
-    public partial int TotalCount { get; set; }
+    private int totalCount;
 
     [ObservableProperty]
-    public partial bool CanGoPrevious { get; set; }
+    private bool canGoPrevious;
 
     [ObservableProperty]
-    public partial bool CanGoNext { get; set; }
+    private bool canGoNext;
 
     [ObservableProperty]
-    public partial bool IsLoadingSummary { get; set; }
+    private bool isLoadingSummary;
 
     [ObservableProperty]
-    public partial bool IsLoadingHistory { get; set; }
+    private bool isLoadingHistory;
 
     [ObservableProperty]
-    public partial bool IsLoadingChart { get; set; }
+    private bool isLoadingChart;
 
     [ObservableProperty]
-    public partial bool ShowEmptyState { get; set; } = true;
+    private bool showEmptyState = true;
 
     public ObservableCollection<WorkoutHistoryItemViewModel> HistoryItems { get; } = new();
 
@@ -60,9 +60,6 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         TotalPages == 0
             ? string.Empty
             : string.Create(CultureInfo.InvariantCulture, $"Page {CurrentPage + 1} of {TotalPages}");
-
-    partial void OnCurrentPageChanged(int value) => OnPropertyChanged(nameof(PageDisplayText));
-    partial void OnTotalCountChanged(int value) => OnPropertyChanged(nameof(PageDisplayText));
 
     public ClientDashboardViewModel(IClientDashboardService dashboardService, IUserSession userSession)
     {
