@@ -19,6 +19,7 @@ public sealed partial class MainWindowView : Page
         InitializeComponent();
 
         ViewModel.AddTab("Home", typeof(MainView));
+        ViewModel.AddTab("Meals", typeof(MealsPage));
         ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
         ViewModel.AddTab("Inventory", typeof(InventoryView));
         ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));

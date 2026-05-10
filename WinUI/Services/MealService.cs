@@ -7,7 +7,7 @@ namespace WinUI.Services;
 
 public sealed class MealService : IMealService
 {
-    private const string API_BASE_ADRESS = "https://localhost:7197/api";
+    private static readonly string API_BASE_ADRESS = $"{ApiBaseUrl.BASE_URL}/api";
     private const string FOOD_ITEMS_ROUTE = "fooditems";
     private readonly HttpClient httpClient;
 
@@ -18,14 +18,22 @@ public sealed class MealService : IMealService
 
     public async Task<IReadOnlyList<FoodItem>> SearchMealsAsync(FoodItemFilter filter)
     {
-        string query =
-            $"searchTerm={Uri.EscapeDataString(filter.SearchTerm ?? string.Empty)}" +
-            $"&isVegan={filter.IsVegan}" +
-            $"&isKeto={filter.IsKeto}" +
-            $"&isGlutenFree={filter.IsGlutenFree}" +
-            $"&isLactoseFree={filter.IsLactoseFree}" +
-            $"&isNutFree={filter.IsNutFree}" +
-            $"&isFavoriteOnly={filter.IsFavoriteOnly}";
+        var queryParams = new List<string>
+        {
+            $"isVegan={filter.IsVegan}",
+            $"isKeto={filter.IsKeto}",
+            $"isGlutenFree={filter.IsGlutenFree}",
+            $"isLactoseFree={filter.IsLactoseFree}",
+            $"isNutFree={filter.IsNutFree}",
+            $"isFavoriteOnly={filter.IsFavoriteOnly}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+        {
+            queryParams.Add($"searchTerm={Uri.EscapeDataString(filter.SearchTerm)}");
+        }
+
+        string query = string.Join("&", queryParams);
 
         var foodItemDataTransferObjects =
             await this.httpClient.GetFromJsonAsync<List<FoodItemDto>>(
