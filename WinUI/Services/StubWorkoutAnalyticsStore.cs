@@ -64,4 +64,5 @@ public sealed class StubWorkoutAnalyticsStore : IWorkoutAnalyticsStore
     {
         return Task.FromResult<ClassLibrary.Models.Analytics.WorkoutSessionDetail?>(null);
     }
+}
 
