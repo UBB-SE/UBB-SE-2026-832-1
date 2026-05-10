@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
 using ClassLibrary.Services;
@@ -24,7 +25,6 @@ public partial class UserViewModel : ObservableObject
 
     private readonly IUserService? userService;
 
-    
     [ObservableProperty] private string userName = string.Empty;
     [ObservableProperty] private string password = string.Empty;
     [ObservableProperty] private string statusMessage = string.Empty;
@@ -130,10 +130,7 @@ public partial class UserViewModel : ObservableObject
 
         if (role == ROLE_USER)
         {
-            var registered = await this.userService.RegisterAsync(
-                this.UserName,
-                this.Password,
-                ROLE_USER);
+            var registered = await this.userService.RegisterAsync(this.UserName, this.Password, ROLE_USER);
 
             if (registered == null)
             {
@@ -143,9 +140,7 @@ public partial class UserViewModel : ObservableObject
 
             this.LoggedInUserId = registered.Id;
             this.LoggedInUsername = registered.Username;
-            UserSession.SetCurrentSession(
-       registered.Id,
-       registered.Role);
+            UserSession.SetCurrentSession(registered.Id, registered.Role);
 
             this.RegistrationValid?.Invoke(this, EventArgs.Empty);
             return;
@@ -181,7 +176,6 @@ public partial class UserViewModel : ObservableObject
                 this.StatusMessage = ERROR_INVALID_BIRTHDATE;
                 return;
             }
-
 
             var userDataDto = new UserDataDto
             {

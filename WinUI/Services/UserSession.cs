@@ -29,6 +29,8 @@ public sealed class UserSession : IUserSession
 
     public static int? UserId { get; set; }
 
+    public static int? ClientId { get; set; }
+
     public static string Role
     {
         get => currentRole;
@@ -38,14 +40,20 @@ public sealed class UserSession : IUserSession
     public static void SetCurrentSession(int userId, string role)
     {
         UserId = userId;
-        currentClientId = userId;
         currentRole = role;
+
+        if (role == CLIENT_ROLE)
+        {
+            ClientId = userId;
+            currentClientId = userId;
+        }
     }
 
     public static void Clear()
     {
         UserId = null;
+        ClientId = null;
         currentRole = string.Empty;
-        currentClientId = 1;
+        currentClientId = 0;
     }
 }
