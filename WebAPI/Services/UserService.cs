@@ -9,10 +9,11 @@ namespace WebAPI.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository userRepository;
-
-    public UserService(IUserRepository userRepository)
+    private readonly IClientRepository clientRepository;
+    public UserService(IUserRepository userRepository, IClientRepository clientRepository)
     {
         this.userRepository = userRepository;
+        this.clientRepository = clientRepository;
     }
 
     public async Task<IReadOnlyList<UserDto>> GetUsersAsync()
@@ -61,6 +62,16 @@ public class UserService : IUserService
         };
 
         await this.userRepository.AddAsync(user);
+        if (role == "Client")
+        {
+            var client = new Client
+            {
+                ClientId = user.UserId
+            };
+            client.WorkoutTemplates = CreateDefaultWorkoutTemplates(client);
+
+            await this.clientRepository.AddAsync(client);
+        }
 
         return new UserDto
         {
@@ -89,14 +100,41 @@ public class UserService : IUserService
 
     public async Task AddUserDataAsync(UserDataDto userDataDto)
     {
-        var userData = MapToUserData(userDataDto);
-        await this.userRepository.AddUserDataAsync(userData);
+        var user =
+            await this.userRepository.GetByIdAsync(
+                userDataDto.UserId);
+
+        if (user == null)
+        {
+            return;
+        }
+
+        var userData =
+            MapToUserData(
+                userDataDto,
+                user);
+
+        var computedData =
+            NutritionCalculator.ComputeAllNutritionValues(
+                userData);
+
+        await this.userRepository.AddUserDataAsync(
+            computedData);
     }
 
     public async Task UpdateUserDataAsync(UserDataDto userDataDto)
     {
-        var userData = MapToUserData(userDataDto);
+        var user = await this.userRepository.GetByIdAsync(userDataDto.UserId);
+
+        if (user == null)
+        {
+            return;
+        }
+
+        var userData = MapToUserData(userDataDto, user);
+
         var computedData = NutritionCalculator.ComputeAllNutritionValues(userData);
+
         await this.userRepository.UpdateUserDataAsync(computedData);
     }
 
@@ -119,12 +157,12 @@ public class UserService : IUserService
         };
     }
 
-    private static UserData MapToUserData(UserDataDto dto)
+    private static UserData MapToUserData(UserDataDto dto, User user)
     {
         return new UserData
         {
             UserDataId = dto.UserDataId,
-            User = new User { UserId = dto.UserId },
+            User = user,
             Weight = dto.Weight,
             Height = dto.Height,
             Age = dto.Age,
@@ -136,5 +174,114 @@ public class UserService : IUserService
             CarbohydrateNeeds = dto.CarbohydrateNeeds,
             FatNeeds = dto.FatNeeds,
         };
+    }
+    private static List<WorkoutTemplate> CreateDefaultWorkoutTemplates(
+    Client client)
+    {
+        var pushTemplate = new WorkoutTemplate
+        {
+            Client = client,
+            Name = "Push Day",
+            Type = WorkoutType.PREBUILT,
+            Exercises = new List<TemplateExercise>
+        {
+            new TemplateExercise
+            {
+                Name = "Bench Press",
+                MuscleGroup = MuscleGroup.CHEST,
+                TargetSets = 4,
+                TargetReps = 10
+            },
+
+            new TemplateExercise
+            {
+                Name = "Incline Dumbbell Press",
+                MuscleGroup = MuscleGroup.CHEST,
+                TargetSets = 3,
+                TargetReps = 12
+            },
+
+            new TemplateExercise
+            {
+                Name = "Shoulder Press",
+                MuscleGroup = MuscleGroup.SHOULDERS,
+                TargetSets = 3,
+                TargetReps = 10
+            }
+        }
+        };
+
+        var pullTemplate = new WorkoutTemplate
+        {
+            Client = client,
+            Name = "Pull Day",
+            Type = WorkoutType.PREBUILT,
+            Exercises = new List<TemplateExercise>
+        {
+            new TemplateExercise
+            {
+                Name = "Pull Ups",
+                MuscleGroup = MuscleGroup.BACK,
+                TargetSets = 4,
+                TargetReps = 10
+            },
+
+            new TemplateExercise
+            {
+                Name = "Barbell Row",
+                MuscleGroup = MuscleGroup.BACK,
+                TargetSets = 4,
+                TargetReps = 10
+            },
+
+            new TemplateExercise
+            {
+                Name = "Bicep Curl",
+                MuscleGroup = MuscleGroup.ARMS,
+                TargetSets = 3,
+                TargetReps = 12
+            }
+        }
+        };
+
+        var hiitTemplate = new WorkoutTemplate
+        {
+            Client = client,
+            Name = "HIIT Fat Burner",
+            Type = WorkoutType.PREBUILT,
+            Exercises = new List<TemplateExercise>
+        {
+            new TemplateExercise
+            {
+                Name = "Burpees",
+                MuscleGroup = MuscleGroup.CARDIO,
+                TargetSets = 4,
+                TargetReps = 15
+            },
+
+            new TemplateExercise
+            {
+                Name = "Mountain Climbers",
+                MuscleGroup = MuscleGroup.CARDIO,
+                TargetSets = 4,
+                TargetReps = 20
+            },
+
+            new TemplateExercise
+            {
+                Name = "Jump Squats",
+                MuscleGroup = MuscleGroup.LEGS,
+                TargetSets = 4,
+                TargetReps = 15
+            }
+        }
+        };
+
+        return new List<WorkoutTemplate>
+    {
+        pushTemplate,
+        pullTemplate,
+        hiitTemplate
+    };
     }
 }

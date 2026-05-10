@@ -15,9 +15,8 @@ public sealed partial class WorkoutHistoryPage : Page
     {
         var userSession = new UserSession();
         ClientId = userSession.CurrentClientId;
-        var httpClient = new System.Net.Http.HttpClient();
         ViewModel = new WorkoutLogViewModel(
-            new WorkoutLogService(new WorkoutLogServiceProxy(httpClient)));
+            new WorkoutLogService(new System.Net.Http.HttpClient()));
         ViewModel.StartWorkoutRequested += clientId => Frame.Navigate(typeof(ActiveWorkoutView), clientId);
         InitializeComponent();
     }

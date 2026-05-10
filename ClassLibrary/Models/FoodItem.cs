@@ -3,7 +3,10 @@ namespace ClassLibrary.Models;
 public sealed class FoodItem
 {
     public int FoodItemId { get; set; }
-
+    public ICollection<FoodItemIngredient> FoodItemIngredients { get; set; }
+    = new List<FoodItemIngredient>();
+    public ICollection<MealPlanFoodItem> MealPlanFoodItems { get; set; }
+    = new List<MealPlanFoodItem>();
     public string Name { get; set; } = string.Empty;
 
     public int Calories { get; set; }

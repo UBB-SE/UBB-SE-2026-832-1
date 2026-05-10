@@ -24,8 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<IMealPlanService, MealPlanService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IDailyLogServiceProxy, DailyLogServiceProxy>();
-        services.AddScoped<IWorkoutLogService, WorkoutLogService>();
-        services.AddScoped<IWorkoutLogServiceProxy, WorkoutLogServiceProxy>();
+        services.AddHttpClient<IWorkoutLogService, WorkoutLogService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IRemindersService, RemindersService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
