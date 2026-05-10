@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:WinUI.ViewModels"
     xmlns:models="using:ClassLibrary.DTOs.Analytics"
+    xmlns:dto="using:ClassLibrary.DTOs"
     xmlns:extensions="using:WinUI.Extensions"
     mc:Ignorable="d"
     Loaded="Page_Loaded">
@@ -136,7 +137,7 @@
                     </Border>
                 </Grid>
 
-                <!-- Consistency Chart (control added in code-behind; hidden when empty) -->
+                <!-- Consistency analytics -->
                 <Border
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -153,7 +154,19 @@
                                 Width="20" Height="20" />
                         </Grid>
 
-                        <Grid x:Name="ChartContainer" Height="240" Margin="0,16,0,0" />
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.ConsistencyBuckets, Mode=OneWay}" Margin="0,16,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:ConsistencyWeekBucket">
+                                    <Grid ColumnDefinitions="*,Auto" Padding="0,8">
+                                        <TextBlock Text="{x:Bind WeekStart}" Style="{StaticResource BodyTextBlockStyle}" />
+                                        <TextBlock Grid.Column="1" Style="{StaticResource BodyStrongTextBlockStyle}">
+                                            <Run Text="{x:Bind WorkoutCount}" />
+                                            <Run Text=" workouts" />
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </Border>
 
@@ -326,6 +339,35 @@
                                    Style="{StaticResource BodyTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    HorizontalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="16" Margin="0,24,0,0">
+                        <TextBlock Text="Recent Achievements"
+                                   Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.RecentAchievements, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="dto:AchievementDataTransferObject">
+                                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="6"
+                                            Padding="16"
+                                            Margin="0,0,0,8">
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Text="{x:Bind Title}"
+                                                       Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                            <TextBlock Text="{x:Bind Description}"
+                                                       Style="{StaticResource BodyTextBlockStyle}"
+                                                       TextWrapping="Wrap" />
+                                            <TextBlock Text="{x:Bind Criteria}"
+                                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
 
                     <!-- Pagination controls -->

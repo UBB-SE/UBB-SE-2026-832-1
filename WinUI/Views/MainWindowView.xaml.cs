@@ -23,14 +23,13 @@ public sealed partial class MainWindowView : Page
         ViewModel.AddTab("Inventory", typeof(InventoryView));
         ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
         ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
-        ViewModel.AddTab("Analytics Dashboard", typeof(ClientDashboardPage));
         if (UserSession.Role == UserSession.CLIENT_ROLE || string.IsNullOrEmpty(UserSession.Role))
         {
+            ViewModel.AddTab("Analytics Dashboard", typeof(ClientDashboardPage));
             ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
             ViewModel.AddTab("Calendar Integration", typeof(CalendarIntegration.CalendarIntegrationPage));
         }
 
-        
         ViewModel.AddTab("Chat", typeof(ChatView.NutritionistChatView));
 
         ViewModel.Tabs.CollectionChanged += OnTabsCollectionChanged;

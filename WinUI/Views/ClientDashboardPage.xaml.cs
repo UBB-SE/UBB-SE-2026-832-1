@@ -10,6 +10,7 @@ public sealed partial class ClientDashboardPage : Page
 {
     private readonly ClientDashboardViewModel viewModel;
     private readonly UserSession userSession;
+    private readonly AnalyticsDashboardRefreshBus refreshBus = AnalyticsDashboardRefreshBus.Shared;
 
     public ClientDashboardViewModel ViewModel => this.viewModel;
 
@@ -27,6 +28,7 @@ public sealed partial class ClientDashboardPage : Page
 
             this.Loaded += this.Page_Loaded;
             this.Unloaded += this.Page_Unloaded;
+            this.refreshBus.RefreshRequested += this.RefreshBus_RefreshRequested;
         }
         catch (Exception ex)
         {
@@ -57,8 +59,13 @@ public sealed partial class ClientDashboardPage : Page
         }
     }
 
+    private async void RefreshBus_RefreshRequested(object? sender, EventArgs e)
+    {
+        await this.viewModel.LoadInitialAsync();
+    }
+
     private void Page_Unloaded(object sender, RoutedEventArgs e)
     {
-        // Cleanup if needed
+        this.refreshBus.RefreshRequested -= this.RefreshBus_RefreshRequested;
     }
 }

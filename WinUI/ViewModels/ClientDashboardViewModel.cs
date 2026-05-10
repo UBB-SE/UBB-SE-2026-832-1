@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using ClassLibrary.DTOs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WinUI.Services;
@@ -15,6 +16,8 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
     private readonly IUserSession userSession;
     private CancellationTokenSource? loadCts;
     private ObservableCollection<ConsistencyWeekBucket> consistencyBuckets = new();
+
+    public ObservableCollection<AchievementDataTransferObject> RecentAchievements { get; } = new();
 
     [ObservableProperty]
     private int totalWorkouts;
@@ -50,6 +53,8 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
     private bool showEmptyState = true;
 
     public ObservableCollection<WorkoutHistoryItemViewModel> HistoryItems { get; } = new();
+
+    public ObservableCollection<ConsistencyWeekBucket> ConsistencyBuckets => this.consistencyBuckets;
 
     public int PageSize { get; set; } = DefaultPageSize;
 
@@ -106,18 +111,21 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
             IsLoadingSummary = true;
             IsLoadingChart = true;
             IsLoadingHistory = true;
+            RecentAchievements.Clear();
 
             var summaryTask = this.dashboardService.GetDashboardSummaryAsync(clientId);
             var bucketsTask = this.dashboardService.GetConsistencyLastFourWeeksAsync(clientId);
             CurrentPage = 0;
             var historyTask = this.dashboardService.GetWorkoutHistoryPageAsync(clientId, CurrentPage, PageSize);
+            var achievementsTask = this.dashboardService.GetRecentAchievementsAsync(clientId);
 
-            await Task.WhenAll(summaryTask, bucketsTask, historyTask).ConfigureAwait(true);
+            await Task.WhenAll(summaryTask, bucketsTask, historyTask, achievementsTask).ConfigureAwait(true);
             token.ThrowIfCancellationRequested();
 
             ApplySummary(summaryTask.Result);
             ApplyBuckets(bucketsTask.Result);
             ApplyHistory(historyTask.Result, clientId);
+            ApplyAchievements(achievementsTask.Result);
         }
         catch (OperationCanceledException)
         {
@@ -203,6 +211,15 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
 
         // Chart data can be used by code-behind to populate LiveChartsCore if available
         // For now, we store the buckets for potential future use
+    }
+
+    private void ApplyAchievements(IReadOnlyList<AchievementDataTransferObject> achievements)
+    {
+        RecentAchievements.Clear();
+        foreach (var achievement in achievements)
+        {
+            RecentAchievements.Add(achievement);
+        }
     }
 
     private void ApplyHistory(WorkoutHistoryPageResult result, int clientId)
