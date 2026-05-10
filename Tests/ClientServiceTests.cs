@@ -4,6 +4,7 @@ using ClassLibrary.Models;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using WebAPI.Services;
+using WebAPI.IServices;
 
 namespace Tests;
 
@@ -12,6 +13,7 @@ public sealed class ClientServiceTests
     private readonly Mock<IAchievementsRepository> achievementsRepo = new();
     private readonly Mock<INotificationRepository> notificationRepo = new();
     private readonly Mock<INutritionRepository> nutritionRepo = new();
+    private readonly Mock<IAnalyticsService> analyticsService = new();
     private readonly Mock<IWorkoutLogRepository> workoutLogRepo = new();
     private readonly Mock<IWorkoutTemplateRepository> workoutTemplateRepo = new();
     private readonly Mock<IClientRepository> clientRepo = new();
@@ -22,6 +24,7 @@ public sealed class ClientServiceTests
         this.achievementsRepo.Object,
         this.notificationRepo.Object,
         this.nutritionRepo.Object,
+        this.analyticsService.Object,
         this.workoutLogRepo.Object,
         this.workoutTemplateRepo.Object,
         this.clientRepo.Object,
@@ -32,7 +35,10 @@ public sealed class ClientServiceTests
     public async Task ModifyWorkout_WithValidLog_DelegatesToRepository()
     {
         var client = new Client { ClientId = 5, Email = "a@b.com", FullName = "Alice" };
-        this.clientRepo.Setup(repository => repository.GetByIdAsync(5)).ReturnsAsync(client);
+
+        this.clientRepo
+            .Setup(repository => repository.GetByIdAsync(5))
+            .ReturnsAsync(client);
 
         var dto = new WorkoutLogDataTransferObject
         {
@@ -46,21 +52,32 @@ public sealed class ClientServiceTests
         };
 
         var service = this.CreateService();
+
         bool result = await service.ModifyWorkoutAsync(dto);
 
         Assert.True(result);
-        this.workoutLogRepo.Verify(repository => repository.UpdateWorkoutLogAsync(It.Is<WorkoutLog>(
-            log => log.WorkoutLogId == 10 && log.WorkoutName == "Updated Push Day")), Times.Once);
+
+        this.workoutLogRepo.Verify(
+            repository => repository.UpdateWorkoutLogAsync(
+                It.Is<WorkoutLog>(
+                    log =>
+                        log.WorkoutLogId == 10 &&
+                        log.WorkoutName == "Updated Push Day")),
+            Times.Once);
     }
 
     [Fact]
     public async Task ModifyWorkout_WithNullDto_ReturnsFalse()
     {
         var service = this.CreateService();
+
         bool result = await service.ModifyWorkoutAsync(null!);
 
         Assert.False(result);
-        this.workoutLogRepo.Verify(repository => repository.UpdateWorkoutLogAsync(It.IsAny<WorkoutLog>()), Times.Never);
+
+        this.workoutLogRepo.Verify(
+            repository => repository.UpdateWorkoutLogAsync(It.IsAny<WorkoutLog>()),
+            Times.Never);
     }
 
     [Fact]
@@ -73,6 +90,7 @@ public sealed class ClientServiceTests
         };
 
         var service = this.CreateService();
+
         bool result = await service.ModifyWorkoutAsync(dto);
 
         Assert.False(result);
@@ -81,7 +99,9 @@ public sealed class ClientServiceTests
     [Fact]
     public async Task ModifyWorkout_WhenClientNotFound_ReturnsFalse()
     {
-        this.clientRepo.Setup(repository => repository.GetByIdAsync(999)).ReturnsAsync((Client?)null);
+        this.clientRepo
+            .Setup(repository => repository.GetByIdAsync(999))
+            .ReturnsAsync((Client?)null);
 
         var dto = new WorkoutLogDataTransferObject
         {
@@ -92,16 +112,21 @@ public sealed class ClientServiceTests
         };
 
         var service = this.CreateService();
+
         bool result = await service.ModifyWorkoutAsync(dto);
 
         Assert.False(result);
-        this.workoutLogRepo.Verify(repository => repository.UpdateWorkoutLogAsync(It.IsAny<WorkoutLog>()), Times.Never);
+
+        this.workoutLogRepo.Verify(
+            repository => repository.UpdateWorkoutLogAsync(It.IsAny<WorkoutLog>()),
+            Times.Never);
     }
 
     [Fact]
     public async Task FinalizeWorkout_WithNullRequest_ReturnsFalse()
     {
         var service = this.CreateService();
+
         bool result = await service.FinalizeWorkoutAsync(null!);
 
         Assert.False(result);
@@ -110,8 +135,16 @@ public sealed class ClientServiceTests
     [Fact]
     public async Task FinalizeWorkout_WithValidRequest_SavesAndReturnsTrue()
     {
-        var client = new Client { ClientId = 3, Email = "c@d.com", FullName = "Charlie" };
-        this.clientRepo.Setup(repository => repository.GetByIdAsync(3)).ReturnsAsync(client);
+        var client = new Client
+        {
+            ClientId = 3,
+            Email = "c@d.com",
+            FullName = "Charlie",
+        };
+
+        this.clientRepo
+            .Setup(repository => repository.GetByIdAsync(3))
+            .ReturnsAsync(client);
 
         var request = new FinalizeWorkoutRequestDataTransferObject
         {
@@ -126,10 +159,15 @@ public sealed class ClientServiceTests
         };
 
         var service = this.CreateService();
+
         bool result = await service.FinalizeWorkoutAsync(request);
 
         Assert.True(result);
-        this.workoutLogRepo.Verify(repository => repository.SaveWorkoutLogAsync(It.Is<WorkoutLog>(
-            log => log.WorkoutName == "Leg Day")), Times.Once);
+
+        this.workoutLogRepo.Verify(
+            repository => repository.SaveWorkoutLogAsync(
+                It.Is<WorkoutLog>(
+                    log => log.WorkoutName == "Leg Day")),
+            Times.Once);
     }
 }
