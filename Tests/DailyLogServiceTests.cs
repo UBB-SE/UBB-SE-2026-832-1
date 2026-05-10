@@ -14,6 +14,7 @@ public sealed class DailyLogServiceTests
     private readonly Mock<IUserRepository> mockUserRepository;
     private readonly Mock<IFoodItemService> mockFoodItemService;
     private readonly Mock<IFoodItemRepository> mockFoodItemRepository;
+    private readonly Mock<IWorkoutLogRepository> mockWorkoutLogRepository;
     private readonly DailyLogService dailyLogService;
 
     public DailyLogServiceTests()
@@ -22,11 +23,13 @@ public sealed class DailyLogServiceTests
         this.mockUserRepository = new Mock<IUserRepository>();
         this.mockFoodItemService = new Mock<IFoodItemService>();
         this.mockFoodItemRepository = new Mock<IFoodItemRepository>();
+        this.mockWorkoutLogRepository = new Mock<IWorkoutLogRepository>();
         this.dailyLogService = new DailyLogService(
             this.mockDailyLogRepository.Object,
             this.mockUserRepository.Object,
             this.mockFoodItemService.Object,
-            this.mockFoodItemRepository.Object);
+            this.mockFoodItemRepository.Object,
+            this.mockWorkoutLogRepository.Object);
     }
 
     [Fact]
@@ -88,11 +91,41 @@ public sealed class DailyLogServiceTests
     }
 
     [Fact]
-    public async Task GetTodayBurnedCaloriesAsync_ShouldReturnDefaultValue()
+    public async Task GetTodayBurnedCaloriesAsync_ShouldCallWorkoutLogRepository()
     {
+        this.mockWorkoutLogRepository
+            .Setup(repository => repository.GetTotalCaloriesBurnedForRangeAsync(
+                1, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(450d);
+
         var result = await this.dailyLogService.GetTodayBurnedCaloriesAsync(1);
 
-        Assert.Equal(500d, result);
+        Assert.Equal(450d, result);
+        this.mockWorkoutLogRepository.Verify(
+            repository => repository.GetTotalCaloriesBurnedForRangeAsync(
+                1,
+                It.Is<DateTime>(start => start.Date == DateTime.Today),
+                It.Is<DateTime>(end => end.Date == DateTime.Today.AddDays(1))),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task GetWeekBurnedCaloriesAsync_ShouldCallWorkoutLogRepositoryWithWeekRange()
+    {
+        this.mockWorkoutLogRepository
+            .Setup(repository => repository.GetTotalCaloriesBurnedForRangeAsync(
+                1, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(3150d);
+
+        var result = await this.dailyLogService.GetWeekBurnedCaloriesAsync(1);
+
+        Assert.Equal(3150d, result);
+        this.mockWorkoutLogRepository.Verify(
+            repository => repository.GetTotalCaloriesBurnedForRangeAsync(
+                1,
+                It.Is<DateTime>(start => start.DayOfWeek == DayOfWeek.Monday),
+                It.Is<DateTime>(end => (end - DateTime.Today).TotalDays <= 7)),
+            Times.Once);
     }
 
     [Fact]

@@ -17,7 +17,6 @@ public sealed partial class MainWindowView : Page
     {
         ViewModel = new MainWindowViewModel();
         InitializeComponent();
-       
         if (UserSession.Role == UserSession.CLIENT_ROLE || string.IsNullOrEmpty(UserSession.Role))
         {
             ViewModel.AddTab("Analytics Dashboard", typeof(ClientDashboardPage));
@@ -27,6 +26,7 @@ public sealed partial class MainWindowView : Page
             ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
             ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
             ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
+            ViewModel.AddTab("Progress", typeof(DailyLogView));
         }
 
         ViewModel.AddTab("Chat", typeof(ChatView.NutritionistChatView));
