@@ -17,18 +17,16 @@ public sealed partial class MainWindowView : Page
     {
         ViewModel = new MainWindowViewModel();
         InitializeComponent();
-
-        ViewModel.AddTab("Home", typeof(MainView));
-        ViewModel.AddTab("Meals", typeof(MealsPage));
-        ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
-        ViewModel.AddTab("Inventory", typeof(InventoryView));
-        ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
-        ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
+       
         if (UserSession.Role == UserSession.CLIENT_ROLE || string.IsNullOrEmpty(UserSession.Role))
         {
             ViewModel.AddTab("Analytics Dashboard", typeof(ClientDashboardPage));
             ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
             ViewModel.AddTab("Calendar Integration", typeof(CalendarIntegration.CalendarIntegrationPage));
+            ViewModel.AddTab("Meals", typeof(MealsPage));
+            ViewModel.AddTab("Meal Plans", typeof(MealPlanView));
+            ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
+            ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
         }
 
         ViewModel.AddTab("Chat", typeof(ChatView.NutritionistChatView));
