@@ -80,7 +80,7 @@ public sealed class WorkoutLogRepository : IWorkoutLogRepository
         var totalCalories = await (
             from workoutLog in this.databaseContext.WorkoutLogs
             join client in this.databaseContext.Clients on workoutLog.ClientId equals client.ClientId
-            join user in this.databaseContext.Users on EF.Property<int>(client, "UserId") equals user.UserId
+            join user in this.databaseContext.Users on client.ClientId equals user.UserId
             where user.UserId == userId
                 && workoutLog.Date >= startInclusive
                 && workoutLog.Date < endExclusive
