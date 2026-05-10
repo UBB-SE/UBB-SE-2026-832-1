@@ -41,12 +41,12 @@ public sealed class NavigationService : INavigationService
 
     public void NavigateToActiveWorkout(int clientId = 0)
     {
-        // TODO: Navigate to ActiveWorkoutPage once it is implemented
+    
     }
 
     public void NavigateToWorkoutLogs()
     {
-        // TODO: Navigate to WorkoutLogsPage once it is implemented
+    
     }
 
     public void GoBack()
@@ -59,11 +59,11 @@ public sealed class NavigationService : INavigationService
 
     public void NavigateToTrainerDashboard()
     {
-        // TODO: Navigate to TrainerDashboardView once it is implemented
+    
     }
 
     public void NavigateToClientProfile(int clientId)
     {
-        // TODO: Navigate to ClientProfileView once it is implemented
+    
     }
 }

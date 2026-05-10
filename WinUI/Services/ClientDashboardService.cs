@@ -24,7 +24,6 @@ public sealed class ClientDashboardService : IClientDashboardService
         }
         catch
         {
-            // Return safe empty data on error
             return new DashboardSummary();
         }
     }
@@ -39,7 +38,6 @@ public sealed class ClientDashboardService : IClientDashboardService
         }
         catch
         {
-            // Return safe empty data on error
             return new List<ConsistencyWeekBucket>();
         }
     }
@@ -54,7 +52,6 @@ public sealed class ClientDashboardService : IClientDashboardService
         }
         catch
         {
-            // Return safe empty data on error
             return new WorkoutHistoryPageResult { TotalCount = 0, Items = new List<WorkoutHistoryRow>() };
         }
     }
@@ -146,7 +143,6 @@ public sealed class ClientDashboardService : IClientDashboardService
         }
         catch
         {
-            // Return safe empty data on error
             return new List<AchievementDataTransferObject>();
         }
     }

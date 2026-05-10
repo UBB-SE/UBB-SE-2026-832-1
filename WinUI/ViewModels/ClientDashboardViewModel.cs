@@ -129,7 +129,6 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         }
         catch
         {
-            // Ignore detail-load errors and keep summary data visible.
         }
         finally
         {
@@ -166,12 +165,9 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            // Normal cancellation, no action needed
         }
         catch (Exception ex)
         {
-            // Silently handle other exceptions to prevent crashes
-            // Set safe default values for UI
             ShowEmptyState = true;
             TotalWorkouts = 0;
             ActiveTimeSevenDaysDisplay = "—";
@@ -200,12 +196,9 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            // Normal cancellation, no action needed
         }
         catch (Exception ex)
         {
-            // Silently handle exceptions to prevent crashes
-            // Show empty state if loading fails
             ShowEmptyState = true;
             HistoryItems.Clear();
             UpdatePaginationButtons();
@@ -218,8 +211,6 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
 
     public void ReloadAchievementsPreview()
     {
-        // This method is called when achievements are unlocked
-        // Can be used to refresh achievement-related UI if needed
     }
 
     private void CancelPendingLoad()
@@ -246,8 +237,7 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
             consistencyBuckets.Add(b);
         }
 
-        // Chart data can be used by code-behind to populate LiveChartsCore if available
-        // For now, we store the buckets for potential future use
+        
     }
 
     private void ApplyAchievements(IReadOnlyList<AchievementDataTransferObject> achievements)
