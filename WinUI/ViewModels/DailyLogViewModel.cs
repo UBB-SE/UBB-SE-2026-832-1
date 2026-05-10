@@ -78,6 +78,9 @@ public partial class DailyLogViewModel : ObservableObject
     [ObservableProperty]
     private string statusMessage = string.Empty;
 
+    [ObservableProperty]
+    private bool hasMealLogged;
+
     public DailyLogViewModel(IDailyLogService dailyLogService)
     {
         this.dailyLogService = dailyLogService ?? throw new ArgumentNullException(nameof(dailyLogService));
@@ -184,6 +187,7 @@ public partial class DailyLogViewModel : ObservableObject
 
             await this.dailyLogService.LogFoodItemAsync(userId, request);
             StatusMessage = $"Logged {this.SelectedFoodItem.Name} successfully.";
+            HasMealLogged = true;
             await LoadDailySummaryAsync(userId);
         }
         catch (Exception exception)

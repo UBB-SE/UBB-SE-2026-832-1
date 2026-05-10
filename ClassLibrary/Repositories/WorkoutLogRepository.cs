@@ -78,4 +78,15 @@ public sealed class WorkoutLogRepository : IWorkoutLogRepository
 
         return client?.Weight ?? 0;
     }
+
+    public async Task<double> GetTotalCaloriesBurnedForRangeAsync(int userId, DateTime startInclusive, DateTime endExclusive)
+    {
+        var totalCalories = await this.databaseContext.WorkoutLogs
+            .AsNoTracking()
+            .Where(workoutLog => workoutLog.Client.User.UserId == userId)
+            .Where(workoutLog => workoutLog.Date >= startInclusive && workoutLog.Date < endExclusive)
+            .SumAsync(workoutLog => (double)workoutLog.TotalCaloriesBurned);
+
+        return totalCalories;
+    }
 }

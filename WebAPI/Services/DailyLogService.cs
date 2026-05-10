@@ -12,23 +12,25 @@ public sealed class DailyLogService : IDailyLogService
     private const int DAYS_IN_WEEK = 7;
     private const int ONE_DAY = 1;
     private const DayOfWeek START_OF_WEEK = DayOfWeek.Monday;
-    private const double DEFAULT_BURNED_CALORIES = 500d;
 
     private readonly IDailyLogRepository dailyLogRepository;
     private readonly IUserRepository userRepository;
     private readonly IFoodItemRepository foodItemRepository;
     private readonly IFoodItemService foodItemService;
+    private readonly IWorkoutLogRepository workoutLogRepository;
 
     public DailyLogService(
         IDailyLogRepository dailyLogRepository,
         IUserRepository userRepository,
         IFoodItemService foodItemService,
-        IFoodItemRepository foodItemRepository)
+        IFoodItemRepository foodItemRepository,
+        IWorkoutLogRepository workoutLogRepository)
     {
         this.dailyLogRepository = dailyLogRepository;
         this.userRepository = userRepository;
         this.foodItemService = foodItemService;
         this.foodItemRepository = foodItemRepository;
+        this.workoutLogRepository = workoutLogRepository;
     }
 
     private static DailyLogTotalsDto MapToDailyLogTotalsDto(DailyLog? log)
@@ -111,9 +113,23 @@ public sealed class DailyLogService : IDailyLogService
         return MapToUserDataDto(userData);
     }
 
-    public Task<double> GetTodayBurnedCaloriesAsync(int userId)
+    public async Task<double> GetTodayBurnedCaloriesAsync(int userId)
     {
-        return Task.FromResult(DEFAULT_BURNED_CALORIES);
+        var start = DateTime.Today;
+        var end = start.AddDays(ONE_DAY);
+
+        return await this.workoutLogRepository.GetTotalCaloriesBurnedForRangeAsync(userId, start, end);
+    }
+
+    public async Task<double> GetWeekBurnedCaloriesAsync(int userId)
+    {
+        var today = DateTime.Today;
+        int diff = (DAYS_IN_WEEK + (today.DayOfWeek - START_OF_WEEK)) % DAYS_IN_WEEK;
+
+        var startOfWeek = today.AddDays(-diff);
+        var endOfWeek = startOfWeek.AddDays(DAYS_IN_WEEK);
+
+        return await this.workoutLogRepository.GetTotalCaloriesBurnedForRangeAsync(userId, startOfWeek, endOfWeek);
     }
 
     public async Task<IReadOnlyList<FoodItemDto>> SearchFoodItemsAsync(string? searchTerm)
