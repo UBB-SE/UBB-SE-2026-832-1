@@ -1,4 +1,5 @@
 using ClassLibrary.DTOs;
+using ClassLibrary.DTOs.Analytics;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 using WebAPI.IServices;
@@ -13,6 +14,7 @@ public sealed class ClientService : IClientService
     private readonly IAchievementsRepository achievementsRepository;
     private readonly INotificationRepository notificationRepository;
     private readonly INutritionRepository nutritionRepository;
+    private readonly IAnalyticsService analyticsService;
     private readonly IWorkoutLogRepository workoutLogRepository;
     private readonly IWorkoutTemplateRepository workoutTemplateRepository;
     private readonly IClientRepository clientRepository;
@@ -23,6 +25,7 @@ public sealed class ClientService : IClientService
         IAchievementsRepository achievementsRepository,
         INotificationRepository notificationRepository,
         INutritionRepository nutritionRepository,
+        IAnalyticsService analyticsService,
         IWorkoutLogRepository workoutLogRepository,
         IWorkoutTemplateRepository workoutTemplateRepository,
         IClientRepository clientRepository,
@@ -32,6 +35,7 @@ public sealed class ClientService : IClientService
         this.achievementsRepository = achievementsRepository;
         this.notificationRepository = notificationRepository;
         this.nutritionRepository = nutritionRepository;
+        this.analyticsService = analyticsService;
         this.workoutLogRepository = workoutLogRepository;
         this.workoutTemplateRepository = workoutTemplateRepository;
         this.clientRepository = clientRepository;
@@ -95,6 +99,16 @@ public sealed class ClientService : IClientService
     {
         var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(clientId);
         return logs.Select(MapWorkoutLog).ToList();
+    }
+
+    public Task<DashboardSummary> GetDashboardSummaryAsync(int clientId)
+    {
+        return this.analyticsService.GetDashboardSummaryAsync(clientId);
+    }
+
+    public Task<IReadOnlyList<ConsistencyWeekBucket>> GetConsistencyLastFourWeeksAsync(int clientId)
+    {
+        return this.analyticsService.GetConsistencyLastFourWeeksAsync(clientId);
     }
 
     public async Task<bool> FinalizeWorkoutAsync(FinalizeWorkoutRequestDataTransferObject request)
