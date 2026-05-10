@@ -60,9 +60,9 @@ public sealed class StubWorkoutAnalyticsStore : IWorkoutAnalyticsStore
         });
     }
 
-    public Task<ClassLibrary.Models.Analytics.WorkoutSessionDetail?> GetWorkoutSessionDetailAsync(long clientId, int workoutLogId, CancellationToken cancellationToken = default)
+    public Task<WorkoutSessionDetail?> GetWorkoutSessionDetailAsync(long clientId, int workoutLogId, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<ClassLibrary.Models.Analytics.WorkoutSessionDetail?>(null);
+        return Task.FromResult<WorkoutSessionDetail?>(null);
     }
 }
 
