@@ -1,6 +1,6 @@
+using System.Net;
 using ClassLibrary.Models;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net;
 using WinUI.Services;
 using WinUI.Services.Interfaces;
 namespace WinUI.Extensions;
@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRemindersService, RemindersService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddHttpClient<IShoppingListService, ShoppingListService>();
-       
+
         return services;
     }
 }

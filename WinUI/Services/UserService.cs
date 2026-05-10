@@ -1,9 +1,9 @@
-using ClassLibrary.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using ClassLibrary.DTOs;
 
 namespace WinUI.Services;
 
@@ -61,7 +61,9 @@ public sealed class UserService : IUserService
                 var clientRequest = new { Id = user.Id, UserId = user.Id };
                 await this.httpClient.PostAsJsonAsync($"{ApiBaseUrl.BASE_URL}/api/clients", clientRequest);
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         return user;

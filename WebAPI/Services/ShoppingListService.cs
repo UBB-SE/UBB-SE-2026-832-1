@@ -1,9 +1,9 @@
-﻿using ClassLibrary.DTOs;
-using ClassLibrary.IRepositories;
-using ClassLibrary.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ClassLibrary.DTOs;
+using ClassLibrary.IRepositories;
+using ClassLibrary.Models;
 using WebAPI.IServices;
 
 namespace WebAPI.Services
@@ -167,10 +167,16 @@ namespace WebAPI.Services
         public async Task<bool> MoveToPantryAsync(int itemId)
         {
             var item = await shoppingRepository.GetByIdAsync(itemId);
-            if (item == null) return false;
+            if (item == null)
+            {
+                return false;
+            }
 
             var userId = item.User?.UserId ?? 0;
-            if (userId <= 0) return false;
+            if (userId <= 0)
+            {
+                return false;
+            }
 
             await inventoryRepository.AddAsync(new Inventory
             {

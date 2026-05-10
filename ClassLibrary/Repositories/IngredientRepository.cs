@@ -23,7 +23,10 @@ public sealed class IngredientRepository : IIngredientRepository
         var ingredientEntity = await databaseContext.Ingredients
             .FirstOrDefaultAsync(ingredient => ingredient.Name.ToLower() == name.ToLower());
 
-        if (ingredientEntity != null) return ingredientEntity.IngredientId;
+        if (ingredientEntity != null)
+        {
+            return ingredientEntity.IngredientId;
+        }
 
         var newIngredient = new Ingredient { Name = name };
         await databaseContext.Ingredients.AddAsync(newIngredient);

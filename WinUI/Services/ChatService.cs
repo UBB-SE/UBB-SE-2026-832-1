@@ -25,7 +25,10 @@ public sealed class ChatService : IChatService
     {
         var response = await this.httpClient.PostAsync($"{ApiBaseUrl.BASE_URL}/api/chat/user/{userId}", null);
 
-        if (!response.IsSuccessStatusCode) return null;
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
 
         var dto = await response.Content.ReadFromJsonAsync<ConversationDto>();
         return dto != null ? DataTransferObjectToDomainModelMappers.MapConversation(dto) : null;

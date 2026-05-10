@@ -130,6 +130,7 @@ public partial class DailyLogViewModel : ObservableObject
             NutritionTargets = await this.dailyLogService.GetNutritionTargetsAsync(userId);
             BurnedCalories = await this.dailyLogService.GetTodayBurnedCaloriesAsync(userId);
             WeekBurnedCalories = await this.dailyLogService.GetWeekBurnedCaloriesAsync(userId);
+            HasMealLogged = TodayTotals.TotalCalories > 0;
         }
         catch (Exception exception)
         {

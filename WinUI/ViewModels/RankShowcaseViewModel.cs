@@ -14,7 +14,6 @@ public partial class RankShowcaseViewModel : ObservableObject
     private const string DEFAULT_NEXT_RANK_INFO = "Complete more achievements to unlock your next rank.";
     private const string RANK_SHOWCASE_LOAD_ERROR_FORMAT = "Failed to load rank showcase: {0}";
 
-
     private readonly IRankShowcaseService rankShowcaseService;
     private readonly UserSession userSession;
 

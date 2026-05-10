@@ -58,7 +58,9 @@ public class ReminderRepository : IReminderRepository
             .FirstOrDefaultAsync(reminder => reminder.ReminderId == id);
 
         if (reminder == null)
+        {
             return;
+        }
 
         dbContext.Reminders.Remove(reminder);
         await dbContext.SaveChangesAsync();

@@ -90,14 +90,14 @@ public sealed class WorkoutLogRepositoryPreservationTests : IDisposable
 
         Assert.NotNull(result);
         Assert.Single(result);
-        
+
         var workout = result[0];
         Assert.Equal("Upper Body", workout.WorkoutName);
         Assert.NotNull(workout.Client);
         Assert.Equal(1, workout.Client.ClientId);
         Assert.NotNull(workout.Exercises);
         Assert.Equal(2, workout.Exercises.Count);
-        
+
         Assert.Equal(2, workout.Exercises[0].Sets.Count);
         Assert.Single(workout.Exercises[1].Sets);
     }
@@ -303,7 +303,7 @@ public sealed class WorkoutLogRepositoryPreservationTests : IDisposable
 
         Assert.Single(client1Workouts);
         Assert.Equal("Client 1 Workout", client1Workouts[0].WorkoutName);
-        
+
         Assert.Single(client2Workouts);
         Assert.Equal("Client 2 Workout", client2Workouts[0].WorkoutName);
     }
@@ -422,7 +422,7 @@ public sealed class WorkoutLogRepositoryPreservationTests : IDisposable
             .Include(w => w.Exercises)
             .ThenInclude(e => e.Sets)
             .FirstOrDefaultAsync();
-        
+
         Assert.NotNull(savedLog);
         Assert.Single(savedLog.Exercises);
         Assert.Equal("Bench Press", savedLog.Exercises[0].ExerciseName);
@@ -432,7 +432,7 @@ public sealed class WorkoutLogRepositoryPreservationTests : IDisposable
     [Fact]
     public async Task SaveWorkoutLogAsync_WithNullLog_ThrowsArgumentNullException()
     {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => 
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
             this.repository.SaveWorkoutLogAsync(null!));
     }
 

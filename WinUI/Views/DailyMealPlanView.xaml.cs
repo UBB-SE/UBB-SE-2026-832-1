@@ -1,8 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
-using WinUI.ViewModels; 
+using WinUI.ViewModels;
 
 namespace WinUI.Views;
-
 
 public sealed partial class DailyMealPlanView : Page
 {
@@ -12,7 +11,6 @@ public sealed partial class DailyMealPlanView : Page
     {
         this.InitializeComponent();
 
-        
         ViewModel = new DailyMealPlanViewModel();
     }
 }

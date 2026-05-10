@@ -1,8 +1,5 @@
 ﻿namespace WinUI.ViewModels
 {
-    using ClassLibrary.Models;
-    using CommunityToolkit.Mvvm.ComponentModel;
-    using CommunityToolkit.Mvvm.Input;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -10,6 +7,9 @@
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
+    using ClassLibrary.Models;
+    using CommunityToolkit.Mvvm.ComponentModel;
+    using CommunityToolkit.Mvvm.Input;
     using WinUI.Services;
 
     public partial class NutritionistChatViewModel : ObservableObject
@@ -214,7 +214,10 @@
         [RelayCommand]
         public async Task SendMessageAsync()
         {
-            if (string.IsNullOrWhiteSpace(InputText)) return;
+            if (string.IsNullOrWhiteSpace(InputText))
+            {
+                return;
+            }
 
             if (InputText.Length > MaxMessageLength)
             {
@@ -237,7 +240,10 @@
                 }
 
                 var conversation = await chatService.GetOrCreateConversationForUserAsync(this.userSession.CurrentClientId);
-                if (conversation == null) return;
+                if (conversation == null)
+                {
+                    return;
+                }
 
                 currentConversationId = conversation.Id;
             }

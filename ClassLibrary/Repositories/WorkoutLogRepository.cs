@@ -84,8 +84,7 @@ public sealed class WorkoutLogRepository : IWorkoutLogRepository
             where user.UserId == userId
                 && workoutLog.Date >= startInclusive
                 && workoutLog.Date < endExclusive
-            select workoutLog.TotalCaloriesBurned
-        ).SumAsync(calories => (double)calories);
+            select workoutLog.TotalCaloriesBurned).SumAsync(calories => (double)calories);
 
         return totalCalories;
     }

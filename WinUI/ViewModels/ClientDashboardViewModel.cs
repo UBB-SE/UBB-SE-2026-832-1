@@ -236,8 +236,6 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         {
             consistencyBuckets.Add(b);
         }
-
-        
     }
 
     private void ApplyAchievements(IReadOnlyList<AchievementDataTransferObject> achievements)

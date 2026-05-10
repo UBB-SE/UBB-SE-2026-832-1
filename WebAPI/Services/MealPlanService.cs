@@ -208,7 +208,7 @@ public sealed class MealPlanService : IMealPlanService
         {
             int remainingSlots = maxMeals - slot - 1;
             int maxAllowed = upperBound - runningCalories;
-            int minNeeded = Math.Max(0, lowerBound - runningCalories - remainingSlots * maxSingleMealCalories);
+            int minNeeded = Math.Max(0, lowerBound - runningCalories - (remainingSlots * maxSingleMealCalories));
 
             var candidate = shuffled.FirstOrDefault(foodItem =>
                 !selected.Contains(foodItem) &&

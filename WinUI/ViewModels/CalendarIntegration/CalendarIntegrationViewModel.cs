@@ -283,5 +283,4 @@ public sealed partial class CalendarIntegrationViewModel : ObservableObject
         StatusMessage = string.Empty;
         IsStatusOpen = false;
     }
-
 }

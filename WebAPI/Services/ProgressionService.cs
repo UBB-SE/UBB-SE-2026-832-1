@@ -1,7 +1,7 @@
+using System.Linq;
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
-using System.Linq;
 using WebAPI.IServices;
 
 namespace WebAPI.Services;

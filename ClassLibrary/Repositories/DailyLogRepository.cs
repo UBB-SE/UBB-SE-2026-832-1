@@ -17,13 +17,19 @@ public sealed class DailyLogRepository : IDailyLogRepository
     public async Task AddAsync(DailyLog log)
     {
         if (log.User != null)
+        {
             log.User = await this.databaseContext.Users.FindAsync(log.User.UserId) ?? log.User;
+        }
 
         if (log.FoodItem != null)
+        {
             log.FoodItem = await this.databaseContext.FoodItems.FindAsync(log.FoodItem.FoodItemId) ?? log.FoodItem;
+        }
 
         if (log.Meal != null)
+        {
             log.Meal = await this.databaseContext.Meals.FindAsync(log.Meal.MealId) ?? log.Meal;
+        }
 
         await this.databaseContext.DailyLogs.AddAsync(log);
         await this.databaseContext.SaveChangesAsync();

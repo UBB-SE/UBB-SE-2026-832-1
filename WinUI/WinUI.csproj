@@ -14,6 +14,7 @@
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <WindowsPackageType>None</WindowsPackageType>
+	 <NoWarn>$(NoWarn);MVVMTK0045</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\NutritionistChatView\NutritionistChatView.xaml" />
@@ -24,6 +25,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.0.1" />
     <ProjectReference Include="..\ClassLibrary\ClassLibrary.csproj" />
+	<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

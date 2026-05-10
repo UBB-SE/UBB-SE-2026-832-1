@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
 
-
 public sealed class AchievementsRepository : IAchievementsRepository
 {
     private readonly AppDbContext databaseContext;

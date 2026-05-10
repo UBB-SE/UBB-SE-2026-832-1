@@ -1,7 +1,7 @@
 namespace WinUI.Services;
 
-using ClassLibrary.DTOs;
 using System.Net.Http.Json;
+using ClassLibrary.DTOs;
 
 public sealed class ClientProfileService : IClientProfileService
 {

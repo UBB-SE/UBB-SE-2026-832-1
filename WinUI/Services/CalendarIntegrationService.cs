@@ -20,8 +20,8 @@ public interface ICalendarIntegrationService
 public sealed class CalendarIntegrationService : ICalendarIntegrationService
 {
     private readonly HttpClient httpClient;
-    private const string apiBaseAddress = ApiBaseUrl.BASE_URL;
-    private const string clientRoutePrefix = "api/client";
+    private const string ApiBaseAddress = ApiBaseUrl.BASE_URL;
+    private const string ClientRoutePrefix = "api/client";
 
     public CalendarIntegrationService(HttpClient httpClient)
     {
@@ -30,7 +30,7 @@ public sealed class CalendarIntegrationService : ICalendarIntegrationService
 
     public async Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsAsync(int clientId, CancellationToken cancellationToken = default)
     {
-        var requestUri = $"{apiBaseAddress}/{clientRoutePrefix}/{clientId}/available-workouts";
+        var requestUri = $"{ApiBaseAddress}/{ClientRoutePrefix}/{clientId}/available-workouts";
         var response = await this.httpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         var dataTransferObjects = await response.Content.ReadFromJsonAsync<List<WorkoutTemplateDataTransferObject>>(cancellationToken: cancellationToken).ConfigureAwait(false);

@@ -38,16 +38,16 @@ public sealed class StubWorkoutAnalyticsStore : IWorkoutAnalyticsStore
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
         var buckets = new List<ConsistencyWeekBucket>();
-        
+
         for (int i = 0; i < 4; i++)
         {
             buckets.Add(new ConsistencyWeekBucket
             {
-                WeekStart = today.AddDays(-21 + i * 7),
+                WeekStart = today.AddDays(-21 + (i * 7)),
                 WorkoutCount = 0
             });
         }
-        
+
         return Task.FromResult<IReadOnlyList<ConsistencyWeekBucket>>(buckets);
     }
 

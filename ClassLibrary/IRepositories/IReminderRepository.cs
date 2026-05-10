@@ -6,7 +6,7 @@ public interface IReminderRepository
 {
     Task<Reminder?> GetByIdAsync(int id);
 
-    Task<IEnumerable<Reminder>> GetAllAsync(); 
+    Task<IEnumerable<Reminder>> GetAllAsync();
 
     Task<IEnumerable<Reminder>> GetAllByUserIdAsync(int userId);
     Task<Reminder?> GetNextReminderAsync(int userId);

@@ -1,9 +1,9 @@
-using ClassLibrary.Models;
-using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WebAPI.IServices;
 using ClassLibrary.DTOs;
+using ClassLibrary.Models;
+using Microsoft.AspNetCore.Mvc;
+using WebAPI.IServices;
 
 namespace WebAPI.Controllers
 {
@@ -18,7 +18,7 @@ namespace WebAPI.Controllers
             this.shoppingListService = shoppingListService;
         }
 
-        [HttpPost("user/{userId}")] 
+        [HttpPost("user/{userId}")]
         public async Task<IActionResult> AddItem(int userId, [FromBody] AddShoppingItemRequest request)
         {
             await shoppingListService.AddItemAsync(userId, request);

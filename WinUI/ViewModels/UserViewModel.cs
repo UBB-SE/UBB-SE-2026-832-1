@@ -44,7 +44,9 @@ public partial class UserViewModel : ObservableObject
         set
         {
             if (SetProperty(ref isTrainer, value) && value)
+            {
                 IsNutritionist = false;
+            }
         }
     }
 
@@ -55,7 +57,9 @@ public partial class UserViewModel : ObservableObject
         set
         {
             if (SetProperty(ref isNutritionist, value) && value)
+            {
                 IsTrainer = false;
+            }
         }
     }
 
@@ -68,7 +72,9 @@ public partial class UserViewModel : ObservableObject
     public event EventHandler? NavigateToRegister;
     public event EventHandler? NavigateToLogin;
 
-    public UserViewModel() { }
+    public UserViewModel()
+    {
+    }
 
     public UserViewModel(IUserService userService)
     {
@@ -78,7 +84,11 @@ public partial class UserViewModel : ObservableObject
     [RelayCommand]
     private async Task LoginAsync()
     {
-        if (this.userService == null) return;
+        if (this.userService == null)
+        {
+            return;
+        }
+
         this.StatusMessage = string.Empty;
 
         if (string.IsNullOrWhiteSpace(this.UserName) || string.IsNullOrWhiteSpace(this.Password))
@@ -111,7 +121,11 @@ public partial class UserViewModel : ObservableObject
     [RelayCommand]
     private async Task RegisterAsync()
     {
-        if (this.userService == null) return;
+        if (this.userService == null)
+        {
+            return;
+        }
+
         this.StatusMessage = string.Empty;
 
         if (this.UserName.Length < 3 || this.Password.Length < 6)
@@ -165,7 +179,11 @@ public partial class UserViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveDataAsync()
     {
-        if (this.userService == null) return;
+        if (this.userService == null)
+        {
+            return;
+        }
+
         this.StatusMessage = string.Empty;
 
         try
@@ -208,8 +226,16 @@ public partial class UserViewModel : ObservableObject
     }
     private string GetSelectedRole()
     {
-        if (this.IsTrainer) return ROLE_TRAINER;
-        if (this.IsNutritionist) return ROLE_NUTRITIONIST;
+        if (this.IsTrainer)
+        {
+            return ROLE_TRAINER;
+        }
+
+        if (this.IsNutritionist)
+        {
+            return ROLE_NUTRITIONIST;
+        }
+
         return ROLE_USER;
     }
     public static int CalculateAge(DateTimeOffset? birthDate)

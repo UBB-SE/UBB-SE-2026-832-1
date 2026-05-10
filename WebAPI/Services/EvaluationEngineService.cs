@@ -11,7 +11,7 @@ public sealed class EvaluationEngineService : IEvaluationEngineService
     private const string UnlockedAchievementIcon = "&#xE73E;";
     private const string LockedAchievementIcon = "&#xE72E;";
 
-    private static readonly IReadOnlyList<IMilestoneCheck> milestoneChecks = new List<IMilestoneCheck>
+    private static readonly IReadOnlyList<IMilestoneCheck> MilestoneChecks = new List<IMilestoneCheck>
     {
         new WorkoutCountCheck("First Rep", 1),
         new WorkoutCountCheck("Getting Serious", 10),
@@ -23,7 +23,7 @@ public sealed class EvaluationEngineService : IEvaluationEngineService
         new WeeklyVolumeCheck("Iron Week", requiredWorkoutsPerWeek: 5),
     };
 
-    private static readonly IReadOnlyList<LevelingTier> levelingTiers = new List<LevelingTier>
+    private static readonly IReadOnlyList<LevelingTier> LevelingTiers = new List<LevelingTier>
     {
         new LevelingTier(1, "Beginner", 0),
         new LevelingTier(2, "Trainee", 1),
@@ -56,7 +56,7 @@ public sealed class EvaluationEngineService : IEvaluationEngineService
 
         List<string> newlyUnlocked = new List<string>();
 
-        foreach (IMilestoneCheck check in milestoneChecks)
+        foreach (IMilestoneCheck check in MilestoneChecks)
         {
             if (!catalogByTitle.TryGetValue(check.AchievementTitle, out AchievementShowcaseItem? showcaseItem))
             {
@@ -91,15 +91,15 @@ public sealed class EvaluationEngineService : IEvaluationEngineService
 
         int unlockedCount = showcaseItems.Count(item => item.IsUnlocked);
 
-        int level = levelingTiers[0].level;
-        string rankTitle = levelingTiers[0].rankTitle;
+        int level = LevelingTiers[0].Level;
+        string rankTitle = LevelingTiers[0].RankTitle;
 
-        foreach (LevelingTier tier in levelingTiers)
+        foreach (LevelingTier tier in LevelingTiers)
         {
-            if (unlockedCount >= tier.minimumAchievements)
+            if (unlockedCount >= tier.MinimumAchievements)
             {
-                level = tier.level;
-                rankTitle = tier.rankTitle;
+                level = tier.Level;
+                rankTitle = tier.RankTitle;
             }
         }
 
@@ -141,9 +141,9 @@ public sealed class EvaluationEngineService : IEvaluationEngineService
     {
         int currentIndex = -1;
 
-        for (int i = 0; i < levelingTiers.Count; i++)
+        for (int i = 0; i < LevelingTiers.Count; i++)
         {
-            if (levelingTiers[i].level == level)
+            if (LevelingTiers[i].Level == level)
             {
                 currentIndex = i;
                 break;
@@ -152,13 +152,13 @@ public sealed class EvaluationEngineService : IEvaluationEngineService
 
         int nextIndex = currentIndex + 1;
 
-        if (currentIndex < 0 || nextIndex >= levelingTiers.Count)
+        if (currentIndex < 0 || nextIndex >= LevelingTiers.Count)
         {
             return (false, 100.0, "Max rank reached — keep going!");
         }
 
-        int bandStart = levelingTiers[currentIndex].minimumAchievements;
-        int bandEnd = levelingTiers[nextIndex].minimumAchievements;
+        int bandStart = LevelingTiers[currentIndex].MinimumAchievements;
+        int bandEnd = LevelingTiers[nextIndex].MinimumAchievements;
         int earned = unlockedCount - bandStart;
         int needed = bandEnd - bandStart;
 
@@ -169,7 +169,7 @@ public sealed class EvaluationEngineService : IEvaluationEngineService
         int remaining = Math.Max(0, bandEnd - unlockedCount);
 
         string nextRankInfo =
-            $"Next: Level {levelingTiers[nextIndex].level}: {levelingTiers[nextIndex].rankTitle} – " +
+            $"Next: Level {LevelingTiers[nextIndex].Level}: {LevelingTiers[nextIndex].RankTitle} – " +
             $"{remaining} more achievement{(remaining == 1 ? string.Empty : "s")} to go";
 
         return (true, progressPercent, nextRankInfo);

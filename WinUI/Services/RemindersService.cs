@@ -4,7 +4,6 @@ namespace WinUI.Services;
 
 public sealed class RemindersService : IRemindersService
 {
-
     private readonly HttpClient httpClient;
 
     public RemindersService(HttpClient httpClient)

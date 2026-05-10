@@ -6,8 +6,8 @@ namespace WinUI.Services;
 
 public sealed class RankShowcaseService : IRankShowcaseService
 {
-    private const string apiBaseAddress = "https://localhost:7197/api";
-    private const string evaluationRoute = "evaluation";
+    private const string ApiBaseAddress = "https://localhost:7197/api";
+    private const string EvaluationRoute = "evaluation";
     private readonly HttpClient httpClient;
 
     public RankShowcaseService(HttpClient httpClient)
@@ -18,7 +18,7 @@ public sealed class RankShowcaseService : IRankShowcaseService
     public async Task<RankShowcaseSnapshot> GetRankShowcaseAsync(int clientId)
     {
         var snapshotDataTransferObject = await this.httpClient.GetFromJsonAsync<RankShowcaseSnapshotDataTransferObject>(
-            $"{apiBaseAddress}/{evaluationRoute}/{clientId}/rank-showcase");
+            $"{ApiBaseAddress}/{EvaluationRoute}/{clientId}/rank-showcase");
 
         if (snapshotDataTransferObject is null)
         {

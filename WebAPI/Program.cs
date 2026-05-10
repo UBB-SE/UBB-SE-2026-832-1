@@ -13,11 +13,8 @@ builder.Services.AddWebApiServices();
 var app = builder.Build();
 app.Services.SeedClassLibraryData();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

@@ -41,12 +41,10 @@ public sealed class NavigationService : INavigationService
 
     public void NavigateToActiveWorkout(int clientId = 0)
     {
-    
     }
 
     public void NavigateToWorkoutLogs()
     {
-    
     }
 
     public void GoBack()
@@ -59,11 +57,9 @@ public sealed class NavigationService : INavigationService
 
     public void NavigateToTrainerDashboard()
     {
-    
     }
 
     public void NavigateToClientProfile(int clientId)
     {
-    
     }
 }

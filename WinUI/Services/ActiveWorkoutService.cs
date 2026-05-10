@@ -7,8 +7,8 @@ namespace WinUI.Services;
 public sealed class ActiveWorkoutService : IActiveWorkoutService
 {
     private readonly HttpClient httpClient;
-    private const string baseAddress = ApiBaseUrl.BASE_URL + "/api";
-    private const string clientRoute = baseAddress + "/client";
+    private const string BaseAddress = ApiBaseUrl.BASE_URL + "/api";
+    private const string ClientRoute = BaseAddress + "/client";
 
     public ActiveWorkoutService(HttpClient httpClient)
     {
@@ -17,7 +17,7 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
 
     public async Task<IReadOnlyList<WorkoutTemplate>> GetAvailableWorkoutsForClient(int clientId)
     {
-        var workoutTemplateDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{clientRoute}/{clientId}/available-workouts");
+        var workoutTemplateDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<WorkoutTemplateDataTransferObject>>($"{ClientRoute}/{clientId}/available-workouts");
         return DataTransferObjectToDomainModelMappers.MapWorkoutTemplates(workoutTemplateDataTransferObjects);
     }
 
@@ -39,7 +39,7 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
 
     public async Task<IDictionary<string, double>> GetPreviousBestWeightsAsync(int clientId)
     {
-        var previousBestWeightsDataTransferObject = await this.httpClient.GetFromJsonAsync<PreviousBestWeightsDataTransferObject>($"{clientRoute}/{clientId}/previous-best-weights");
+        var previousBestWeightsDataTransferObject = await this.httpClient.GetFromJsonAsync<PreviousBestWeightsDataTransferObject>($"{ClientRoute}/{clientId}/previous-best-weights");
         return previousBestWeightsDataTransferObject?.BestWeightsByExercise ?? new Dictionary<string, double>();
     }
 
@@ -72,7 +72,7 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
             return true;
         }
 
-        var modifyWorkoutResponse = await this.httpClient.PutAsJsonAsync($"{clientRoute}/modify-workout", MapToWorkoutLogDataTransferObject(workoutLog));
+        var modifyWorkoutResponse = await this.httpClient.PutAsJsonAsync($"{ClientRoute}/modify-workout", MapToWorkoutLogDataTransferObject(workoutLog));
         return modifyWorkoutResponse.IsSuccessStatusCode;
     }
 
@@ -84,13 +84,13 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
         {
             WorkoutLog = MapToWorkoutLogDataTransferObject(workoutLog),
         };
-        var finalizeWorkoutResponse = await this.httpClient.PostAsJsonAsync($"{clientRoute}/finalize-workout", finalizeWorkoutRequestDataTransferObject);
+        var finalizeWorkoutResponse = await this.httpClient.PostAsJsonAsync($"{ClientRoute}/finalize-workout", finalizeWorkoutRequestDataTransferObject);
         return finalizeWorkoutResponse.IsSuccessStatusCode;
     }
 
     public async Task<IReadOnlyList<Notification>> GetNotifications(int clientId)
     {
-        var notificationDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<NotificationDataTransferObject>>($"{clientRoute}/{clientId}/notifications");
+        var notificationDataTransferObjects = await this.httpClient.GetFromJsonAsync<List<NotificationDataTransferObject>>($"{ClientRoute}/{clientId}/notifications");
         return DataTransferObjectToDomainModelMappers.MapNotifications(notificationDataTransferObjects);
     }
 
@@ -103,7 +103,7 @@ public sealed class ActiveWorkoutService : IActiveWorkoutService
             NotificationId = notification.NotificationId,
         };
 
-        var confirmDeloadResponse = await this.httpClient.PostAsJsonAsync($"{clientRoute}/confirm-deload", request);
+        var confirmDeloadResponse = await this.httpClient.PostAsJsonAsync($"{ClientRoute}/confirm-deload", request);
         confirmDeloadResponse.EnsureSuccessStatusCode();
     }
 

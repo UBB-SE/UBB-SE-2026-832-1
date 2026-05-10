@@ -1,4 +1,5 @@
 namespace WinUI.Services;
+
 using ClassLibrary.DTOs;
 public interface IClientProfileService
 {
