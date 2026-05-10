@@ -48,6 +48,27 @@ public sealed class ClientController : ControllerBase
         return this.Ok(history);
     }
 
+    [HttpGet("{clientId}/workout-history-page")]
+    public async Task<IActionResult> GetWorkoutHistoryPage(int clientId, [FromQuery] int page = 0, [FromQuery] int pageSize = 5)
+    {
+        var history = await this.clientService.GetWorkoutHistoryPageAsync(clientId, page, pageSize);
+        return this.Ok(history);
+    }
+
+    [HttpGet("{clientId}/dashboard-summary")]
+    public async Task<IActionResult> GetDashboardSummary(int clientId)
+    {
+        var summary = await this.clientService.GetDashboardSummaryAsync(clientId);
+        return this.Ok(summary);
+    }
+
+    [HttpGet("{clientId}/consistency-four-weeks")]
+    public async Task<IActionResult> GetConsistencyFourWeeks(int clientId)
+    {
+        var buckets = await this.clientService.GetConsistencyLastFourWeeksAsync(clientId);
+        return this.Ok(buckets);
+    }
+
     [HttpGet("{clientId}/available-workouts")]
     public async Task<IActionResult> GetAvailableWorkouts(int clientId)
     {
