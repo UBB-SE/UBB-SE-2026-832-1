@@ -14,6 +14,8 @@ public sealed partial class WorkoutHistoryItemViewModel : ObservableObject
 
     private int workoutLogId;
 
+    public int WorkoutLogId => workoutLogId;
+
     public string Title { get; set; } = string.Empty;
 
     public string DateLine { get; set; } = string.Empty;
@@ -88,6 +90,63 @@ public sealed partial class WorkoutHistoryItemViewModel : ObservableObject
         }
 
         return vm;
+    }
+
+    public void ApplyDetail(WorkoutSessionDetail detail)
+    {
+        TotalCaloriesBurned = detail.TotalCaloriesBurned;
+        OnPropertyChanged(nameof(TotalCaloriesBurned));
+
+        ExerciseSetGroups.Clear();
+        var grouped = detail.Sets.GroupBy(set => set.ExerciseName).ToList();
+        foreach (var group in grouped)
+        {
+            var exerciseGroup = new ExerciseSetGroupViewModel { ExerciseName = group.Key };
+            int setIndex = 1;
+            foreach (var set in group)
+            {
+                var setVm = new SetDetailRowViewModel
+                {
+                    SetNumber = setIndex++,
+                    RepsDisplay = set.ActualReps?.ToString() ?? "—",
+                    WeightDisplay = set.ActualWeight?.ToString("F1") ?? "—"
+                };
+                exerciseGroup.Sets.Add(setVm);
+            }
+            ExerciseSetGroups.Add(exerciseGroup);
+        }
+
+        ExerciseCalories.Clear();
+
+        var caloriesByExercise = detail.ExerciseCalories
+            .Where(calorie => !string.IsNullOrWhiteSpace(calorie.ExerciseName))
+            .GroupBy(calorie => calorie.ExerciseName)
+            .ToDictionary(
+                group => group.Key,
+                group => Math.Max(0, group.Sum(item => item.CaloriesBurned)),
+                StringComparer.OrdinalIgnoreCase);
+
+        foreach (var group in grouped)
+        {
+            if (string.IsNullOrWhiteSpace(group.Key))
+            {
+                continue;
+            }
+
+            if (!caloriesByExercise.ContainsKey(group.Key))
+            {
+                caloriesByExercise[group.Key] = 0;
+            }
+        }
+
+        foreach (var pair in caloriesByExercise.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            ExerciseCalories.Add(new ExerciseCalorieInfo
+            {
+                ExerciseName = pair.Key,
+                CaloriesBurned = pair.Value,
+            });
+        }
     }
 
     private static string FormatDuration(int seconds)
