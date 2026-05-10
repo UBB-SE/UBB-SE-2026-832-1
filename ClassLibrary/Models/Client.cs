@@ -20,7 +20,8 @@ public class Client
 
     [MaxLength(500)]
     public string PrimaryGoal { get; set; } = string.Empty;
-
+    public ICollection<WorkoutTemplate> WorkoutTemplates { get; set; }
+    = new List<WorkoutTemplate>();
     public ICollection<WorkoutLog> WorkoutLogs { get; set; } = [];
 
     public ICollection<Achievement> UnlockedAchievements { get; set; } = [];
