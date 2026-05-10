@@ -68,6 +68,7 @@ public class UserService : IUserService
             {
                 ClientId = user.UserId
             };
+            client.WorkoutTemplates = CreateDefaultWorkoutTemplates(client);
 
             await this.clientRepository.AddAsync(client);
         }
@@ -173,5 +174,114 @@ public class UserService : IUserService
             CarbohydrateNeeds = dto.CarbohydrateNeeds,
             FatNeeds = dto.FatNeeds,
         };
+    }
+    private static List<WorkoutTemplate> CreateDefaultWorkoutTemplates(
+    Client client)
+    {
+        var pushTemplate = new WorkoutTemplate
+        {
+            Client = client,
+            Name = "Push Day",
+            Type = WorkoutType.PREBUILT,
+            Exercises = new List<TemplateExercise>
+        {
+            new TemplateExercise
+            {
+                Name = "Bench Press",
+                MuscleGroup = MuscleGroup.CHEST,
+                TargetSets = 4,
+                TargetReps = 10
+            },
+
+            new TemplateExercise
+            {
+                Name = "Incline Dumbbell Press",
+                MuscleGroup = MuscleGroup.CHEST,
+                TargetSets = 3,
+                TargetReps = 12
+            },
+
+            new TemplateExercise
+            {
+                Name = "Shoulder Press",
+                MuscleGroup = MuscleGroup.SHOULDERS,
+                TargetSets = 3,
+                TargetReps = 10
+            }
+        }
+        };
+
+        var pullTemplate = new WorkoutTemplate
+        {
+            Client = client,
+            Name = "Pull Day",
+            Type = WorkoutType.PREBUILT,
+            Exercises = new List<TemplateExercise>
+        {
+            new TemplateExercise
+            {
+                Name = "Pull Ups",
+                MuscleGroup = MuscleGroup.BACK,
+                TargetSets = 4,
+                TargetReps = 10
+            },
+
+            new TemplateExercise
+            {
+                Name = "Barbell Row",
+                MuscleGroup = MuscleGroup.BACK,
+                TargetSets = 4,
+                TargetReps = 10
+            },
+
+            new TemplateExercise
+            {
+                Name = "Bicep Curl",
+                MuscleGroup = MuscleGroup.ARMS,
+                TargetSets = 3,
+                TargetReps = 12
+            }
+        }
+        };
+
+        var hiitTemplate = new WorkoutTemplate
+        {
+            Client = client,
+            Name = "HIIT Fat Burner",
+            Type = WorkoutType.PREBUILT,
+            Exercises = new List<TemplateExercise>
+        {
+            new TemplateExercise
+            {
+                Name = "Burpees",
+                MuscleGroup = MuscleGroup.CARDIO,
+                TargetSets = 4,
+                TargetReps = 15
+            },
+
+            new TemplateExercise
+            {
+                Name = "Mountain Climbers",
+                MuscleGroup = MuscleGroup.CARDIO,
+                TargetSets = 4,
+                TargetReps = 20
+            },
+
+            new TemplateExercise
+            {
+                Name = "Jump Squats",
+                MuscleGroup = MuscleGroup.LEGS,
+                TargetSets = 4,
+                TargetReps = 15
+            }
+        }
+        };
+
+        return new List<WorkoutTemplate>
+    {
+        pushTemplate,
+        pullTemplate,
+        hiitTemplate
+    };
     }
 }
