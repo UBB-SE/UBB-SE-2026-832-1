@@ -32,7 +32,6 @@ public sealed partial class ClientDashboardPage : Page
         }
         catch (Exception ex)
         {
-            // Fail gracefully if initialization fails
             System.Diagnostics.Debug.WriteLine($"ClientDashboardPage initialization error: {ex.Message}");
         }
     }
@@ -54,7 +53,6 @@ public sealed partial class ClientDashboardPage : Page
         }
         catch (Exception ex)
         {
-            // Log but don't crash
             System.Diagnostics.Debug.WriteLine($"ClientDashboardPage_Loaded error: {ex.Message}");
         }
     }

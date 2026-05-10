@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using ClassLibrary.DTOs;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -100,6 +101,41 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
 
     public Task LoadInitialAsync() => LoadAllAsync();
 
+    public async Task LoadWorkoutDetailAsync(WorkoutHistoryItemViewModel item)
+    {
+        if (item.IsLoadingDetail)
+        {
+            return;
+        }
+
+        if (item.ExerciseCalories.Count > 0 && item.ExerciseSetGroups.Count > 0)
+        {
+            return;
+        }
+
+        item.IsLoadingDetail = true;
+        try
+        {
+            var detail = await this.dashboardService.GetWorkoutSessionDetailAsync(
+                (int)this.userSession.CurrentClientId,
+                item.WorkoutLogId).ConfigureAwait(true);
+
+            if (detail == null)
+            {
+                return;
+            }
+
+            item.ApplyDetail(detail);
+        }
+        catch
+        {
+        }
+        finally
+        {
+            item.IsLoadingDetail = false;
+        }
+    }
+
     private async Task LoadAllAsync()
     {
         CancelPendingLoad();
@@ -129,12 +165,9 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            // Normal cancellation, no action needed
         }
         catch (Exception ex)
         {
-            // Silently handle other exceptions to prevent crashes
-            // Set safe default values for UI
             ShowEmptyState = true;
             TotalWorkouts = 0;
             ActiveTimeSevenDaysDisplay = "—";
@@ -163,12 +196,9 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            // Normal cancellation, no action needed
         }
         catch (Exception ex)
         {
-            // Silently handle exceptions to prevent crashes
-            // Show empty state if loading fails
             ShowEmptyState = true;
             HistoryItems.Clear();
             UpdatePaginationButtons();
@@ -181,8 +211,6 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
 
     public void ReloadAchievementsPreview()
     {
-        // This method is called when achievements are unlocked
-        // Can be used to refresh achievement-related UI if needed
     }
 
     private void CancelPendingLoad()
@@ -209,8 +237,7 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
             consistencyBuckets.Add(b);
         }
 
-        // Chart data can be used by code-behind to populate LiveChartsCore if available
-        // For now, we store the buckets for potential future use
+        
     }
 
     private void ApplyAchievements(IReadOnlyList<AchievementDataTransferObject> achievements)
@@ -228,10 +255,30 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         ShowEmptyState = result.TotalCount == 0;
         UpdatePaginationButtons();
 
+        foreach (var item in HistoryItems)
+        {
+            item.PropertyChanged -= OnHistoryItemPropertyChanged;
+        }
+
         HistoryItems.Clear();
         foreach (var row in result.Items)
         {
-            HistoryItems.Add(WorkoutHistoryItemViewModel.FromWorkoutHistoryRow(row));
+            var item = WorkoutHistoryItemViewModel.FromWorkoutHistoryRow(row);
+            item.PropertyChanged += OnHistoryItemPropertyChanged;
+            HistoryItems.Add(item);
+        }
+    }
+
+    private void OnHistoryItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(WorkoutHistoryItemViewModel.IsExpanded))
+        {
+            return;
+        }
+
+        if (sender is WorkoutHistoryItemViewModel item && item.IsExpanded)
+        {
+            _ = LoadWorkoutDetailAsync(item);
         }
     }
 
