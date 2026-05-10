@@ -49,7 +49,7 @@ public sealed class ClientDashboardService : IClientDashboardService
         try
         {
             var result = await httpClient.GetFromJsonAsync<WorkoutHistoryPageResult>(
-                $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/workout-history?page={page}&pageSize={pageSize}");
+                $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/workout-history-page?page={page}&pageSize={pageSize}");
             return result ?? new WorkoutHistoryPageResult { TotalCount = 0, Items = new List<WorkoutHistoryRow>() };
         }
         catch

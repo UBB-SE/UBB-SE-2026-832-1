@@ -101,6 +101,33 @@ public sealed class ClientService : IClientService
         return logs.Select(MapWorkoutLog).ToList();
     }
 
+    public async Task<WorkoutHistoryPageResult> GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize)
+    {
+        var logs = await this.workoutLogRepository.GetWorkoutHistoryAsync(clientId);
+
+        if (page < 0)
+        {
+            page = 0;
+        }
+
+        if (pageSize <= 0)
+        {
+            pageSize = 5;
+        }
+
+        var items = logs
+            .Skip(page * pageSize)
+            .Take(pageSize)
+            .Select(MapWorkoutHistoryRow)
+            .ToList();
+
+        return new WorkoutHistoryPageResult
+        {
+            TotalCount = logs.Count,
+            Items = items,
+        };
+    }
+
     public Task<DashboardSummary> GetDashboardSummaryAsync(int clientId)
     {
         return this.analyticsService.GetDashboardSummaryAsync(clientId);
@@ -294,6 +321,19 @@ public sealed class ClientService : IClientService
             IntensityTag = log.IntensityTag,
             Rating = log.Rating <= 0 ? null : log.Rating,
             TrainerNotes = log.TrainerNotes,
+        };
+    }
+
+    private static WorkoutHistoryRow MapWorkoutHistoryRow(WorkoutLog log)
+    {
+        return new WorkoutHistoryRow
+        {
+            Id = log.WorkoutLogId,
+            WorkoutName = log.WorkoutName,
+            LogDate = log.Date,
+            DurationSeconds = (int)log.Duration.TotalSeconds,
+            TotalCaloriesBurned = log.TotalCaloriesBurned,
+            IntensityTag = log.IntensityTag,
         };
     }
 

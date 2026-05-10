@@ -13,6 +13,8 @@ public interface IClientService
 
     Task<IReadOnlyList<WorkoutLogDataTransferObject>> GetWorkoutHistoryAsync(int clientId);
 
+    Task<WorkoutHistoryPageResult> GetWorkoutHistoryPageAsync(int clientId, int page, int pageSize);
+
     Task<DashboardSummary> GetDashboardSummaryAsync(int clientId);
 
     Task<IReadOnlyList<ConsistencyWeekBucket>> GetConsistencyLastFourWeeksAsync(int clientId);
