@@ -22,9 +22,9 @@ public sealed partial class MainWindowView : Page
         ViewModel.AddTab("Inventory", typeof(InventoryView));
         ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
         ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
+        ViewModel.AddTab("Analytics Dashboard", typeof(ClientDashboardPage));
         if (userSession.IsClient)
         {
-            ViewModel.AddTab("Analytics Dashboard", typeof(ClientDashboardPage));
             ViewModel.AddTab("Workout History", typeof(WorkoutLogView));
             ViewModel.AddTab("Calendar Integration", typeof(CalendarIntegration.CalendarIntegrationPage));
         }
