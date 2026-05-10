@@ -15,8 +15,23 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
     {
         return await dbContext.MealPlans
             .AsNoTracking()
-            .Include(mealPlan => mealPlan.User)
-            .FirstOrDefaultAsync(mealPlan => mealPlan.MealPlanId == id);
+            .Include(
+                mealPlan => mealPlan.User)
+
+            .Include(
+                mealPlan => mealPlan.MealPlanFoodItems)
+
+            .ThenInclude(
+                mealPlanFoodItem => mealPlanFoodItem.FoodItem)
+
+            .ThenInclude(
+                foodItem => foodItem.FoodItemIngredients)
+
+            .ThenInclude(
+                foodItemIngredient => foodItemIngredient.Ingredient)
+
+            .FirstOrDefaultAsync(
+                mealPlan => mealPlan.MealPlanId == id);
     }
 
     public async Task<IReadOnlyList<MealPlan>> GetByUserIdAsync(int userId)
@@ -93,8 +108,29 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
     {
         return await dbContext.MealPlanFoodItems
             .AsNoTracking()
-            .Where(mealPlanFoodItem => EF.Property<int>(mealPlanFoodItem, "MealPlanId") == mealPlanId)
-            .Select(mealPlanFoodItem => mealPlanFoodItem.FoodItem)
+
+            .Include(
+                mealPlanFoodItem =>
+                    mealPlanFoodItem.FoodItem)
+
+            .ThenInclude(
+                foodItem =>
+                    foodItem.FoodItemIngredients)
+
+            .ThenInclude(
+                foodItemIngredient =>
+                    foodItemIngredient.Ingredient)
+
+            .Where(
+                mealPlanFoodItem =>
+                    EF.Property<int>(
+                        mealPlanFoodItem,
+                        "MealPlanId") == mealPlanId)
+
+            .Select(
+                mealPlanFoodItem =>
+                    mealPlanFoodItem.FoodItem)
+
             .ToListAsync();
     }
 
@@ -173,5 +209,37 @@ public sealed class MealPlanRepository(AppDbContext dbContext) : IMealPlanReposi
 
         return mealPlan.MealPlanId;
     }
+    public async Task<IReadOnlyList<FoodItemIngredient>> GetFoodItemIngredientsForMealPlanAsync(int mealPlanId)
+    {
+        return await dbContext.MealPlanFoodItems
+            .AsNoTracking()
+            .Where(
+                mealPlanFoodItem =>
+                    EF.Property<int>(
+                        mealPlanFoodItem,
+                        "MealPlanId") == mealPlanId)
 
+            .Join(
+                dbContext.FoodItemIngredients
+                    .Include(
+                        foodItemIngredient =>
+                            foodItemIngredient.Ingredient),
+
+                mealPlanFoodItem =>
+                    EF.Property<int>(
+                        mealPlanFoodItem,
+                        "FoodItemId"),
+
+                foodItemIngredient =>
+                    EF.Property<int>(
+                        foodItemIngredient,
+                        "FoodItemId"),
+
+                (
+                    mealPlanFoodItem,
+                    foodItemIngredient) =>
+                        foodItemIngredient)
+
+            .ToListAsync();
+    }
 }
