@@ -59,6 +59,60 @@ public sealed class ClientDashboardService : IClientDashboardService
         }
     }
 
+    public async Task<WorkoutSessionDetail?> GetWorkoutSessionDetailAsync(int clientId, int workoutLogId)
+    {
+        try
+        {
+            var history = await httpClient.GetFromJsonAsync<List<WorkoutLogDataTransferObject>>(
+                $"{ApiBaseUrl.BASE_URL}/{ROUTE}/{clientId}/workout-history");
+
+            var log = history?.FirstOrDefault(item => item.WorkoutLogId == workoutLogId);
+            if (log == null)
+            {
+                return null;
+            }
+
+            var exercises = log.Exercises ?? new List<LoggedExerciseDataTransferObject>();
+
+            // Keep 0-calorie exercises visible in the breakdown.
+            var exerciseCalories = exercises
+                .GroupBy(exercise => exercise.ExerciseName)
+                .Select(group => new ExerciseCalorieInfo
+                {
+                    ExerciseName = group.Key,
+                    CaloriesBurned = Math.Max(0, group.Sum(exercise => exercise.ExerciseCaloriesBurned)),
+                })
+                .ToList();
+
+            var sets = exercises
+                .SelectMany(exercise => exercise.Sets)
+                .Select(set => new WorkoutSetRow
+                {
+                    ExerciseName = set.ExerciseName,
+                    SetIndex = set.SetIndex,
+                    ActualReps = set.ActualReps,
+                    ActualWeight = set.ActualWeight,
+                })
+                .ToList();
+
+            return new WorkoutSessionDetail
+            {
+                WorkoutLogId = log.WorkoutLogId,
+                WorkoutName = log.WorkoutName,
+                LogDate = log.Date,
+                DurationSeconds = (int)Math.Max(0, log.Duration.TotalSeconds),
+                TotalCaloriesBurned = log.TotalCaloriesBurned,
+                IntensityTag = log.IntensityTag,
+                ExerciseCalories = exerciseCalories,
+                Sets = sets,
+            };
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public async Task<IReadOnlyList<AchievementDataTransferObject>> GetRecentAchievementsAsync(int clientId)
     {
         try

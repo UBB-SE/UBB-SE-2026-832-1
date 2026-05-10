@@ -100,6 +100,42 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
 
     public Task LoadInitialAsync() => LoadAllAsync();
 
+    public async Task LoadWorkoutDetailAsync(WorkoutHistoryItemViewModel item)
+    {
+        if (item.IsLoadingDetail)
+        {
+            return;
+        }
+
+        if (item.ExerciseCalories.Count > 0 || item.ExerciseSetGroups.Count > 0)
+        {
+            return;
+        }
+
+        item.IsLoadingDetail = true;
+        try
+        {
+            var detail = await this.dashboardService.GetWorkoutSessionDetailAsync(
+                (int)this.userSession.CurrentClientId,
+                item.WorkoutLogId).ConfigureAwait(true);
+
+            if (detail == null)
+            {
+                return;
+            }
+
+            item.ApplyDetail(detail);
+        }
+        catch
+        {
+            // Ignore detail-load errors and keep summary data visible.
+        }
+        finally
+        {
+            item.IsLoadingDetail = false;
+        }
+    }
+
     private async Task LoadAllAsync()
     {
         CancelPendingLoad();

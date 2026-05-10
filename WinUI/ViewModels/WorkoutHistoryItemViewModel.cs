@@ -14,6 +14,8 @@ public sealed partial class WorkoutHistoryItemViewModel : ObservableObject
 
     private int workoutLogId;
 
+    public int WorkoutLogId => workoutLogId;
+
     public string Title { get; set; } = string.Empty;
 
     public string DateLine { get; set; } = string.Empty;
@@ -88,6 +90,37 @@ public sealed partial class WorkoutHistoryItemViewModel : ObservableObject
         }
 
         return vm;
+    }
+
+    public void ApplyDetail(WorkoutSessionDetail detail)
+    {
+        TotalCaloriesBurned = detail.TotalCaloriesBurned;
+        OnPropertyChanged(nameof(TotalCaloriesBurned));
+
+        ExerciseCalories.Clear();
+        foreach (var calorie in detail.ExerciseCalories)
+        {
+            ExerciseCalories.Add(calorie);
+        }
+
+        ExerciseSetGroups.Clear();
+        var grouped = detail.Sets.GroupBy(set => set.ExerciseName).ToList();
+        foreach (var group in grouped)
+        {
+            var exerciseGroup = new ExerciseSetGroupViewModel { ExerciseName = group.Key };
+            int setIndex = 1;
+            foreach (var set in group)
+            {
+                var setVm = new SetDetailRowViewModel
+                {
+                    SetNumber = setIndex++,
+                    RepsDisplay = set.ActualReps?.ToString() ?? "—",
+                    WeightDisplay = set.ActualWeight?.ToString("F1") ?? "—"
+                };
+                exerciseGroup.Sets.Add(setVm);
+            }
+            ExerciseSetGroups.Add(exerciseGroup);
+        }
     }
 
     private static string FormatDuration(int seconds)
