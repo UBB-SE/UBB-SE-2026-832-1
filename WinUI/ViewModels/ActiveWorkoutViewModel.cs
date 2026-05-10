@@ -72,7 +72,21 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
             }
         }
     }
-
+    private static double GetExerciseIntensityMultiplier(
+    MuscleGroup muscleGroup)
+    {
+        return muscleGroup switch
+        {
+            MuscleGroup.CHEST => 0.11,
+            MuscleGroup.BACK => 0.12,
+            MuscleGroup.LEGS => 0.15,
+            MuscleGroup.SHOULDERS => 0.10,
+            MuscleGroup.ARMS => 0.08,
+            MuscleGroup.CORE => 0.07,
+            MuscleGroup.CARDIO => 0.18,
+            _ => 0.10
+        };
+    }
     public string CurrentSetWeightInputText
     {
         get => double.IsNaN(this.CurrentSetWeightInput) ? string.Empty : this.CurrentSetWeightInput.ToString("0.##");
@@ -297,15 +311,75 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
             WorkoutLog = this.activeLog,
         };
 
-        bool isSaved = await this.activeWorkoutService.SaveSetAsync(this.activeLog, set);
+        double multiplier =
+            GetExerciseIntensityMultiplier(
+                this.CurrentExercise?.MuscleGroup
+                ?? MuscleGroup.CHEST);
+
+        double setCalories =
+            ((set.ActualReps ?? 0)
+            * (set.ActualWeight ?? 0)
+            * multiplier) / 10.0;
+
+        var loggedExercise =
+            this.activeLog.Exercises
+                .FirstOrDefault(
+                    exercise =>
+                        exercise.ExerciseName ==
+                        set.ExerciseName);
+
+        if (loggedExercise == null)
+        {
+            loggedExercise = new LoggedExercise
+            {
+                ExerciseName = set.ExerciseName,
+
+                TargetMuscles =
+                    this.CurrentExercise?.MuscleGroup
+                    ?? MuscleGroup.CHEST,
+
+                Sets = new List<LoggedSet>(),
+
+                ExerciseCaloriesBurned = 0,
+            };
+
+            this.activeLog.Exercises.Add(loggedExercise);
+        }
+
+        loggedExercise.Sets.Add(set);
+
+        loggedExercise.ExerciseCaloriesBurned += (int)setCalories;
+
+        loggedExercise.MetabolicEquivalent =
+            (float)multiplier * 50;
+
+        this.activeLog.TotalCaloriesBurned =
+            this.activeLog.Exercises.Sum(
+                exercise =>
+                    exercise.ExerciseCaloriesBurned);
+
+        this.activeLog.AverageMetabolicEquivalent =
+            this.activeLog.Exercises.Average(
+                exercise =>
+                    exercise.MetabolicEquivalent);
+
+        bool isSaved =
+            await this.activeWorkoutService.SaveSetAsync(
+                this.activeLog,
+                set);
+
         if (!isSaved)
         {
-            this.ErrorMessage = "Failed to save set. Please try again.";
+            this.ErrorMessage =
+                "Failed to save set. Please try again.";
+
             return;
         }
 
         setViewModel.IsCompleted = true;
+
         FocusNextSet(setViewModel);
+
         UpdateCurrentSetDisplay();
     }
 
