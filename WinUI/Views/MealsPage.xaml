@@ -1,0 +1,155 @@
+<Page
+    x:Class="WinUI.Views.MealsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:WinUI.Converters">
+
+    <Page.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
+    </Page.Resources>
+
+    <Grid Padding="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
+
+            <TextBox x:Name="txtSearch"
+                     PlaceholderText="Search meal..."
+                     Width="250"
+                     KeyDown="txtSearch_KeyDown"/>
+
+            <Button Content="Search"
+                    Click="btnSearch_Click"/>
+
+            <Button Content="Filters">
+                <Button.Flyout>
+                    <Flyout>
+                        <StackPanel Padding="10" Spacing="5">
+                            <CheckBox x:Name="chkVegan" Content="Vegan"/>
+                            <CheckBox x:Name="chkKeto" Content="Keto"/>
+                            <CheckBox x:Name="chkGlutenFree" Content="Gluten Free"/>
+                            <CheckBox x:Name="chkLactoseFree" Content="Lactose Free"/>
+                            <CheckBox x:Name="chkNutFree" Content="No Nuts"/>
+                            <CheckBox x:Name="chkFavorites" Content="Favorites Only"/>
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+
+        </StackPanel>
+
+        <ListView x:Name="listMeals"
+                  Grid.Row="1"
+                  IsItemClickEnabled="True"
+                  ItemClick="listMeals_ItemClick">
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+
+                    <Grid Padding="10" Margin="5"
+                          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                          BorderThickness="1"
+                          CornerRadius="10">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel>
+
+                            <TextBlock Text="{Binding Name}"
+                                       FontSize="17"
+                                       FontWeight="SemiBold"/>
+
+                            <TextBlock Opacity="0.75">
+                                <Run Text="{Binding Calories}" />
+                                <Run Text=" kcal" />
+                            </TextBlock>
+
+                            <TextBlock Opacity="0.7" FontSize="12">
+
+                                <Run Text="P " Foreground="Green"/>
+                                <Run Text="{Binding Protein}" Foreground="Green"/>
+                                <Run Text="g  •  "/>
+
+                                <Run Text="C " Foreground="Orange"/>
+                                <Run Text="{Binding Carbohydrates}" Foreground="Orange"/>
+                                <Run Text="g  •  "/>
+
+                                <Run Text="F " Foreground="Crimson"/>
+                                <Run Text="{Binding Fat}" Foreground="Crimson"/>
+                                <Run Text="g"/>
+
+                            </TextBlock>
+
+                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
+                                <Border Background="#2E7D32" CornerRadius="12" Padding="8,2"
+                                        Visibility="{Binding IsVegan, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Vegan" Foreground="White" FontSize="11"/>
+                                </Border>
+
+                                <Border Background="#8E24AA" CornerRadius="12" Padding="8,2"
+                                        Visibility="{Binding IsKeto, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Keto" Foreground="White" FontSize="11"/>
+                                </Border>
+
+                                <Border Background="#EF6C00" CornerRadius="12" Padding="8,2"
+                                        Visibility="{Binding IsGlutenFree, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Gluten Free" Foreground="White" FontSize="11"/>
+                                </Border>
+
+                                <Border Background="#00838F" CornerRadius="12" Padding="8,2"
+                                        Visibility="{Binding IsLactoseFree, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Lactose Free" Foreground="White" FontSize="11"/>
+                                </Border>
+
+                                <Border Background="#5D4037" CornerRadius="12" Padding="8,2"
+                                        Visibility="{Binding IsNutFree, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Nut Free" Foreground="White" FontSize="11"/>
+                                </Border>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                        <Button Grid.Column="1"
+                            Click="Favorite_Click"
+                            FontSize="22"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="Gold"
+                            Content="☆"
+                            Loaded="Favorite_Loaded"/>
+
+                    </Grid>
+
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+        </ListView>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Spacing="10"
+                    Margin="0,10,0,0">
+
+            <Button x:Name="btnPrev" Content="Prev" Click="Prev_Click"/>
+
+            <TextBlock x:Name="txtPage"
+                       VerticalAlignment="Center"
+                       FontSize="14"
+                       FontWeight="SemiBold"/>
+
+            <Button x:Name="btnNext" Content="Next" Click="Next_Click"/>
+
+        </StackPanel>
+
+    </Grid>
+</Page>
