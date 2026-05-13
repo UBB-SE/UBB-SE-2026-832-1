@@ -27,6 +27,7 @@ public sealed partial class MainWindowView : Page
             ViewModel.AddTab("Pantry", typeof(PantryView.PantryView));
             ViewModel.AddTab("Shopping List", typeof(ShoppingList.ShoppingListView));
             ViewModel.AddTab("Progress", typeof(DailyLogView));
+            ViewModel.AddTab("Achievements", typeof(AchievementsPage));
         }
 
         ViewModel.AddTab("Chat", typeof(ChatView.NutritionistChatView));
