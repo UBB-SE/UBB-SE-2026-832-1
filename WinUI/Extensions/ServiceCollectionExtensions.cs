@@ -16,10 +16,6 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<ITrainerDashboardService, TrainerDashboardService>();
         services.AddHttpClient<IAchievementsService, AchievementsService>();
         services.AddHttpClient<IRankShowcaseService, RankShowcaseService>();
-        services.AddHttpClient<IAchievementsService, AchievementsService>(client =>
-        {
-            client.BaseAddress = new Uri($"{ApiBaseUrl.BASE_URL}/api/");
-        });
         services.AddHttpClient<IMealPlanService, MealPlanService>();
         services.AddScoped<IDailyLogService, DailyLogService>();
         services.AddScoped<IDailyLogServiceProxy, DailyLogServiceProxy>();
