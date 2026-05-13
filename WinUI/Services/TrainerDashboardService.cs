@@ -75,7 +75,8 @@ public sealed class TrainerDashboardService : ITrainerDashboardService
             TrainerNotes = workoutLog.TrainerNotes,
         };
 
-        await this.httpClient.PutAsJsonAsync($"{BaseAddress}/trainer/save-workout-feedback", saveWorkoutFeedbackRequestDataTransferObject);
+        var response = await this.httpClient.PutAsJsonAsync($"{BaseAddress}/trainer/save-workout-feedback", saveWorkoutFeedbackRequestDataTransferObject);
+        response.EnsureSuccessStatusCode();
     }
 
     public async Task<bool> CreateAndAssignNutritionPlanAsync(DateTime startDate, DateTime endDate, int clientId)
