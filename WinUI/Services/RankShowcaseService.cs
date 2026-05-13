@@ -6,7 +6,7 @@ namespace WinUI.Services;
 
 public sealed class RankShowcaseService : IRankShowcaseService
 {
-    private const string ApiBaseAddress = "https://localhost:7197/api";
+    private const string ApiBaseAddress = ApiBaseUrl.BASE_URL + "/api";
     private const string EvaluationRoute = "evaluation";
     private readonly HttpClient httpClient;
 

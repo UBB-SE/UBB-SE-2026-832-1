@@ -14,13 +14,13 @@ public sealed class UserService : IUserService
 
     public UserService()
     {
-        this.httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000/") };
+        this.httpClient = new HttpClient { BaseAddress = new Uri(ApiBaseUrl.BASE_URL + "/") };
     }
 
     public UserService(IUserServiceProxy serviceProxy)
     {
         this.legacyProxy = serviceProxy;
-        this.httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000/") };
+        this.httpClient = new HttpClient { BaseAddress = new Uri(ApiBaseUrl.BASE_URL + "/") };
     }
 
     public async Task<IReadOnlyList<UserDto>> GetUsersAsync()
