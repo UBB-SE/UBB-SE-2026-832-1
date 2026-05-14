@@ -247,6 +247,7 @@ public sealed class ProgressionServiceTests
     [InlineData(100, 90.0)]
     [InlineData(50, 45.0)]
     [InlineData(33, 29.5)]
+    [InlineData(0, 0.0)]
     public async Task ProcessDeloadAsync_DeloadWeight_IsRoundedCorrectly(double originalWeight, double expectedDeload)
     {
         var template = new TemplateExercise
@@ -273,5 +274,129 @@ public sealed class ProgressionServiceTests
         this.templateRepo.Verify(
             r => r.UpdateTemplateExerciseWeightAsync(DefaultTemplateExerciseId, expectedDeload),
             Times.Once);
+    }
+
+    [Fact]
+    public async Task AveragePerformance_NeitherPlateauNorOverload_DoesNotModifyAnything()
+    {
+        // 9 out of 10 reps → ratio 0.9, which is exactly at the plateau threshold
+        // but NOT consecutive failures, and below 1.0 overload threshold.
+        // neither path should trigger.
+        var request = BuildRequest(1, new List<LoggedExerciseDataTransferObject>
+        {
+            BuildExercise(DefaultTemplateExerciseId, "Bench Press", (9, (float)DefaultWeight)),
+        });
+
+        var template = new TemplateExercise
+        {
+            TemplateExerciseId = DefaultTemplateExerciseId,
+            TargetReps = DefaultTargetReps,
+            TargetWeight = DefaultWeight,
+            MuscleGroup = MuscleGroup.CHEST,
+        };
+
+        this.templateRepo
+            .Setup(r => r.GetTemplateExerciseByIdAsync(DefaultTemplateExerciseId))
+            .ReturnsAsync(template);
+
+        var service = this.CreateService();
+        await service.EvaluateWorkoutAsync(request);
+
+        this.templateRepo.Verify(
+            r => r.UpdateTemplateExerciseWeightAsync(It.IsAny<int>(), It.IsAny<double>()),
+            Times.Never);
+        this.notificationRepo.Verify(
+            r => r.SaveNotificationAsync(It.IsAny<Notification>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task Plateau_should_include_exercise_name_in_notification_message()
+    {
+        var request = BuildRequest(1, new List<LoggedExerciseDataTransferObject>
+        {
+            BuildExercise(DefaultTemplateExerciseId, "Overhead Press", (3, 40f), (3, 40f)),
+        });
+
+        var template = new TemplateExercise
+        {
+            TemplateExerciseId = DefaultTemplateExerciseId,
+            TargetReps = DefaultTargetReps,
+            TargetWeight = DefaultWeight,
+            MuscleGroup = MuscleGroup.SHOULDERS,
+        };
+
+        this.templateRepo
+            .Setup(r => r.GetTemplateExerciseByIdAsync(DefaultTemplateExerciseId))
+            .ReturnsAsync(template);
+
+        var service = this.CreateService();
+        await service.EvaluateWorkoutAsync(request);
+
+        this.notificationRepo.Verify(r => r.SaveNotificationAsync(
+            It.Is<Notification>(n => n.Message.Contains("Overhead Press"))),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task EvaluateWorkout_ZeroTargetReps_TreatsRatioAsZero()
+    {
+        // TargetReps = 0 on the template → ratio computation divides by 0
+        // should produce 0.0 ratio → below overload threshold, single set so no plateau
+        var request = BuildRequest(1, new List<LoggedExerciseDataTransferObject>
+        {
+            BuildExercise(DefaultTemplateExerciseId, "Tricep Dip", (5, 20f)),
+        });
+
+        var template = new TemplateExercise
+        {
+            TemplateExerciseId = DefaultTemplateExerciseId,
+            TargetReps = 0,
+            TargetWeight = 20,
+            MuscleGroup = MuscleGroup.ARMS,
+        };
+
+        this.templateRepo
+            .Setup(r => r.GetTemplateExerciseByIdAsync(DefaultTemplateExerciseId))
+            .ReturnsAsync(template);
+
+        var service = this.CreateService();
+        await service.EvaluateWorkoutAsync(request);
+
+        this.templateRepo.Verify(
+            r => r.UpdateTemplateExerciseWeightAsync(It.IsAny<int>(), It.IsAny<double>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task PlateauNeedsConsecutiveFailures_NotJustAnyTwoBelow()
+    {
+        // pattern: fail, pass, fail — should NOT trigger plateau (failures aren't consecutive)
+        var request = BuildRequest(1, new List<LoggedExerciseDataTransferObject>
+        {
+            BuildExercise(DefaultTemplateExerciseId, "Bench Press",
+                (3, (float)DefaultWeight),   // fail: 3/10 = 0.3
+                (10, (float)DefaultWeight),  // pass: 10/10 = 1.0
+                (3, (float)DefaultWeight)),  // fail: 3/10 = 0.3
+        });
+
+        var template = new TemplateExercise
+        {
+            TemplateExerciseId = DefaultTemplateExerciseId,
+            TargetReps = DefaultTargetReps,
+            TargetWeight = DefaultWeight,
+            MuscleGroup = MuscleGroup.CHEST,
+        };
+
+        this.templateRepo
+            .Setup(r => r.GetTemplateExerciseByIdAsync(DefaultTemplateExerciseId))
+            .ReturnsAsync(template);
+
+        var service = this.CreateService();
+        await service.EvaluateWorkoutAsync(request);
+
+        this.notificationRepo.Verify(
+            r => r.SaveNotificationAsync(It.IsAny<Notification>()),
+            Times.Never);
     }
 }

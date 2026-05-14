@@ -126,4 +126,69 @@ public sealed class EvaluationEngineServiceTests
         Assert.Equal(100, result.ProgressPercent);
         Assert.False(result.HasNextRank);
     }
+
+    [Fact]
+    public async Task EvaluateAsync_AchievementNotInMilestoneList_IsIgnored()
+    {
+        // titles that don't match any IMilestoneCheck get skipped via TryGetValue miss
+        var showcase = new List<AchievementShowcaseItem>
+        {
+            new() { AchievementId = 99, Title = "Nonexistent Badge", IsUnlocked = false },
+        };
+
+        this.achievementsRepo
+            .Setup(r => r.GetAchievementShowcaseForClientAsync(42))
+            .ReturnsAsync(showcase);
+
+        var service = this.CreateService();
+        var result = await service.EvaluateAsync(42);
+
+        Assert.Empty(result);
+        this.achievementsRepo.Verify(
+            r => r.AwardAchievementAsync(It.IsAny<int>(), It.IsAny<int>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task Showcase_should_map_unlock_icon_correctly()
+    {
+        var showcase = new List<AchievementShowcaseItem>
+        {
+            new() { AchievementId = 1, Title = "Locked", Description = "d", Criteria = "c", IsUnlocked = false },
+            new() { AchievementId = 2, Title = "Unlocked", Description = "d", Criteria = "c", IsUnlocked = true },
+        };
+
+        this.achievementsRepo
+            .Setup(r => r.GetAchievementShowcaseForClientAsync(3))
+            .ReturnsAsync(showcase);
+
+        var service = this.CreateService();
+        var result = await service.BuildRankShowcaseAsync(3);
+
+        // locked items get the lock icon, unlocked get the check icon
+        var locked = result.ShowcaseAchievements.Single(a => a.AchievementId == 1);
+        var unlocked = result.ShowcaseAchievements.Single(a => a.AchievementId == 2);
+        Assert.NotEqual(locked.Icon, unlocked.Icon);
+        Assert.True(unlocked.IsUnlocked);
+        Assert.False(locked.IsUnlocked);
+    }
+
+    [Fact]
+    public async Task BuildRankShowcase_FiveUnlocked_ReachesGymEnthusiastTier()
+    {
+        // leveling tiers: 0→Beginner, 1→Trainee, 2→Apprentice, 3→Gym Novice, 5→Gym Enthusiast
+        var showcase = Enumerable.Range(0, 5)
+            .Select(_ => new AchievementShowcaseItem { IsUnlocked = true })
+            .ToList();
+
+        this.achievementsRepo
+            .Setup(r => r.GetAchievementShowcaseForClientAsync(1))
+            .ReturnsAsync(showcase);
+
+        var service = this.CreateService();
+        var result = await service.BuildRankShowcaseAsync(1);
+
+        Assert.Equal(5, result.DisplayLevel);
+        Assert.Contains("Gym Enthusiast", result.LevelDisplayLine);
+    }
 }
