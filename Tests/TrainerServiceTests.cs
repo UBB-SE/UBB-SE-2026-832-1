@@ -326,4 +326,85 @@ public sealed class TrainerServiceTests
         Assert.Single(result);
         Assert.Equal("John Doe", result[0].FullName);
     }
+
+    [Fact]
+    public async Task GetAllExerciseNames_returns_distinct_names_across_templates()
+    {
+        var templates = new List<WorkoutTemplate>
+        {
+            new()
+            {
+                WorkoutTemplateId = 1,
+                Name = "Push",
+                Exercises = new List<TemplateExercise>
+                {
+                    new() { Name = "Bench Press" },
+                    new() { Name = "Overhead Press" },
+                },
+            },
+            new()
+            {
+                WorkoutTemplateId = 2,
+                Name = "Pull",
+                Exercises = new List<TemplateExercise>
+                {
+                    new() { Name = "Bench Press" },
+                    new() { Name = "Rows" },
+                },
+            },
+        };
+
+        this.templateRepo
+            .Setup(r => r.GetAllTemplatesAsync())
+            .ReturnsAsync(templates);
+
+        var service = this.CreateService();
+        var names = await service.GetAllExerciseNamesAsync();
+
+        Assert.Equal(3, names.Count);
+        Assert.Contains("Bench Press", names);
+        Assert.Contains("Rows", names);
+    }
+
+    [Fact]
+    public async Task SaveTrainerWorkout_maps_unknown_type_to_TRAINER_ASSIGNED()
+    {
+        // invalid workout type string → should fall back to TRAINER_ASSIGNED
+        var dto = new WorkoutTemplateDataTransferObject
+        {
+            ClientId = 1,
+            Name = "Mystery Workout",
+            Type = "TOTALLY_INVALID",
+            Exercises = new List<TemplateExerciseDataTransferObject>(),
+        };
+
+        var service = this.CreateService();
+        await service.SaveTrainerWorkoutAsync(dto);
+
+        this.trainerRepo.Verify(r => r.SaveTrainerWorkoutAsync(
+            It.Is<WorkoutTemplate>(t => t.Type == WorkoutType.TRAINER_ASSIGNED)),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task AssignNewRoutineAsync_maps_unknown_muscle_to_OTHER()
+    {
+        var request = new AssignNewRoutineRequestDataTransferObject
+        {
+            EditingTemplateId = null,
+            ClientId = 1,
+            RoutineName = "Test",
+            Exercises = new List<TemplateExerciseDataTransferObject>
+            {
+                new() { Name = "Weird Machine", MuscleGroup = "ALIEN_MUSCLE" },
+            },
+        };
+
+        var service = this.CreateService();
+        await service.AssignNewRoutineAsync(request);
+
+        this.trainerRepo.Verify(r => r.SaveTrainerWorkoutAsync(
+            It.Is<WorkoutTemplate>(t => t.Exercises.First().MuscleGroup == MuscleGroup.OTHER)),
+            Times.Once);
+    }
 }

@@ -355,4 +355,136 @@ public sealed class ClientServiceTests
 
         Assert.False(result);
     }
+
+    [Fact]
+    public async Task SyncNutrition_without_configured_endpoint_should_bail()
+    {
+        // endpoint not in config → early return false, no HTTP call
+        this.configuration
+            .Setup(c => c["NutritionSync:Endpoint"])
+            .Returns(string.Empty);
+
+        var request = new NutritionSyncRequestDataTransferObject { ClientId = 1 };
+
+        var service = this.CreateService();
+        var result = await service.SyncNutritionAsync(request);
+
+        Assert.False(result);
+        this.httpClientFactory.Verify(f => f.CreateClient(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ConfirmDeloadAsync_throws_NotImplemented()
+    {
+        // deload confirmation is explicitly stubbed — document this so nobody
+        // wastes time debugging "why does deload always fail"
+        var request = new ConfirmDeloadRequestDataTransferObject { NotificationId = 1 };
+        var service = this.CreateService();
+
+        await Assert.ThrowsAsync<NotImplementedException>(
+            () => service.ConfirmDeloadAsync(request));
+    }
+
+    [Fact]
+    public async Task ConfirmDeloadAsync_NullRequest_ReturnsFalse()
+    {
+        var service = this.CreateService();
+        var result = await service.ConfirmDeloadAsync(null!);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task GetWorkoutHistoryPageAsync_clamps_negative_page_to_zero()
+    {
+        var logs = new List<WorkoutLog>
+        {
+            new() { WorkoutLogId = 1, WorkoutName = "A", Client = new Client { ClientId = 1 }, Exercises = new() },
+            new() { WorkoutLogId = 2, WorkoutName = "B", Client = new Client { ClientId = 1 }, Exercises = new() },
+        };
+
+        this.workoutLogRepo
+            .Setup(r => r.GetWorkoutHistoryAsync(1))
+            .ReturnsAsync(logs);
+
+        var service = this.CreateService();
+        var result = await service.GetWorkoutHistoryPageAsync(1, page: -5, pageSize: 10);
+
+        Assert.Equal(2, result.TotalCount);
+        Assert.Equal(2, result.Items.Count);
+    }
+
+    [Fact]
+    public async Task GetWorkoutHistoryPageAsync_defaults_pageSize_when_zero()
+    {
+        var logs = Enumerable.Range(1, 8).Select(i => new WorkoutLog
+        {
+            WorkoutLogId = i,
+            WorkoutName = $"Workout {i}",
+            Client = new Client { ClientId = 1 },
+            Exercises = new(),
+        }).ToList();
+
+        this.workoutLogRepo
+            .Setup(r => r.GetWorkoutHistoryAsync(1))
+            .ReturnsAsync(logs);
+
+        var service = this.CreateService();
+        // pageSize <= 0 should default to 5
+        var result = await service.GetWorkoutHistoryPageAsync(1, page: 0, pageSize: 0);
+
+        Assert.Equal(8, result.TotalCount);
+        Assert.Equal(5, result.Items.Count);
+    }
+
+    [Fact]
+    public async Task GetClientProfileSnapshot_NoWorkouts_ReturnsPlaceholderHint()
+    {
+        this.workoutLogRepo
+            .Setup(r => r.GetWorkoutHistoryAsync(1))
+            .ReturnsAsync(new List<WorkoutLog>());
+        this.nutritionRepo
+            .Setup(r => r.GetNutritionPlansForClientAsync(1))
+            .ReturnsAsync(new List<NutritionPlan>());
+
+        var service = this.CreateService();
+        var result = await service.GetClientProfileSnapshotAsync(1);
+
+        Assert.Contains("No completed workouts", result.LatestSessionHint);
+        Assert.Empty(result.LoggedExercises);
+    }
+
+    [Fact]
+    public async Task GetPreviousBestWeightsAsync_tracks_heaviest_per_exercise()
+    {
+        var logs = new List<WorkoutLog>
+        {
+            new()
+            {
+                WorkoutLogId = 1,
+                Client = new Client { ClientId = 1 },
+                Exercises = new List<LoggedExercise>
+                {
+                    new()
+                    {
+                        ExerciseName = "Bench",
+                        Sets = new List<LoggedSet>
+                        {
+                            new() { ExerciseName = "Bench", ActualWeight = 60 },
+                            new() { ExerciseName = "Bench", ActualWeight = 80 },
+                        },
+                    },
+                },
+            },
+        };
+
+        this.workoutLogRepo
+            .Setup(r => r.GetWorkoutHistoryAsync(1))
+            .ReturnsAsync(logs);
+
+        var service = this.CreateService();
+        var result = await service.GetPreviousBestWeightsAsync(1);
+
+        Assert.Equal(80, result.BestWeightsByExercise["Bench"]);
+    }
 }
