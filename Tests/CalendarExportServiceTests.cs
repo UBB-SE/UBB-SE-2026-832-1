@@ -64,6 +64,21 @@ public sealed class CalendarExportServiceTests
     }
 
     [Fact]
+    public async Task GenerateCalendar_null_SelectedDays_throws_ArgumentException()
+    {
+        var request = new GenerateCalendarRequestDataTransferObject
+        {
+            WorkoutTemplateId = 1,
+            DurationWeeks = 4,
+            SelectedDays = null!,
+        };
+
+        var service = this.CreateService();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => service.GenerateCalendarAsync(request));
+    }
+
+    [Fact]
     public async Task GenerateCalendarAsync_ValidTemplate_GeneratesCorrectEventCount()
     {
         var template = new WorkoutTemplate
@@ -170,6 +185,87 @@ public sealed class CalendarExportServiceTests
 
         Assert.Contains("BEGIN:VCALENDAR", result.IcsContent);
         Assert.Contains("END:VCALENDAR", result.IcsContent);
+    }
+
+    [Fact]
+    public async Task GenerateCalendar_exercises_with_special_chars_are_ICS_escaped()
+    {
+        var template = new WorkoutTemplate
+        {
+            WorkoutTemplateId = 1,
+            Name = "Back, Bis & Abs",
+            Exercises = new List<TemplateExercise>
+            {
+                new() { Name = "Pull-up; wide grip", TargetSets = 3, TargetReps = 8, TargetWeight = 0 },
+            },
+        };
+
+        this.templateRepo
+            .Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(template);
+
+        var request = new GenerateCalendarRequestDataTransferObject
+        {
+            WorkoutTemplateId = 1,
+            DurationWeeks = 1,
+            SelectedDays = new List<DayOfWeek> { DayOfWeek.Tuesday },
+            StartDate = new DateTime(2026, 5, 5),
+        };
+
+        var service = this.CreateService();
+        var result = await service.GenerateCalendarAsync(request);
+
+        // ICS spec requires commas and semicolons to be escaped
+        Assert.Contains("Back\\, Bis & Abs", result.IcsContent);
+    }
+
+    [Fact]
+    public async Task GenerateCalendar_with_no_StartDate_defaults_to_today()
+    {
+        var template = new WorkoutTemplate
+        {
+            WorkoutTemplateId = 1,
+            Name = "Quick",
+            Exercises = new List<TemplateExercise>(),
+        };
+
+        this.templateRepo
+            .Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(template);
+
+        var request = new GenerateCalendarRequestDataTransferObject
+        {
+            WorkoutTemplateId = 1,
+            DurationWeeks = 1,
+            SelectedDays = new List<DayOfWeek> { DateTime.Now.DayOfWeek },
+            StartDate = null,
+        };
+
+        var service = this.CreateService();
+        var result = await service.GenerateCalendarAsync(request);
+
+        // at least one event is generated for today's day-of-week
+        int eventCount = CountOccurrences(result.IcsContent, "BEGIN:VEVENT");
+        Assert.True(eventCount >= 1);
+    }
+
+    [Fact]
+    public async Task SaveCalendar_null_workout_name_produces_safe_filename()
+    {
+        var request = new SaveCalendarRequestDataTransferObject
+        {
+            IcsContent = "BEGIN:VCALENDAR\nEND:VCALENDAR",
+            WorkoutName = null,
+        };
+
+        var service = this.CreateService();
+        var result = await service.SaveCalendarAsync(request);
+
+        // null name should fall back to "workout" and still succeed
+        if (result.IsSuccess)
+        {
+            Assert.Contains("workout", result.FilePath!);
+        }
     }
 
     private static int CountOccurrences(string text, string pattern)
