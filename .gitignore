@@ -8,4 +8,5 @@ TestResults/
 *.suo
 *.db
 *.sqlite
+*lscache
 
