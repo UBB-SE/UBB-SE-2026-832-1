@@ -1,4 +1,5 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels.CalendarIntegration;
 
@@ -23,3 +24,4 @@ public sealed partial class DaySelectionItem : ObservableObject
         DayName = dayName;
     }
 }
+

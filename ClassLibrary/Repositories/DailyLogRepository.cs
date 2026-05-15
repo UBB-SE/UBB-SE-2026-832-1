@@ -44,8 +44,8 @@ public sealed class DailyLogRepository : IDailyLogRepository
 
     public async Task<bool> HasFoodItemLoggedTodayAsync(int userId, int foodItemId)
     {
-        var todayUtc = DateTime.UtcNow.Date;
-        var tomorrowUtc = todayUtc.AddDays(1);
+        var today = DateTime.Now.Date;
+        var tomorrow = today.AddDays(1);
 
         return await this.databaseContext.DailyLogs
             .AsNoTracking()
@@ -53,8 +53,8 @@ public sealed class DailyLogRepository : IDailyLogRepository
                 dailyLog.UserId == userId &&
                 dailyLog.FoodItem != null &&
                 dailyLog.FoodItem.FoodItemId == foodItemId &&
-                dailyLog.LoggedAt >= todayUtc &&
-                dailyLog.LoggedAt < tomorrowUtc);
+                dailyLog.LoggedAt >= today &&
+                dailyLog.LoggedAt < tomorrow);
     }
 
     public async Task<DailyLog?> GetNutritionTotalsForRangeAsync(int userId, DateTime startInclusive, DateTime endExclusive)

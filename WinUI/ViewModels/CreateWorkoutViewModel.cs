@@ -1,8 +1,9 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -11,7 +12,7 @@ public sealed class CreateWorkoutViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     public event Action? WorkoutSaved;
 
-    private readonly ICreateWorkoutService createWorkoutService;
+    private readonly ICreateWorkoutProxy createWorkoutService;
 
     private string workoutName = string.Empty;
     private string? selectedNewExercise;
@@ -81,7 +82,7 @@ public sealed class CreateWorkoutViewModel : INotifyPropertyChanged
     public IRelayCommand<TemplateExercise> RemoveExerciseCommand { get; }
     public IRelayCommand SaveWorkoutCommand { get; }
 
-    public CreateWorkoutViewModel(ICreateWorkoutService createWorkoutService)
+    public CreateWorkoutViewModel(ICreateWorkoutProxy createWorkoutService)
     {
         this.createWorkoutService = createWorkoutService;
         AddExerciseCommand = new RelayCommand(AddExercise);
@@ -166,3 +167,4 @@ public sealed class CreateWorkoutViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
+

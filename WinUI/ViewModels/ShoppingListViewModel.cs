@@ -1,11 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
-using UserSession = WinUI.Services.UserSession;
+using ClassLibrary.Proxies;
+using UserSession = ClassLibrary.Proxies.UserSession;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -23,7 +24,7 @@ public partial class ShoppingListViewModel : ObservableObject
     private const string ERROR_DELETE_ITEM = "Failed to delete item from database.";
     private const string ERROR_GENERATE_LIST = "Error analyzing Meal Plan for ingredients.";
 
-    private readonly IShoppingListService shoppingListService;
+    private readonly IShoppingListProxy shoppingListService;
     private readonly UserSession userSession;
 
     [ObservableProperty]
@@ -47,7 +48,7 @@ public partial class ShoppingListViewModel : ObservableObject
     [ObservableProperty]
     private bool isLoading;
 
-    public ShoppingListViewModel(IShoppingListService shoppingListService, UserSession userSession)
+    public ShoppingListViewModel(IShoppingListProxy shoppingListService, UserSession userSession)
     {
         this.shoppingListService = shoppingListService;
         this.userSession = userSession;
@@ -180,3 +181,4 @@ public partial class ShoppingListViewModel : ObservableObject
         }, TaskScheduler.FromCurrentSynchronizationContext());
     }
 }
+

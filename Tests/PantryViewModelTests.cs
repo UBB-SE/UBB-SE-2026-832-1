@@ -1,4 +1,4 @@
-using ClassLibrary.DTOs;
+﻿using ClassLibrary.DTOs;
 using Moq;
 using WinUI.Services;
 using WinUI.ViewModels;
@@ -9,10 +9,10 @@ public sealed class PantryViewModelTests
 {
     private const int TEST_USER_ID = 42;
 
-    private readonly Mock<IInventoryService> mockInventoryService = new();
+    private readonly Mock<IInventoryProxy> mockInventoryProxy = new();
 
     private PantryViewModel CreateViewModel() =>
-        new(this.mockInventoryService.Object, TEST_USER_ID);
+        new(this.mockInventoryProxy.Object, TEST_USER_ID);
 
     [Fact]
     public async Task LoadInventoryAsync_PopulatesItems()
@@ -23,7 +23,7 @@ public sealed class PantryViewModelTests
             new() { InventoryId = 2, IngredientName = "Rice", QuantityGrams = 300 },
         };
 
-        this.mockInventoryService
+        this.mockInventoryProxy
             .Setup(service => service.GetUserInventoryAsync(TEST_USER_ID))
             .ReturnsAsync(inventoryItems);
 
@@ -38,7 +38,7 @@ public sealed class PantryViewModelTests
     [Fact]
     public async Task LoadInventoryAsync_WhenServiceThrows_SetsStatusMessage()
     {
-        this.mockInventoryService
+        this.mockInventoryProxy
             .Setup(service => service.GetUserInventoryAsync(TEST_USER_ID))
             .ThrowsAsync(new Exception("Network error"));
 
@@ -52,7 +52,7 @@ public sealed class PantryViewModelTests
     [Fact]
     public async Task LoadInventoryAsync_EmptyList_IsListEmptyReturnsTrue()
     {
-        this.mockInventoryService
+        this.mockInventoryProxy
             .Setup(service => service.GetUserInventoryAsync(TEST_USER_ID))
             .ReturnsAsync(new List<InventoryDataTransferObject>());
 
@@ -70,7 +70,7 @@ public sealed class PantryViewModelTests
             new() { InventoryId = 1, IngredientName = "Eggs", QuantityGrams = 200 },
         };
 
-        this.mockInventoryService
+        this.mockInventoryProxy
             .Setup(service => service.GetUserInventoryAsync(TEST_USER_ID))
             .ReturnsAsync(inventoryItems);
 
@@ -89,7 +89,7 @@ public sealed class PantryViewModelTests
             new() { IngredientId = 2, Name = "Sugar" },
         };
 
-        this.mockInventoryService
+        this.mockInventoryProxy
             .Setup(service => service.GetAllIngredientsAsync())
             .ReturnsAsync(ingredients);
 
@@ -110,7 +110,7 @@ public sealed class PantryViewModelTests
             new() { IngredientId = 3, Name = "Flower Seeds" },
         };
 
-        this.mockInventoryService
+        this.mockInventoryProxy
             .Setup(service => service.GetAllIngredientsAsync())
             .ReturnsAsync(ingredients);
 
@@ -133,7 +133,7 @@ public sealed class PantryViewModelTests
             new() { IngredientId = 2, Name = "Sugar" },
         };
 
-        this.mockInventoryService
+        this.mockInventoryProxy
             .Setup(service => service.GetAllIngredientsAsync())
             .ReturnsAsync(ingredients);
 
@@ -156,7 +156,7 @@ public sealed class PantryViewModelTests
         await viewModel.AddNewIngredientAsync();
 
         Assert.Contains("choose an ingredient", viewModel.StatusMessage);
-        this.mockInventoryService.Verify(
+        this.mockInventoryProxy.Verify(
             service => service.AddToPantryAsync(It.IsAny<AddToPantryRequestDataTransferObject>()),
             Times.Never);
     }
@@ -171,7 +171,7 @@ public sealed class PantryViewModelTests
         await viewModel.AddNewIngredientAsync();
 
         Assert.Contains("greater than 0", viewModel.StatusMessage);
-        this.mockInventoryService.Verify(
+        this.mockInventoryProxy.Verify(
             service => service.AddToPantryAsync(It.IsAny<AddToPantryRequestDataTransferObject>()),
             Times.Never);
     }
@@ -179,7 +179,7 @@ public sealed class PantryViewModelTests
     [Fact]
     public async Task AddNewIngredientAsync_ValidInput_CallsServiceAndReloads()
     {
-        this.mockInventoryService
+        this.mockInventoryProxy
             .Setup(service => service.GetUserInventoryAsync(TEST_USER_ID))
             .ReturnsAsync(new List<InventoryDataTransferObject>());
 
@@ -189,7 +189,7 @@ public sealed class PantryViewModelTests
 
         await viewModel.AddNewIngredientAsync();
 
-        this.mockInventoryService.Verify(
+        this.mockInventoryProxy.Verify(
             service => service.AddToPantryAsync(
                 It.Is<AddToPantryRequestDataTransferObject>(request =>
                     request.UserId == TEST_USER_ID
@@ -205,7 +205,7 @@ public sealed class PantryViewModelTests
     [Fact]
     public async Task AddNewIngredientAsync_WhenServiceThrows_SetsErrorStatus()
     {
-        this.mockInventoryService
+        this.mockInventoryProxy
             .Setup(service => service.AddToPantryAsync(It.IsAny<AddToPantryRequestDataTransferObject>()))
             .ThrowsAsync(new Exception("Server error"));
 
@@ -225,7 +225,7 @@ public sealed class PantryViewModelTests
 
         await viewModel.RemoveItemAsync(null);
 
-        this.mockInventoryService.Verify(
+        this.mockInventoryProxy.Verify(
             service => service.RemoveItemAsync(It.IsAny<int>()),
             Times.Never);
     }
@@ -246,7 +246,7 @@ public sealed class PantryViewModelTests
         await viewModel.RemoveItemAsync(item);
 
         Assert.Empty(viewModel.Items);
-        this.mockInventoryService.Verify(
+        this.mockInventoryProxy.Verify(
             service => service.RemoveItemAsync(10),
             Times.Once);
     }
@@ -254,7 +254,7 @@ public sealed class PantryViewModelTests
     [Fact]
     public async Task RemoveItemAsync_WhenServiceThrows_SetsErrorStatus()
     {
-        this.mockInventoryService
+        this.mockInventoryProxy
             .Setup(service => service.RemoveItemAsync(It.IsAny<int>()))
             .ThrowsAsync(new Exception("Delete failed"));
 

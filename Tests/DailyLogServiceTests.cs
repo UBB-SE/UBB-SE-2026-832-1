@@ -1,4 +1,4 @@
-using ClassLibrary.DTOs;
+﻿using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 using Moq;
@@ -8,23 +8,23 @@ using WebAPI.Services;
 
 namespace Tests;
 
-public sealed class DailyLogServiceTests
+public sealed class DailyLogProxyTests
 {
     private readonly Mock<IDailyLogRepository> mockDailyLogRepository;
     private readonly Mock<IUserRepository> mockUserRepository;
     private readonly Mock<IFoodItemService> mockFoodItemService;
     private readonly Mock<IFoodItemRepository> mockFoodItemRepository;
     private readonly Mock<IWorkoutLogRepository> mockWorkoutLogRepository;
-    private readonly DailyLogService dailyLogService;
+    private readonly DailyLogProxy dailyLogService;
 
-    public DailyLogServiceTests()
+    public DailyLogProxyTests()
     {
         this.mockDailyLogRepository = new Mock<IDailyLogRepository>();
         this.mockUserRepository = new Mock<IUserRepository>();
         this.mockFoodItemService = new Mock<IFoodItemService>();
         this.mockFoodItemRepository = new Mock<IFoodItemRepository>();
         this.mockWorkoutLogRepository = new Mock<IWorkoutLogRepository>();
-        this.dailyLogService = new DailyLogService(
+        this.dailyLogService = new DailyLogProxy(
             this.mockDailyLogRepository.Object,
             this.mockUserRepository.Object,
             this.mockFoodItemService.Object,

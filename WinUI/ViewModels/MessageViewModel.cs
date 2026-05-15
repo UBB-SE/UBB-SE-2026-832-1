@@ -1,4 +1,5 @@
-﻿namespace WinUI.ViewModels
+﻿using ClassLibrary.Proxies.Interfaces;
+namespace WinUI.ViewModels
 {
     using ClassLibrary.Models;
     using CommunityToolkit.Mvvm.ComponentModel;
@@ -19,3 +20,4 @@
         public string SentAtFormatted => message.SentAt.ToString("MMM dd, HH:mm");
     }
 }
+

@@ -1,7 +1,7 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views.WorkoutLog;
@@ -16,7 +16,7 @@ public sealed partial class WorkoutHistoryPage : Page
         var userSession = new UserSession();
         ClientId = userSession.CurrentClientId;
         ViewModel = new WorkoutLogViewModel(
-            new WorkoutLogService(new System.Net.Http.HttpClient()));
+            new WorkoutLogProxy(new System.Net.Http.HttpClient()));
         ViewModel.StartWorkoutRequested += clientId => Frame.Navigate(typeof(ActiveWorkoutView), clientId);
         InitializeComponent();
     }
@@ -31,3 +31,4 @@ public sealed partial class WorkoutHistoryPage : Page
     {
     }
 }
+

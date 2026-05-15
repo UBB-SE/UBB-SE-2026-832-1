@@ -1,9 +1,9 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ClassLibrary.Models;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
-using WinUI.Services.Interfaces;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels.CalendarIntegration;
 
@@ -17,8 +17,8 @@ public sealed partial class CalendarIntegrationViewModel : ObservableObject
     private static readonly string[] DEFAULT_DAY_NAMES = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
     private static readonly bool[] DEFAULT_DAY_SELECTIONS = { false, true, true, true, true, true, false };
 
-    private readonly ICalendarWorkoutCatalogService calendarWorkoutCatalogService;
-    private readonly ICalendarExportService calendarExportService;
+    private readonly ICalendarWorkoutCatalogProxy calendarWorkoutCatalogService;
+    private readonly ICalendarExportProxy calendarExportService;
     private readonly IUserSession userSession;
 
     private ObservableCollection<WorkoutTemplate> availableWorkouts = new();
@@ -92,7 +92,7 @@ public sealed partial class CalendarIntegrationViewModel : ObservableObject
         set => SetProperty(ref this.isStatusOpen, value);
     }
 
-    public CalendarIntegrationViewModel(ICalendarWorkoutCatalogService calendarWorkoutCatalogService, ICalendarExportService calendarExportService, IUserSession userSession)
+    public CalendarIntegrationViewModel(ICalendarWorkoutCatalogProxy calendarWorkoutCatalogService, ICalendarExportProxy calendarExportService, IUserSession userSession)
     {
         this.calendarWorkoutCatalogService = calendarWorkoutCatalogService ?? throw new ArgumentNullException(nameof(calendarWorkoutCatalogService));
         this.calendarExportService = calendarExportService ?? throw new ArgumentNullException(nameof(calendarExportService));
@@ -284,3 +284,4 @@ public sealed partial class CalendarIntegrationViewModel : ObservableObject
         IsStatusOpen = false;
     }
 }
+

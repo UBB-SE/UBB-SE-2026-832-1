@@ -1,6 +1,6 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views;
@@ -12,7 +12,7 @@ public sealed partial class MealDetailView : Page
     public MealDetailView()
     {
         this.InitializeComponent();
-        this.ViewModel = new MealDetailViewModel(new MealService(new HttpClient()), new UserSession());
+        this.ViewModel = new MealDetailViewModel(new MealProxy(new HttpClient()), new UserSession());
         this.DataContext = this.ViewModel;
         this.Loaded += this.OnLoaded;
     }
@@ -22,3 +22,4 @@ public sealed partial class MealDetailView : Page
         await this.ViewModel.LoadAsync().ConfigureAwait(true);
     }
 }
+

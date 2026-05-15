@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 using WinUI.Views.ShoppingList;
 using WinUI.Views.PantryView;
@@ -84,3 +84,4 @@ public sealed partial class MainWindowView : Page
         Frame.Navigate(typeof(LoginView));
     }
 }
+

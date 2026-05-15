@@ -1,4 +1,5 @@
-﻿namespace WinUI.ViewModels
+﻿using ClassLibrary.Proxies.Interfaces;
+namespace WinUI.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -10,11 +11,11 @@
     using ClassLibrary.Models;
     using CommunityToolkit.Mvvm.ComponentModel;
     using CommunityToolkit.Mvvm.Input;
-    using WinUI.Services;
+    using ClassLibrary.Proxies;
 
     public partial class NutritionistChatViewModel : ObservableObject
     {
-        private readonly IChatService chatService;
+        private readonly IChatProxy chatService;
         private CancellationTokenSource? autoRefreshCancellationTokenSource;
         private int? currentConversationId;
         private readonly IUserSession userSession;
@@ -61,7 +62,7 @@
 
         public bool IsEmptyPlaceholderVisible => !IsNutritionistUser && !HasMessages;
 
-        public NutritionistChatViewModel(IChatService chatService, IUserSession userSession)
+        public NutritionistChatViewModel(IChatProxy chatService, IUserSession userSession)
         {
             Conversations = new ObservableCollection<ConversationViewModel>();
             Messages = new ObservableCollection<MessageViewModel>();
@@ -263,3 +264,4 @@
         }
     }
 }
+

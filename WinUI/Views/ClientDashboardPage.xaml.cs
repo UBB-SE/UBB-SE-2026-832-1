@@ -1,7 +1,7 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views;
@@ -22,7 +22,7 @@ public sealed partial class ClientDashboardPage : Page
         {
             this.userSession = new UserSession();
             this.viewModel = new ClientDashboardViewModel(
-                new ClientDashboardService(new System.Net.Http.HttpClient()),
+                new ClientDashboardProxy(new System.Net.Http.HttpClient()),
                 this.userSession);
             this.DataContext = this.viewModel;
 
@@ -67,3 +67,4 @@ public sealed partial class ClientDashboardPage : Page
         this.refreshBus.RefreshRequested -= this.RefreshBus_RefreshRequested;
     }
 }
+

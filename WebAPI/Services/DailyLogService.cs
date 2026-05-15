@@ -80,7 +80,7 @@ public sealed class DailyLogService : IDailyLogService
 
     public async Task<DailyLogTotalsDto> GetTodayTotalsAsync(int userId)
     {
-        var start = DateTime.Today;
+        var start = DateTime.Now.Date;
         var end = start.AddDays(ONE_DAY);
 
         var log = await this.dailyLogRepository.GetNutritionTotalsForRangeAsync(userId, start, end);
@@ -90,7 +90,7 @@ public sealed class DailyLogService : IDailyLogService
 
     public async Task<DailyLogTotalsDto> GetCurrentWeekTotalsAsync(int userId)
     {
-        var today = DateTime.Today;
+        var today = DateTime.Now.Date;
         int diff = (DAYS_IN_WEEK + (today.DayOfWeek - START_OF_WEEK)) % DAYS_IN_WEEK;
 
         var startOfWeek = today.AddDays(-diff);
@@ -115,7 +115,7 @@ public sealed class DailyLogService : IDailyLogService
 
     public async Task<double> GetTodayBurnedCaloriesAsync(int userId)
     {
-        var start = DateTime.Today;
+        var start = DateTime.Now.Date;
         var end = start.AddDays(ONE_DAY);
 
         return await this.workoutLogRepository.GetTotalCaloriesBurnedForRangeAsync(userId, start, end);
@@ -123,7 +123,7 @@ public sealed class DailyLogService : IDailyLogService
 
     public async Task<double> GetWeekBurnedCaloriesAsync(int userId)
     {
-        var today = DateTime.Today;
+        var today = DateTime.Now.Date;
         int diff = (DAYS_IN_WEEK + (today.DayOfWeek - START_OF_WEEK)) % DAYS_IN_WEEK;
 
         var startOfWeek = today.AddDays(-diff);
@@ -175,7 +175,7 @@ public sealed class DailyLogService : IDailyLogService
             Protein = foodItem.Protein,
             Carbohydrates = foodItem.Carbohydrates,
             Fats = foodItem.Fat,
-            LoggedAt = DateTime.UtcNow
+            LoggedAt = DateTime.Now
         };
 
         await this.dailyLogRepository.AddAsync(dailyLog);

@@ -1,0 +1,33 @@
+﻿using ClassLibrary.Proxies.Interfaces;
+namespace ClassLibrary.Proxies;
+
+using System.Net.Http.Json;
+using ClassLibrary.DTOs;
+
+public sealed class ClientProfileProxy : IClientProfileProxy
+{
+    private const string ROUTE = "api/client-profile";
+    private readonly HttpClient httpClient;
+
+    public ClientProfileProxy(HttpClient httpClient)
+    {
+        this.httpClient = httpClient;
+    }
+
+    public async Task<ClientProfileSnapshotDataTransferObject> GetClientProfileAsync(int clientId)
+    {
+        return await httpClient.GetFromJsonAsync<ClientProfileSnapshotDataTransferObject>($"{ROUTE}/{clientId}")
+            ?? throw new InvalidOperationException("Empty response from client profile endpoint.");
+    }
+
+    public async Task<ClientProfileSnapshotDataTransferObject> SyncNutritionAsync(int clientId, NutritionSyncRequestDataTransferObject request)
+    {
+        var response = await httpClient.PostAsJsonAsync($"{ROUTE}/{clientId}/sync-nutrition", request);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<ClientProfileSnapshotDataTransferObject>()
+            ?? throw new InvalidOperationException("Empty response from nutrition sync endpoint.");
+    }
+}
+
+

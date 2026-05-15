@@ -1,6 +1,7 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ClassLibrary.DTOs.Analytics;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -81,8 +82,8 @@ public sealed partial class WorkoutHistoryItemViewModel : ObservableObject
                 var setVm = new SetDetailRowViewModel
                 {
                     SetNumber = setIndex++,
-                    RepsDisplay = set.ActualReps?.ToString() ?? "—",
-                    WeightDisplay = set.ActualWeight?.ToString("F1") ?? "—"
+                    RepsDisplay = set.ActualReps?.ToString() ?? "â€”",
+                    WeightDisplay = set.ActualWeight?.ToString("F1") ?? "â€”"
                 };
                 exerciseGroup.Sets.Add(setVm);
             }
@@ -108,8 +109,8 @@ public sealed partial class WorkoutHistoryItemViewModel : ObservableObject
                 var setVm = new SetDetailRowViewModel
                 {
                     SetNumber = setIndex++,
-                    RepsDisplay = set.ActualReps?.ToString() ?? "—",
-                    WeightDisplay = set.ActualWeight?.ToString("F1") ?? "—"
+                    RepsDisplay = set.ActualReps?.ToString() ?? "â€”",
+                    WeightDisplay = set.ActualWeight?.ToString("F1") ?? "â€”"
                 };
                 exerciseGroup.Sets.Add(setVm);
             }

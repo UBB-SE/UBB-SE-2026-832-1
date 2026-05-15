@@ -2,13 +2,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ClassLibrary.Models;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
 public sealed partial class AchievementsViewModel : ObservableObject
 {
-    private readonly IAchievementsService achievementsService;
+    private readonly IAchievementsProxy achievementsService;
 
     [ObservableProperty]
     private ObservableCollection<Achievement> achievements;
@@ -16,7 +17,7 @@ public sealed partial class AchievementsViewModel : ObservableObject
     [ObservableProperty]
     private bool isLoading;
 
-    public AchievementsViewModel(IAchievementsService achievementsService)
+    public AchievementsViewModel(IAchievementsProxy achievementsService)
     {
         this.achievementsService = achievementsService;
         this.achievements = new ObservableCollection<Achievement>();
@@ -48,3 +49,4 @@ public sealed partial class AchievementsViewModel : ObservableObject
         }
     }
 }
+

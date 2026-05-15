@@ -1,17 +1,18 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using ClassLibrary.Filters;
 using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels
 {
     public partial class MealSearchViewModel : ObservableObject
     {
-        private readonly IMealService mealService;
+        private readonly IMealProxy mealService;
 
         public ObservableCollection<FoodItem> Meals { get; private set; } = new ObservableCollection<FoodItem>();
 
@@ -19,7 +20,7 @@ namespace WinUI.ViewModels
 
         public FoodItem? SelectedMeal { get; set; }
 
-        public MealSearchViewModel(IMealService mealService)
+        public MealSearchViewModel(IMealProxy mealService)
         {
             this.mealService = mealService;
             _ = LoadMealsAsync();
@@ -65,3 +66,4 @@ namespace WinUI.ViewModels
         }
     }
 }
+

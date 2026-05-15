@@ -1,7 +1,6 @@
 using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
-using ClassLibrary.Services;
 using WebAPI.IServices;
 
 namespace WebAPI.Services;
@@ -48,7 +47,7 @@ public class UserService : IUserService
 
     public async Task<UserDto?> RegisterAsync(string username, string password, string role)
     {
-        var existing = await this.userRepository.GetByUsernameAndPasswordAsync(username, password);
+        var existing = await this.userRepository.GetByUsernameAsync(username);
         if (existing != null)
         {
             return null;

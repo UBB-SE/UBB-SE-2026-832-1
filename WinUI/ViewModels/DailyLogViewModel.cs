@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
 using CommunityToolkit.Mvvm.ComponentModel;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -14,7 +15,7 @@ public partial class DailyLogViewModel : ObservableObject
     private const string ERROR_SEARCH_FORMAT = "Food search failed: {0}";
     private const string ERROR_LOG_FORMAT = "Failed to log food item: {0}";
 
-    private readonly IDailyLogService dailyLogService;
+    private readonly IDailyLogProxy dailyLogService;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DailyCaloriesDisplay))]
@@ -81,7 +82,7 @@ public partial class DailyLogViewModel : ObservableObject
     [ObservableProperty]
     private bool hasMealLogged;
 
-    public DailyLogViewModel(IDailyLogService dailyLogService)
+    public DailyLogViewModel(IDailyLogProxy dailyLogService)
     {
         this.dailyLogService = dailyLogService ?? throw new ArgumentNullException(nameof(dailyLogService));
     }
@@ -225,3 +226,4 @@ public partial class DailyLogViewModel : ObservableObject
         return Math.Min((consumed / goal) * 100, 100);
     }
 }
+

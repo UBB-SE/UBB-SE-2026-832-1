@@ -1,4 +1,4 @@
-using ClassLibrary.Models;
+﻿using ClassLibrary.Models;
 using Moq;
 using WinUI.Services;
 using WinUI.ViewModels;
@@ -7,11 +7,11 @@ namespace Tests;
 
 public sealed class ShoppingListViewModelTests
 {
-    private readonly Mock<IShoppingListService> mockShoppingListService = new();
+    private readonly Mock<IShoppingListProxy> mockShoppingListProxy = new();
     private readonly UserSession userSession = new();
 
     private ShoppingListViewModel CreateViewModel() =>
-        new(this.mockShoppingListService.Object, this.userSession);
+        new(this.mockShoppingListProxy.Object, this.userSession);
 
     [Fact]
     public async Task LoadItemsAsync_PopulatesItemsCollection()
@@ -22,7 +22,7 @@ public sealed class ShoppingListViewModelTests
             new() { ShoppingListItemId = 2, IngredientName = "Bread", QuantityGrams = 500 },
         };
 
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.GetShoppingItemsAsync(It.IsAny<int>()))
             .ReturnsAsync(items);
 
@@ -36,7 +36,7 @@ public sealed class ShoppingListViewModelTests
     [Fact]
     public async Task AddItemCommand_NullIngredient_ShowsErrorStatus()
     {
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.AddItemAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<double>()))
             .ReturnsAsync((ShoppingListItem?)null);
 
@@ -59,11 +59,11 @@ public sealed class ShoppingListViewModelTests
             QuantityGrams = 500,
         };
 
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.AddItemAsync("Sugar", It.IsAny<int>(), 200))
             .ReturnsAsync(addedItem);
 
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.GetShoppingItemsAsync(It.IsAny<int>()))
             .ReturnsAsync(new List<ShoppingListItem> { addedItem });
 
@@ -85,7 +85,7 @@ public sealed class ShoppingListViewModelTests
 
         await viewModel.AddItemCommand.ExecuteAsync(null);
 
-        this.mockShoppingListService.Verify(
+        this.mockShoppingListProxy.Verify(
             service => service.AddItemAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<double>()),
             Times.Never);
     }
@@ -100,7 +100,7 @@ public sealed class ShoppingListViewModelTests
             QuantityGrams = 250,
         };
 
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.MoveToPantryAsync(item))
             .ReturnsAsync(true);
 
@@ -124,7 +124,7 @@ public sealed class ShoppingListViewModelTests
             QuantityGrams = 300,
         };
 
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.MoveToPantryAsync(item))
             .ReturnsAsync(false);
 
@@ -144,7 +144,7 @@ public sealed class ShoppingListViewModelTests
 
         await viewModel.MoveToPantryCommand.ExecuteAsync(null);
 
-        this.mockShoppingListService.Verify(
+        this.mockShoppingListProxy.Verify(
             service => service.MoveToPantryAsync(It.IsAny<ShoppingListItem>()),
             Times.Never);
     }
@@ -159,7 +159,7 @@ public sealed class ShoppingListViewModelTests
             QuantityGrams = 1000,
         };
 
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.RemoveItemAsync(item))
             .ReturnsAsync(true);
 
@@ -182,7 +182,7 @@ public sealed class ShoppingListViewModelTests
             QuantityGrams = 500,
         };
 
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.RemoveItemAsync(item))
             .ReturnsAsync(false);
 
@@ -198,11 +198,11 @@ public sealed class ShoppingListViewModelTests
     [Fact]
     public async Task GenerateListCommand_ItemsAdded_ReloadsAndShowsSuccess()
     {
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.GenerateListAsync(It.IsAny<int>()))
             .ReturnsAsync(3);
 
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.GetShoppingItemsAsync(It.IsAny<int>()))
             .ReturnsAsync(new List<ShoppingListItem>());
 
@@ -216,7 +216,7 @@ public sealed class ShoppingListViewModelTests
     [Fact]
     public async Task GenerateListCommand_ZeroItems_ShowsAlreadyComplete()
     {
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.GenerateListAsync(It.IsAny<int>()))
             .ReturnsAsync(0);
 
@@ -230,7 +230,7 @@ public sealed class ShoppingListViewModelTests
     [Fact]
     public async Task GenerateListCommand_NegativeResult_ShowsError()
     {
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.GenerateListAsync(It.IsAny<int>()))
             .ReturnsAsync(-1);
 
@@ -250,7 +250,7 @@ public sealed class ShoppingListViewModelTests
             new(2, "Apricot"),
         };
 
-        this.mockShoppingListService
+        this.mockShoppingListProxy
             .Setup(service => service.SearchIngredientsAsync("Ap"))
             .ReturnsAsync(expected);
 

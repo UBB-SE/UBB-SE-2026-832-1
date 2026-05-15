@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Net.Http;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views;
@@ -19,7 +19,7 @@ public sealed partial class AchievementsPage : Page
         this.InitializeComponent();
 
         this.userSession = new UserSession();
-        this.viewModel = new AchievementsViewModel(new AchievementsService(new HttpClient()));
+        this.viewModel = new AchievementsViewModel(new AchievementsProxy(new HttpClient()));
         this.DataContext = this.viewModel;
 
         this.Loaded += this.Page_Loaded;
@@ -37,3 +37,4 @@ public sealed partial class AchievementsPage : Page
         }
     }
 }
+

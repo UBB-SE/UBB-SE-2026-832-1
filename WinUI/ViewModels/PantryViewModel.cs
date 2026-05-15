@@ -1,11 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -22,7 +23,7 @@ public partial class PantryViewModel : ObservableObject
     private const string ADD_ITEM_ERROR_FORMAT = "Could not add item: {0}";
     private const string ADD_ITEM_SUCCESS_FORMAT = "Added {0}g of {1}.";
 
-    private readonly IInventoryService inventoryService;
+    private readonly IInventoryProxy inventoryService;
     private readonly int currentUserId;
 
     [ObservableProperty]
@@ -51,7 +52,7 @@ public partial class PantryViewModel : ObservableObject
 
     public bool IsListEmpty => !this.Items.Any();
 
-    public PantryViewModel(IInventoryService inventoryService, int currentUserId)
+    public PantryViewModel(IInventoryProxy inventoryService, int currentUserId)
     {
         this.inventoryService = inventoryService;
         this.currentUserId = currentUserId;
@@ -200,3 +201,4 @@ public partial class PantryViewModel : ObservableObject
         }
     }
 }
+

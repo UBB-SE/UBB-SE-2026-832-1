@@ -1,15 +1,15 @@
-using ClassLibrary.IRepositories;
+﻿using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 using Moq;
 using WebAPI.Services;
 
 namespace Tests;
 
-public sealed class WorkoutLogServiceTests
+public sealed class WorkoutLogProxyTests
 {
     private readonly Mock<IWorkoutLogRepository> workoutLogRepository = new();
 
-    private WorkoutLogService CreateService() => new(this.workoutLogRepository.Object);
+    private WorkoutLogProxy CreateService() => new(this.workoutLogRepository.Object);
 
     [Fact]
     public async Task GetWorkoutHistory_ZeroRating_MapsToNullInDto()

@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using ClassLibrary.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views.ShoppingList;
@@ -25,8 +25,8 @@ public sealed partial class ShoppingListView : Page
     public ShoppingListView()
     {
         this.InitializeComponent();
-        var service = new ShoppingListService(new HttpClient());
-        this.ViewModel = new ShoppingListViewModel(service, new WinUI.Services.UserSession());
+        var service = new ShoppingListProxy(new HttpClient());
+        this.ViewModel = new ShoppingListViewModel(service, new ClassLibrary.Proxies.UserSession());
         this.DataContext = this.ViewModel;
         this.Loaded += this.OnPageLoaded;
     }
@@ -131,3 +131,4 @@ public sealed partial class ShoppingListView : Page
         }
     }
 }
+

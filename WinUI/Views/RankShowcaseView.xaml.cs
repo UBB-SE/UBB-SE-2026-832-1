@@ -1,6 +1,6 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views;
@@ -13,7 +13,7 @@ public sealed partial class RankShowcaseView : Page
     {
         this.InitializeComponent();
         this.ViewModel = new RankShowcaseViewModel(
-            new RankShowcaseService(new HttpClient()),
+            new RankShowcaseProxy(new HttpClient()),
             new UserSession());
         this.DataContext = this.ViewModel;
     }
@@ -23,3 +23,4 @@ public sealed partial class RankShowcaseView : Page
         await this.ViewModel.LoadAsync().ConfigureAwait(true);
     }
 }
+

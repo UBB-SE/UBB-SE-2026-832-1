@@ -1,3 +1,4 @@
+﻿using ClassLibrary.Proxies.Interfaces;
 namespace WinUI.ViewModels;
 
 public sealed class SetDetailRowViewModel
@@ -8,3 +9,4 @@ public sealed class SetDetailRowViewModel
 
     public string WeightDisplay { get; set; } = string.Empty;
 }
+

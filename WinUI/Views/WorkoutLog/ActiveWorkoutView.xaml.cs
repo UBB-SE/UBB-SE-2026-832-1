@@ -1,9 +1,9 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using ClassLibrary.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views.WorkoutLog;
@@ -16,7 +16,7 @@ public sealed partial class ActiveWorkoutView : Page
     public ActiveWorkoutView()
     {
         ViewModel = new ActiveWorkoutViewModel(
-            new ActiveWorkoutService(new HttpClient()),
+            new ActiveWorkoutProxy(new HttpClient()),
             new WorkoutUiState());
         ViewModel.WorkoutFinished += () => Frame.GoBack();
         InitializeComponent();
@@ -105,3 +105,4 @@ public sealed partial class ActiveWorkoutView : Page
         }
     }
 }
+

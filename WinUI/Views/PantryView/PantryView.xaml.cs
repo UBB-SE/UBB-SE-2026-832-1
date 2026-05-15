@@ -1,7 +1,7 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using ClassLibrary.DTOs;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views.PantryView;
@@ -14,7 +14,7 @@ public sealed partial class PantryView : Page
     {
         var userSession = new UserSession();
         this.ViewModel = new PantryViewModel(
-            new InventoryService(new InventoryServiceProxy(new HttpClient())),
+            new InventoryProxy(new HttpClient()),
             userSession.CurrentClientId);
         this.DataContext = this.ViewModel;
         this.InitializeComponent();
@@ -37,3 +37,4 @@ public sealed partial class PantryView : Page
         }
     }
 }
+

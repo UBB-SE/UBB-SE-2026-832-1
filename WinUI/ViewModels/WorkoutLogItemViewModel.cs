@@ -1,6 +1,7 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -45,3 +46,4 @@ public sealed partial class WorkoutLogItemViewModel : ObservableObject
         }
     }
 }
+

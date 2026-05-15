@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using ClassLibrary.Models;
@@ -6,7 +6,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -16,7 +17,7 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
     private const int REST_TIMER_INTERVAL_MS = 1000;
     private const int HOUR_IN_SECONDS = 3600;
 
-    private readonly IActiveWorkoutService activeWorkoutService;
+    private readonly IActiveWorkoutProxy activeWorkoutService;
     private readonly WorkoutUiState workoutUiState;
 
     private int clientId;
@@ -28,7 +29,7 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
 
     public event Action? WorkoutFinished;
 
-    public ActiveWorkoutViewModel(IActiveWorkoutService activeWorkoutService, WorkoutUiState workoutUiState)
+    public ActiveWorkoutViewModel(IActiveWorkoutProxy activeWorkoutService, WorkoutUiState workoutUiState)
     {
         this.activeWorkoutService = activeWorkoutService;
         this.workoutUiState = workoutUiState;
@@ -650,3 +651,4 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
         return builder.ToString();
     }
 }
+

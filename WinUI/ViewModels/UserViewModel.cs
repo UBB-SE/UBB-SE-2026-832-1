@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
-using ClassLibrary.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -23,7 +23,7 @@ public partial class UserViewModel : ObservableObject
     private const string ERROR_SAVING_DATA_FORMAT = "Error: {0}";
     private const string ERROR_VALIDATION_LENGTH = "Username (min 3) and Password (min 6) required.";
 
-    private readonly IUserService? userService;
+    private readonly IUserProxy? userService;
 
     [ObservableProperty] private string userName = string.Empty;
     [ObservableProperty] private string password = string.Empty;
@@ -76,7 +76,7 @@ public partial class UserViewModel : ObservableObject
     {
     }
 
-    public UserViewModel(IUserService userService)
+    public UserViewModel(IUserProxy userService)
     {
         this.userService = userService;
     }
@@ -257,3 +257,4 @@ public partial class UserViewModel : ObservableObject
         return age;
     }
 }
+

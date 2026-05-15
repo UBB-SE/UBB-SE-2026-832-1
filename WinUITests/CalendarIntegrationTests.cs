@@ -1,4 +1,4 @@
-using ClassLibrary.Models;
+﻿using ClassLibrary.Models;
 using WinUI.Services;
 using WinUI.Services.Interfaces;
 using WinUI.ViewModels.CalendarIntegration;
@@ -11,7 +11,7 @@ public sealed class CalendarIntegrationTests
     [Fact]
     public void GenerateCalendar_WithValidInput_ReturnsIcsEnvelopeAndEvents()
     {
-        CalendarExportService calendarExportService = new CalendarExportService();
+        CalendarExportProxy calendarExportService = new CalendarExportProxy();
         WorkoutTemplate workoutTemplate = CreateWorkoutTemplate("Strength Base");
         int[] selectedDays = [1, 3];
         DateTime startDate = new DateTime(2026, 5, 4, 9, 0, 0, DateTimeKind.Local);
@@ -27,7 +27,7 @@ public sealed class CalendarIntegrationTests
     [Fact]
     public async Task SaveCalendarToDownloadsAsync_WithValidContent_CreatesFile()
     {
-        CalendarExportService calendarExportService = new CalendarExportService();
+        CalendarExportProxy calendarExportService = new CalendarExportProxy();
         string calendarContent = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nEND:VCALENDAR\r\n";
         string? savedPath = await calendarExportService.SaveCalendarToDownloadsAsync(calendarContent, "Calendar Test");
 
@@ -49,7 +49,7 @@ public sealed class CalendarIntegrationTests
     [Fact]
     public void GetFallbackWorkouts_ReturnsExpectedWorkoutsForClient()
     {
-        CalendarWorkoutCatalogService calendarWorkoutCatalogService = new CalendarWorkoutCatalogService(new HttpClient());
+        CalendarWorkoutCatalogProxy calendarWorkoutCatalogService = new CalendarWorkoutCatalogProxy(new HttpClient());
         int clientId = 77;
 
         IReadOnlyList<WorkoutTemplate> fallbackWorkouts = calendarWorkoutCatalogService.GetFallbackWorkouts(clientId);
@@ -61,8 +61,8 @@ public sealed class CalendarIntegrationTests
     [Fact]
     public async Task GenerateCalendarForExportAsync_WithValidSelection_ReturnsSuccess()
     {
-        FakeCalendarWorkoutCatalogService workoutCatalogService = new FakeCalendarWorkoutCatalogService();
-        CalendarExportService calendarExportService = new CalendarExportService();
+        FakeCalendarWorkoutCatalogProxy workoutCatalogService = new FakeCalendarWorkoutCatalogProxy();
+        CalendarExportProxy calendarExportService = new CalendarExportProxy();
         WinUserSession.SetCurrentSession(11, "Client");
         WinUserSession userSession = new WinUserSession();
         CalendarIntegrationViewModel calendarIntegrationViewModel = new CalendarIntegrationViewModel(workoutCatalogService, calendarExportService, userSession);
@@ -135,7 +135,7 @@ public sealed class CalendarIntegrationTests
         }
     }
 
-    private sealed class FakeCalendarWorkoutCatalogService : ICalendarWorkoutCatalogService
+    private sealed class FakeCalendarWorkoutCatalogProxy : ICalendarWorkoutCatalogProxy
     {
         public IReadOnlyList<WorkoutTemplate> Workouts { get; } = new List<WorkoutTemplate>
         {

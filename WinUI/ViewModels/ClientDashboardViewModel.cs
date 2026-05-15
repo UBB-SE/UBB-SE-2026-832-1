@@ -1,11 +1,12 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using ClassLibrary.DTOs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using ClassLibrary.DTOs.Analytics;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -13,7 +14,7 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
 {
     public const int DefaultPageSize = 5;
 
-    private readonly IClientDashboardService dashboardService;
+    private readonly IClientDashboardProxy dashboardService;
     private readonly IUserSession userSession;
     private CancellationTokenSource? loadCts;
     private ObservableCollection<ConsistencyWeekBucket> consistencyBuckets = new();
@@ -67,7 +68,7 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
             ? string.Empty
             : string.Create(CultureInfo.InvariantCulture, $"Page {CurrentPage + 1} of {TotalPages}");
 
-    public ClientDashboardViewModel(IClientDashboardService dashboardService, IUserSession userSession)
+    public ClientDashboardViewModel(IClientDashboardProxy dashboardService, IUserSession userSession)
     {
         this.dashboardService = dashboardService;
         this.userSession = userSession;
@@ -170,8 +171,8 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         {
             ShowEmptyState = true;
             TotalWorkouts = 0;
-            ActiveTimeSevenDaysDisplay = "—";
-            PreferredWorkoutDisplay = "—";
+            ActiveTimeSevenDaysDisplay = "â€”";
+            PreferredWorkoutDisplay = "â€”";
         }
         finally
         {
@@ -296,3 +297,4 @@ public sealed partial class ClientDashboardViewModel : ObservableObject
         return $"{span.TotalMinutes:F0}m";
     }
 }
+

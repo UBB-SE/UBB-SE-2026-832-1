@@ -1,16 +1,17 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
 public partial class MealPlanViewModel : ObservableObject
 {
-    private readonly IMealPlanService mealPlanService;
+    private readonly IMealPlanProxy mealPlanService;
     private readonly UserSession userSession;
 
     private const int InvalidId = 0;
@@ -106,7 +107,7 @@ public partial class MealPlanViewModel : ObservableObject
     [ObservableProperty]
     private string errorDialogMessage = string.Empty;
 
-    public MealPlanViewModel(IMealPlanService mealPlanService, UserSession userSession)
+    public MealPlanViewModel(IMealPlanProxy mealPlanService, UserSession userSession)
     {
         GeneratedMeals = new ObservableCollection<MealViewModel>();
         this.mealPlanService = mealPlanService;
@@ -299,3 +300,4 @@ public partial class MealPlanViewModel : ObservableObject
         await SaveToDailyLog();
     }
 }
+

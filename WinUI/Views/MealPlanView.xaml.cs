@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies.Interfaces;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views;
@@ -12,8 +13,8 @@ namespace WinUI.Views;
 public sealed partial class MealPlanView : Page
 {
     private readonly MealPlanViewModel viewModel;
-    private readonly IUserService userService;
-    private readonly IMealPlanService mealPlanService;
+    private readonly IUserProxy userService;
+    private readonly IMealPlanProxy mealPlanService;
     private readonly UserSession userSession;
 
     private const string ButtonOk = "OK";
@@ -63,8 +64,8 @@ public sealed partial class MealPlanView : Page
 
         var httpClient = new HttpClient();
         this.userSession = new UserSession();
-        this.mealPlanService = new MealPlanService(httpClient);
-        this.userService = new UserService(new UserServiceProxy(httpClient));
+        this.mealPlanService = new MealPlanProxy(httpClient);
+        this.userService = new UserProxy();
         this.viewModel = new MealPlanViewModel(this.mealPlanService, this.userSession);
         this.DataContext = this.viewModel;
 
@@ -308,3 +309,4 @@ public sealed partial class MealPlanView : Page
         MealsListView.ItemsSource = this.viewModel.GeneratedMeals;
     }
 }
+

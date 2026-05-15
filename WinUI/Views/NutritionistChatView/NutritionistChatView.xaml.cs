@@ -1,8 +1,8 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using ClassLibrary.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views.ChatView
@@ -15,7 +15,7 @@ namespace WinUI.Views.ChatView
         {
             this.InitializeComponent();
             this.ViewModel = new NutritionistChatViewModel(
-                new ChatService(new HttpClient()),
+                new ChatProxy(new HttpClient()),
                 new UserSession());
             this.DataContext = ViewModel;
         }
@@ -35,3 +35,4 @@ namespace WinUI.Views.ChatView
         }
     }
 }
+

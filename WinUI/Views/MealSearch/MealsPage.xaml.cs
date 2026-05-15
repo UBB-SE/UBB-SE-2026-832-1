@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ClassLibrary.Filters;
@@ -25,7 +25,7 @@ namespace WinUI.Views
             InitializeComponent();
 
             mealSearchViewModel = new MealSearchViewModel(
-                new WinUI.Services.MealService(
+                new ClassLibrary.Proxies.MealProxy(
                     new System.Net.Http.HttpClient()));
 
             Loaded += MealsPage_Loaded;
@@ -101,7 +101,7 @@ namespace WinUI.Views
             selectedMeal.IsFavorite = !selectedMeal.IsFavorite;
 
             favoriteButton.Content =
-                selectedMeal.IsFavorite ? "★" : "☆";
+                selectedMeal.IsFavorite ? "â˜…" : "â˜†";
 
             await mealSearchViewModel.ToggleFavoriteAsync(selectedMeal);
 
@@ -181,7 +181,7 @@ namespace WinUI.Views
             }
 
             favoriteButton.Content =
-                meal.IsFavorite ? "★" : "☆";
+                meal.IsFavorite ? "â˜…" : "â˜†";
         }
 
         private void PreviousPageButton_Click(
@@ -227,3 +227,4 @@ namespace WinUI.Views
         }
     }
 }
+
