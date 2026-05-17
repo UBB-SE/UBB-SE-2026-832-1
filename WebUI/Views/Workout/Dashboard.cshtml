@@ -3,13 +3,6 @@
     ViewData["Title"] = "Start Workout";
 }
 
-@if (TempData["WorkoutFinalized"] is string finalizedName)
-{
-    <div class="alert alert-success" role="alert">
-        Workout <strong>@finalizedName</strong> finalized.
-    </div>
-}
-
 <div class="d-flex justify-content-between align-items-end mb-4">
     <div>
         <div class="text-muted small text-uppercase" style="letter-spacing: 0.2em;">Workout Time</div>

@@ -32,6 +32,7 @@ public class WorkoutController : Controller
         }
 
         var clientId = userSession.CurrentClientId;
+        TempData.Remove("WorkoutFinalized");
         var logs = await workoutLogProxy.GetWorkoutHistoryAsync(clientId);
 
         var model = new WorkoutHistoryViewModel
