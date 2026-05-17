@@ -5,10 +5,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddSingleton<IUserSession, UserSession>();
 builder.Services.AddHttpClient<ICreateWorkoutProxy, CreateWorkoutProxy>();
 builder.Services.AddHttpClient<IActiveWorkoutProxy, ActiveWorkoutProxy>();
 builder.Services.AddHttpClient<IWorkoutLogProxy, WorkoutLogProxy>();
-builder.Services.AddSingleton<IUserSession, UserSession>();
+builder.Services.AddHttpClient<IMealPlanProxy, MealPlanProxy>();
+builder.Services.AddHttpClient<IDailyLogProxy, DailyLogProxy>();
 
 var app = builder.Build();
 
