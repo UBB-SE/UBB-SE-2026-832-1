@@ -28,7 +28,7 @@ else
             @Html.AntiForgeryToken()
             <input type="hidden" name="templateId" value="@template.WorkoutTemplateId" />
             <input type="hidden" name="durationSeconds" class="duration-input" value="0" />
-            <button type="submit" class="btn btn-info text-white">&#10003; Finish Workout</button>
+            <button type="submit" class="btn btn-info text-white">Finish Workout</button>
         </form>
     </div>
 
@@ -39,7 +39,6 @@ else
             {
                 <div class="list-group-item d-flex justify-content-between align-items-center py-2">
                     <div class="d-flex align-items-center gap-2">
-                        <span class="text-muted">&#128269;</span>
                         <span class="fw-semibold">@w.Name</span>
                         <span class="badge bg-secondary" style="font-size: 0.65rem;">@w.Type</span>
                     </div>
@@ -52,7 +51,7 @@ else
 
     <button type="button" class="btn btn-light border w-100 mb-4"
             id="openFocusModeBtn" data-bs-toggle="modal" data-bs-target="#focusModeModal">
-        &#128065; Open Focus Mode
+        Open Focus Mode
     </button>
 
     @foreach (var exercise in template.Exercises)
@@ -60,11 +59,9 @@ else
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center bg-white">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="text-muted">&#9776;</span>
                     <span class="fw-bold">@exercise.Name</span>
                     <span class="badge bg-secondary" style="font-size: 0.65rem;">@exercise.MuscleGroup</span>
                 </div>
-                <span class="text-muted">&#8963;</span>
             </div>
             <div class="card-body p-0">
                 <div class="d-flex px-3 py-2 border-bottom bg-light small text-muted fw-semibold">
@@ -114,7 +111,7 @@ else
         @Html.AntiForgeryToken()
         <input type="hidden" name="templateId" value="@template.WorkoutTemplateId" />
         <input type="hidden" name="durationSeconds" class="duration-input" value="0" />
-        <button type="submit" class="btn btn-info text-white w-100 fw-semibold">&#10003; Finish Workout</button>
+        <button type="submit" class="btn btn-info text-white w-100 fw-semibold">Finish Workout</button>
     </form>
 
     <!-- Focus Mode Modal -->

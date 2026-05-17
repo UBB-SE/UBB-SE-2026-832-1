@@ -14,7 +14,7 @@
     </div>
     <div>
         <button type="button" class="btn btn-secondary" disabled>
-            &#10003; Finish Workout
+            Finish Workout
         </button>
     </div>
 </div>
@@ -28,7 +28,7 @@
                     data-bs-toggle="dropdown"
                     data-bs-auto-close="outside"
                     aria-expanded="false">
-                &#9638; Select Target Goals
+                Select Target Goals
             </button>
             <div class="dropdown-menu p-3" style="min-width: 280px;">
                 <form asp-action="Dashboard" method="get">
@@ -70,7 +70,6 @@
                     {
                         <div class="list-group-item d-flex justify-content-between align-items-center py-2">
                             <div class="d-flex align-items-center gap-2">
-                                <span class="text-muted">&#128269;</span>
                                 <span class="fw-semibold">@workout.Name</span>
                                 <span class="badge bg-secondary" style="font-size: 0.65rem;">@workout.Type</span>
                             </div>
@@ -107,7 +106,6 @@
                 {
                     <div class="list-group-item d-flex justify-content-between align-items-center py-2">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="text-muted">&#128269;</span>
                             <span class="fw-semibold">@workout.Name</span>
                             <span class="badge bg-secondary" style="font-size: 0.65rem;">@workout.Type</span>
                         </div>
@@ -127,13 +125,13 @@
 {
     <a asp-action="Focus" asp-route-templateId="@lastWorkout.WorkoutTemplateId"
        class="btn btn-light border w-100">
-        &#8635; Repeat This Workout
+        Repeat This Workout
     </a>
 }
 else
 {
     <button type="button" class="btn btn-light border w-100" disabled>
-        &#8635; Repeat This Workout
+        Repeat This Workout
     </button>
 }
 
@@ -195,7 +193,7 @@ else
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-info text-white fw-semibold">
-                            &#128190; Save Workout
+                            Save Workout
                         </button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     </div>
@@ -243,7 +241,7 @@ else
                     '<input type="hidden" name="Exercises[' + index + '].TargetReps" data-field="TargetReps" value="' + reps + '" />' +
                     '<input type="hidden" name="Exercises[' + index + '].TargetWeight" data-field="TargetWeight" value="0" /></td>' +
                     '<td class="text-muted small">' + sets + ' sets &nbsp; ' + reps + ' reps</td>' +
-                    '<td class="text-end"><button type="button" class="btn btn-sm btn-link text-danger remove-row p-0">&#128465;</button></td>';
+                    '<td class="text-end"><button type="button" class="btn btn-sm btn-link text-danger remove-row p-0">Remove</button></td>';
                 tableBody.appendChild(tr);
                 selectEl.value = '';
             });
