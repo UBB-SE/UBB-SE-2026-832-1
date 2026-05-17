@@ -1,3 +1,6 @@
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,6 +15,9 @@ builder.Services.AddSingleton<ClassLibrary.Proxies.Interfaces.IUserSession, Clas
 builder.Services.AddTransient<ClassLibrary.Proxies.Interfaces.ICalendarIntegrationProxy, ClassLibrary.Proxies.CalendarIntegrationProxy>();
 builder.Services.AddTransient<ClassLibrary.Proxies.Interfaces.ICalendarWorkoutCatalogProxy, ClassLibrary.Proxies.CalendarWorkoutCatalogProxy>();
 builder.Services.AddTransient<ClassLibrary.Proxies.Interfaces.ICalendarExportProxy, ClassLibrary.Proxies.CalendarExportProxy>();
+builder.Services.AddSingleton<IUserSession, UserSession>();
+builder.Services.AddHttpClient<IMealPlanProxy, MealPlanProxy>();
+builder.Services.AddHttpClient<IDailyLogProxy, DailyLogProxy>();
 
 var app = builder.Build();
 
