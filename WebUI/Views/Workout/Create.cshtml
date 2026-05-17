@@ -1,0 +1,166 @@
+@model WebUI.Models.Workout.CreateWorkoutFormModel
+@{
+    ViewData["Title"] = "Create Custom Workout";
+}
+
+@if (TempData["WorkoutSaved"] is string savedName)
+{
+    <div class="alert alert-success mx-auto" style="max-width: 600px;" role="alert">
+        Workout <strong>@savedName</strong> saved.
+    </div>
+}
+
+<div class="card mx-auto" style="max-width: 600px;">
+    <div class="card-body p-4">
+        <h4 class="card-title fw-bold mb-4">Create Custom Workout</h4>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger" role="alert">
+                <ul class="mb-0">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(value => value.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <form asp-action="Create" method="post" id="createWorkoutForm">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="WorkoutName" class="form-label fw-semibold">Workout Name</label>
+                <input asp-for="WorkoutName" class="form-control" placeholder="e.g. My Push Day" />
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label fw-semibold">Add Exercises</label>
+                <div class="row g-2 align-items-end">
+                    <div class="col">
+                        <select id="exerciseSelect" class="form-select">
+                            <option value="">Select exercise</option>
+                            @foreach (var name in Model.AvailableExercises)
+                            {
+                                <option value="@name">@name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto" style="width: 80px;">
+                        <label class="form-label small text-muted mb-1">Sets</label>
+                        <input id="exerciseSets" type="number" min="1" max="20" value="3" class="form-control" />
+                    </div>
+                    <div class="col-auto" style="width: 80px;">
+                        <label class="form-label small text-muted mb-1">Reps</label>
+                        <input id="exerciseReps" type="number" min="1" max="999" value="10" class="form-control" />
+                    </div>
+                    <div class="col-auto" style="width: 90px;">
+                        <label class="form-label small text-muted mb-1">Weight</label>
+                        <input id="exerciseWeight" type="number" min="0" max="1000" step="0.5" value="0" class="form-control" />
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-light border" id="addExerciseBtn">
+                            +
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border rounded p-2 mb-4 bg-white" style="min-height: 110px;" id="exercisesContainer">
+                <table class="table table-sm mb-0 align-middle" id="exercisesTable">
+                    <tbody id="exercisesBody">
+                        @if (Model.Exercises is not null)
+                        {
+                            for (var i = 0; i < Model.Exercises.Count; i++)
+                            {
+                                var row = Model.Exercises[i];
+                                <tr>
+                                    <td>
+                                        <strong>@row.Name</strong>
+                                        <input type="hidden" name="Exercises[@i].Name" value="@row.Name" />
+                                    </td>
+                                    <td class="text-muted small text-end">
+                                        @row.TargetSets sets
+                                        <input type="hidden" name="Exercises[@i].TargetSets" value="@row.TargetSets" />
+                                    </td>
+                                    <td class="text-muted small text-end">
+                                        @row.TargetReps reps
+                                        <input type="hidden" name="Exercises[@i].TargetReps" value="@row.TargetReps" />
+                                    </td>
+                                    <td class="text-muted small text-end">
+                                        @row.TargetWeight kg
+                                        <input type="hidden" name="Exercises[@i].TargetWeight" value="@row.TargetWeight" />
+                                    </td>
+                                    <td class="text-end" style="width: 40px;">
+                                        <button type="button" class="btn btn-sm btn-link text-muted remove-row p-0">&times;</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                &#128190; Save Workout
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="mx-auto mt-2" style="max-width: 600px;">
+    <a asp-action="Index" class="btn btn-light border w-100">Cancel</a>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const tableBody = document.getElementById('exercisesBody');
+            const addBtn = document.getElementById('addExerciseBtn');
+            const selectEl = document.getElementById('exerciseSelect');
+            const setsEl = document.getElementById('exerciseSets');
+            const repsEl = document.getElementById('exerciseReps');
+            const weightEl = document.getElementById('exerciseWeight');
+
+            function reindex() {
+                const rows = tableBody.querySelectorAll('tr');
+                rows.forEach((row, index) => {
+                    row.querySelectorAll('input[type="hidden"]').forEach((input) => {
+                        const field = input.name.split('.').pop();
+                        input.name = 'Exercises[' + index + '].' + field;
+                    });
+                });
+            }
+
+            addBtn.addEventListener('click', function () {
+                const name = selectEl.value;
+                if (!name) { return; }
+                const sets = setsEl.value || 1;
+                const reps = repsEl.value || 1;
+                const weight = weightEl.value || 0;
+                const index = tableBody.querySelectorAll('tr').length;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td><strong>' + name + '</strong>' +
+                    '<input type="hidden" name="Exercises[' + index + '].Name" value="' + name + '" /></td>' +
+                    '<td class="text-muted small text-end">' + sets + ' sets' +
+                    '<input type="hidden" name="Exercises[' + index + '].TargetSets" value="' + sets + '" /></td>' +
+                    '<td class="text-muted small text-end">' + reps + ' reps' +
+                    '<input type="hidden" name="Exercises[' + index + '].TargetReps" value="' + reps + '" /></td>' +
+                    '<td class="text-muted small text-end">' + weight + ' kg' +
+                    '<input type="hidden" name="Exercises[' + index + '].TargetWeight" value="' + weight + '" /></td>' +
+                    '<td class="text-end" style="width: 40px;"><button type="button" class="btn btn-sm btn-link text-muted remove-row p-0">&times;</button></td>';
+                tableBody.appendChild(tr);
+                selectEl.value = '';
+            });
+
+            tableBody.addEventListener('click', function (event) {
+                if (event.target.classList.contains('remove-row')) {
+                    event.target.closest('tr').remove();
+                    reindex();
+                }
+            });
+        })();
+    </script>
+}

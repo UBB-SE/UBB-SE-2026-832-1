@@ -1,0 +1,337 @@
+@model WebUI.Models.Workout.FocusModeViewModel
+@{
+    ViewData["Title"] = "Workout";
+}
+
+@if (Model.SelectedTemplate is null)
+{
+    <script>window.location.href = '@Url.Action("Dashboard")';</script>
+}
+else
+{
+    var template = Model.SelectedTemplate;
+    var otherWorkouts = Model.AvailableWorkouts
+        .Where(w => w.WorkoutTemplateId != template.WorkoutTemplateId)
+        .ToList();
+
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <div class="text-muted small text-uppercase" style="letter-spacing: 0.2em;">Workout Time</div>
+            <div id="sessionTimer"
+                 class="display-3 fw-bold text-info font-monospace"
+                 data-template-id="@template.WorkoutTemplateId">
+                00:00
+            </div>
+            <div class="text-muted small">@template.Name</div>
+        </div>
+        <form asp-action="Finalize" method="post" class="d-inline finalize-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="templateId" value="@template.WorkoutTemplateId" />
+            <input type="hidden" name="durationSeconds" class="duration-input" value="0" />
+            <button type="submit" class="btn btn-info text-white">&#10003; Finish Workout</button>
+        </form>
+    </div>
+
+    @if (otherWorkouts.Count > 0)
+    {
+        <div class="list-group list-group-flush mb-3">
+            @foreach (var w in otherWorkouts)
+            {
+                <div class="list-group-item d-flex justify-content-between align-items-center py-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted">&#128269;</span>
+                        <span class="fw-semibold">@w.Name</span>
+                        <span class="badge bg-secondary" style="font-size: 0.65rem;">@w.Type</span>
+                    </div>
+                    <a asp-action="Focus" asp-route-templateId="@w.WorkoutTemplateId" asp-route-fresh="true"
+                       class="btn btn-info btn-sm text-white">Start</a>
+                </div>
+            }
+        </div>
+    }
+
+    <button type="button" class="btn btn-light border w-100 mb-4"
+            id="openFocusModeBtn" data-bs-toggle="modal" data-bs-target="#focusModeModal">
+        &#128065; Open Focus Mode
+    </button>
+
+    @foreach (var exercise in template.Exercises)
+    {
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted">&#9776;</span>
+                    <span class="fw-bold">@exercise.Name</span>
+                    <span class="badge bg-secondary" style="font-size: 0.65rem;">@exercise.MuscleGroup</span>
+                </div>
+                <span class="text-muted">&#8963;</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="d-flex px-3 py-2 border-bottom bg-light small text-muted fw-semibold">
+                    <div style="width: 50px;">#</div>
+                    <div class="flex-grow-1">Exercise</div>
+                    <div style="width: 100px;" class="text-center">Reps</div>
+                    <div style="width: 100px;" class="text-center">Weight (kg)</div>
+                    <div style="width: 36px;"></div>
+                </div>
+                @for (var setIndex = 1; setIndex <= exercise.TargetSets; setIndex++)
+                {
+                    var currentSet = setIndex;
+                    <form asp-action="CompleteSet" method="post"
+                          class="d-flex align-items-center px-3 py-2 border-bottom set-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="WorkoutTemplateId" value="@template.WorkoutTemplateId" />
+                        <input type="hidden" name="ExerciseName" value="@exercise.Name" />
+                        <input type="hidden" name="SetIndex" value="@currentSet" />
+                        <input type="hidden" name="TargetReps" value="@exercise.TargetReps" />
+                        <div style="width: 50px;">
+                            <span class="badge rounded-pill bg-info text-white">@currentSet</span>
+                        </div>
+                        <div class="flex-grow-1 text-muted small">Target: @exercise.TargetReps &nbsp;reps</div>
+                        <div style="width: 100px;" class="px-1">
+                            <input type="number" name="Reps" min="0" max="999"
+                                   placeholder="Reps" class="form-control form-control-sm text-center set-reps" />
+                        </div>
+                        <div style="width: 100px;" class="px-1">
+                            <input type="number" name="Weight" min="0" max="1000" step="0.5"
+                                   placeholder="kg" class="form-control form-control-sm text-center set-weight" />
+                        </div>
+                        <div style="width: 36px;" class="text-center">
+                            <button type="submit" class="btn btn-sm btn-link text-info p-0 set-submit"
+                                    style="visibility: hidden;" disabled>&#10003;</button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="mb-4">
+        <h5 class="fw-bold">Notifications</h5>
+    </div>
+
+    <form asp-action="Finalize" method="post" class="finalize-form">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="templateId" value="@template.WorkoutTemplateId" />
+        <input type="hidden" name="durationSeconds" class="duration-input" value="0" />
+        <button type="submit" class="btn btn-info text-white w-100 fw-semibold">&#10003; Finish Workout</button>
+    </form>
+
+    <!-- Focus Mode Modal -->
+    <div class="modal fade" id="focusModeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 340px;">
+            <div class="modal-content">
+                <div class="modal-body p-4">
+                    <div class="text-center mb-3">
+                        <h5 class="fw-bold mb-1">@template.Name</h5>
+                        <div class="text-muted small text-uppercase" style="letter-spacing: 0.15em;">Session Time</div>
+                        <div id="focusTimer" class="fw-bold font-monospace text-info"
+                             style="font-size: 2.5rem;">00:00</div>
+                    </div>
+
+                    <div class="border rounded p-3 mb-3 bg-light">
+                        <div class="small text-muted mb-1">
+                            Now &nbsp;<strong id="focusExerciseName" class="text-dark"></strong>
+                        </div>
+                        <div class="small text-muted">
+                            Set <strong id="focusSetNumber" class="text-dark"></strong>
+                            &nbsp;&middot;&nbsp; Target
+                            <strong id="focusTargetReps" class="text-dark"></strong> reps
+                        </div>
+                    </div>
+
+                    <div class="fw-semibold mb-2">Complete Current Set</div>
+                    <div class="d-flex gap-2 mb-2">
+                        <input type="number" id="focusReps" placeholder="Reps" min="0" max="999"
+                               class="form-control text-center" />
+                        <input type="number" id="focusWeight" placeholder="Weight" min="0" max="1000" step="0.5"
+                               class="form-control text-center" />
+                    </div>
+                    <button type="button" id="focusCompleteBtn"
+                            class="btn btn-info text-white w-100 fw-semibold mb-3">
+                        Complete Set
+                    </button>
+
+                    <div id="focusSetList" class="mb-3 small text-muted"></div>
+
+                    <button type="button" class="btn btn-info text-white w-100 fw-semibold"
+                            data-bs-dismiss="modal">
+                        Exit Focus Mode
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const timer = document.getElementById('sessionTimer');
+            if (!timer) { return; }
+
+            const templateId = timer.dataset.templateId;
+            const timerKey = 'workout_start_' + templateId;
+            const focusKey = 'focus_active_' + templateId;
+            const setKey = 'focus_set_' + templateId;
+            const setsPrefix = 'set_done_' + templateId + '_';
+            const params = new URLSearchParams(window.location.search);
+
+            function clearAllSetData() {
+                Object.keys(localStorage).filter(k => k.startsWith(setsPrefix)).forEach(k => localStorage.removeItem(k));
+            }
+
+            if (params.get('fresh') === 'True' || params.get('fresh') === 'true') {
+                localStorage.removeItem(timerKey);
+                localStorage.removeItem(focusKey);
+                localStorage.removeItem(setKey);
+                clearAllSetData();
+            }
+            if (!localStorage.getItem(timerKey)) {
+                localStorage.setItem(timerKey, Date.now().toString());
+            }
+
+            const startMs = parseInt(localStorage.getItem(timerKey));
+            function pad(n) { return n < 10 ? '0' + n : n; }
+            function getElapsed() { return Math.max(0, Math.floor((Date.now() - startMs) / 1000)); }
+
+            function tick() {
+                const elapsed = getElapsed();
+                const mm = Math.floor(elapsed / 60);
+                const ss = elapsed % 60;
+                const text = pad(mm) + ':' + pad(ss);
+                timer.textContent = text;
+                const ft = document.getElementById('focusTimer');
+                if (ft) ft.textContent = text;
+                document.querySelectorAll('.duration-input').forEach(function (inp) { inp.value = elapsed; });
+            }
+            tick();
+            setInterval(tick, 1000);
+
+            document.querySelectorAll('.finalize-form').forEach(function (form) {
+                form.addEventListener('submit', function () {
+                    localStorage.removeItem(timerKey);
+                    localStorage.removeItem(focusKey);
+                    localStorage.removeItem(setKey);
+                    clearAllSetData();
+                });
+            });
+
+            const allForms = Array.from(document.querySelectorAll('.set-form'));
+
+            allForms.forEach(function (form) {
+                const exName = form.querySelector('input[name="ExerciseName"]').value;
+                const setIdx = form.querySelector('input[name="SetIndex"]').value;
+                const repsInput = form.querySelector('.set-reps');
+                const weightInput = form.querySelector('.set-weight');
+                const submitBtn = form.querySelector('.set-submit');
+
+                function checkInputs() {
+                    const ready = repsInput.value !== '' && weightInput.value !== '';
+                    submitBtn.disabled = !ready;
+                    submitBtn.style.visibility = ready ? 'visible' : 'hidden';
+                }
+                repsInput.addEventListener('input', checkInputs);
+                weightInput.addEventListener('input', checkInputs);
+
+                const stored = localStorage.getItem(setsPrefix + exName + '_' + setIdx);
+                if (stored) {
+                    const data = JSON.parse(stored);
+                    repsInput.value = data.reps;
+                    weightInput.value = data.weight;
+                    checkInputs();
+                }
+            });
+
+            // Focus Mode
+            const exercises = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                Model.SelectedTemplate!.Exercises.Select(e => new {
+                    name = e.Name,
+                    targetSets = e.TargetSets,
+                    targetReps = e.TargetReps
+                })
+            ));
+
+            const totalSets = allForms.length;
+
+            function getCurrentIndex() {
+                return parseInt(localStorage.getItem(setKey) || '0');
+            }
+
+            function getExerciseAndSet(globalIndex) {
+                let idx = 0;
+                for (let ei = 0; ei < exercises.length; ei++) {
+                    for (let si = 1; si <= exercises[ei].targetSets; si++) {
+                        if (idx === globalIndex) return { exercise: exercises[ei], setNum: si, exIndex: ei };
+                        idx++;
+                    }
+                }
+                return null;
+            }
+
+            function renderFocusModal() {
+                const globalIndex = getCurrentIndex();
+                if (globalIndex >= totalSets) {
+                    document.getElementById('focusExerciseName').textContent = 'All sets done!';
+                    document.getElementById('focusSetNumber').textContent = '';
+                    document.getElementById('focusTargetReps').textContent = '';
+                    document.getElementById('focusSetList').innerHTML = '<span class="text-success">Workout complete!</span>';
+                    document.getElementById('focusCompleteBtn').disabled = true;
+                    return;
+                }
+
+                const info = getExerciseAndSet(globalIndex);
+                if (!info) return;
+
+                document.getElementById('focusExerciseName').textContent = info.exercise.name;
+                document.getElementById('focusSetNumber').textContent = info.setNum;
+                document.getElementById('focusTargetReps').textContent = info.exercise.targetReps;
+                document.getElementById('focusReps').value = '';
+                document.getElementById('focusWeight').value = '';
+                document.getElementById('focusCompleteBtn').disabled = false;
+
+                let html = '<div class="fw-semibold mb-1 text-dark">' + info.exercise.name + '</div>';
+                let baseIdx = 0;
+                for (let ei = 0; ei < info.exIndex; ei++) baseIdx += exercises[ei].targetSets;
+                for (let si = 1; si <= info.exercise.targetSets; si++) {
+                    const isCurrent = (baseIdx + si - 1) === globalIndex;
+                    const cls = isCurrent ? 'fw-semibold text-info' : 'text-muted';
+                    html += '<div class="' + cls + '">Set <strong>' + si + '</strong> &nbsp; ' +
+                            info.exercise.targetReps + ' reps</div>';
+                }
+                document.getElementById('focusSetList').innerHTML = html;
+            }
+
+            document.getElementById('focusCompleteBtn').addEventListener('click', function () {
+                const globalIndex = getCurrentIndex();
+                if (globalIndex >= totalSets) return;
+
+                const reps = document.getElementById('focusReps').value;
+                const weight = document.getElementById('focusWeight').value;
+                if (reps === '' || weight === '') return;
+
+                const form = allForms[globalIndex];
+                const exName = form.querySelector('input[name="ExerciseName"]').value;
+                const setIdx = form.querySelector('input[name="SetIndex"]').value;
+
+                localStorage.setItem(setsPrefix + exName + '_' + setIdx, JSON.stringify({ reps, weight }));
+                localStorage.setItem(setKey, globalIndex + 1);
+                localStorage.setItem(focusKey, '1');
+
+                form.querySelector('.set-reps').value = reps;
+                form.querySelector('.set-weight').value = weight;
+                form.submit();
+            });
+
+            const focusModal = document.getElementById('focusModeModal');
+            focusModal.addEventListener('show.bs.modal', renderFocusModal);
+            focusModal.addEventListener('hide.bs.modal', function () {
+                localStorage.removeItem(focusKey);
+            });
+
+            if (localStorage.getItem(focusKey) === '1') {
+                new bootstrap.Modal(focusModal).show();
+            }
+        })();
+    </script>
+}

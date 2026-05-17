@@ -1,0 +1,266 @@
+@model WebUI.Models.Workout.WorkoutDashboardViewModel
+@{
+    ViewData["Title"] = "Start Workout";
+}
+
+@if (TempData["WorkoutFinalized"] is string finalizedName)
+{
+    <div class="alert alert-success" role="alert">
+        Workout <strong>@finalizedName</strong> finalized.
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <div class="text-muted small text-uppercase" style="letter-spacing: 0.2em;">Workout Time</div>
+        <div id="dashboardTimer"
+             class="display-3 fw-bold text-info font-monospace"
+             data-start="">
+            00:00
+        </div>
+    </div>
+    <div>
+        <button type="button" class="btn btn-secondary" disabled>
+            &#10003; Finish Workout
+        </button>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title fw-bold mb-3">Available Workouts for You</h5>
+        <div class="dropdown mb-2">
+            <button type="button"
+                    class="btn btn-light border w-100 dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside"
+                    aria-expanded="false">
+                &#9638; Select Target Goals
+            </button>
+            <div class="dropdown-menu p-3" style="min-width: 280px;">
+                <form asp-action="Dashboard" method="get">
+                    <div class="fw-bold mb-2">Select your target goal</div>
+
+                    @{
+                        var goals = new[]
+                        {
+                            ("HIIT Fat Burner", "Weight Loss — HIIT Fat Burner"),
+                            ("Full Body Mass", "Muscle Gain — Full Body Mass"),
+                            ("Full Body Power", "Raw Strength — Full Body Power"),
+                            ("Endurance Circuit", "Muscular Endurance — Endurance Circuit"),
+                        };
+                    }
+                    @foreach (var (value, label) in goals)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="goal"
+                                   id="goal_@value.Replace(" ", "")"
+                                   value="@value"
+                                   @(Model.SelectedGoal == value ? "checked" : "") />
+                            <label class="form-check-label" for="goal_@value.Replace(" ", "")">
+                                @label
+                            </label>
+                        </div>
+                    }
+
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Apply</button>
+                </form>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.SelectedGoal))
+        {
+            if (Model.AvailableWorkouts.Count > 0)
+            {
+                <div class="list-group list-group-flush mt-2">
+                    @foreach (var workout in Model.AvailableWorkouts)
+                    {
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-muted">&#128269;</span>
+                                <span class="fw-semibold">@workout.Name</span>
+                                <span class="badge bg-secondary" style="font-size: 0.65rem;">@workout.Type</span>
+                            </div>
+                            <a asp-action="Focus" asp-route-templateId="@workout.WorkoutTemplateId"
+                               class="btn btn-info btn-sm text-white">Start</a>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted small mb-0 mt-2">No workouts match "@Model.SelectedGoal".</p>
+            }
+        }
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="card-title fw-bold m-0">My Saved Workouts</h5>
+            <button type="button" class="btn btn-light border btn-sm" data-bs-toggle="modal" data-bs-target="#createWorkoutModal">
+                + Create Custom
+            </button>
+        </div>
+        @if (Model.SavedWorkouts.Count == 0)
+        {
+            <p class="text-muted small mb-0">No saved workouts yet. Create one or ask your trainer to assign a routine.</p>
+        }
+        else
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var workout in Model.SavedWorkouts)
+                {
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted">&#128269;</span>
+                            <span class="fw-semibold">@workout.Name</span>
+                            <span class="badge bg-secondary" style="font-size: 0.65rem;">@workout.Type</span>
+                        </div>
+                        <a asp-action="Focus" asp-route-templateId="@workout.WorkoutTemplateId" asp-route-fresh="true"
+                           class="btn btn-info btn-sm text-white">Start</a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@{
+    var lastWorkout = Model.SavedWorkouts.LastOrDefault() ?? Model.AvailableWorkouts.LastOrDefault();
+}
+@if (lastWorkout is not null)
+{
+    <a asp-action="Focus" asp-route-templateId="@lastWorkout.WorkoutTemplateId"
+       class="btn btn-light border w-100">
+        &#8635; Repeat This Workout
+    </a>
+}
+else
+{
+    <button type="button" class="btn btn-light border w-100" disabled>
+        &#8635; Repeat This Workout
+    </button>
+}
+
+<div class="modal fade" id="createWorkoutModal" tabindex="-1" aria-labelledby="createWorkoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="createWorkoutModalLabel">Create Custom Workout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+
+                @if (TempData["WorkoutSaved"] is string savedName)
+                {
+                    <div class="alert alert-success" role="alert">
+                        Workout <strong>@savedName</strong> saved.
+                    </div>
+                }
+
+                <form asp-action="Create" method="post" id="createWorkoutForm">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Workout Name</label>
+                        <input name="WorkoutName" class="form-control" placeholder="e.g. My Push Day" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">Add Exercises</label>
+                        <div class="row g-2 align-items-end">
+                            <div class="col">
+                                <select id="modalExerciseSelect" class="form-select">
+                                    <option value="">Select exercise</option>
+                                    @foreach (var name in Model.AvailableExercises)
+                                    {
+                                        <option value="@name">@name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-auto" style="width: 75px;">
+                                <label class="form-label small text-muted mb-1">Sets</label>
+                                <input id="modalSets" type="number" min="1" max="20" value="3" class="form-control" />
+                            </div>
+                            <div class="col-auto" style="width: 75px;">
+                                <label class="form-label small text-muted mb-1">Reps</label>
+                                <input id="modalReps" type="number" min="1" max="999" value="10" class="form-control" />
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-light border" id="modalAddBtn">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border rounded p-2 mb-3" style="min-height: 80px;" id="modalExercisesContainer">
+                        <table class="table table-sm mb-0 align-middle">
+                            <tbody id="modalExercisesBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-info text-white fw-semibold">
+                            &#128190; Save Workout
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const timer = document.getElementById('dashboardTimer');
+            if (!timer) { return; }
+            timer.textContent = '00:00';
+        })();
+
+        (function () {
+            const tableBody = document.getElementById('modalExercisesBody');
+            const addBtn = document.getElementById('modalAddBtn');
+            const selectEl = document.getElementById('modalExerciseSelect');
+            const setsEl = document.getElementById('modalSets');
+            const repsEl = document.getElementById('modalReps');
+
+            function reindex() {
+                tableBody.querySelectorAll('tr').forEach((row, index) => {
+                    row.querySelectorAll('input[type="hidden"]').forEach((input) => {
+                        input.name = 'Exercises[' + index + '].' + input.dataset.field;
+                    });
+                });
+            }
+
+            addBtn.addEventListener('click', function () {
+                const name = selectEl.value;
+                if (!name) { return; }
+                const sets = setsEl.value || 1;
+                const reps = repsEl.value || 1;
+                const index = tableBody.querySelectorAll('tr').length;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td><strong>' + name + '</strong>' +
+                    '<input type="hidden" name="Exercises[' + index + '].Name" data-field="Name" value="' + name + '" />' +
+                    '<input type="hidden" name="Exercises[' + index + '].TargetSets" data-field="TargetSets" value="' + sets + '" />' +
+                    '<input type="hidden" name="Exercises[' + index + '].TargetReps" data-field="TargetReps" value="' + reps + '" />' +
+                    '<input type="hidden" name="Exercises[' + index + '].TargetWeight" data-field="TargetWeight" value="0" /></td>' +
+                    '<td class="text-muted small">' + sets + ' sets &nbsp; ' + reps + ' reps</td>' +
+                    '<td class="text-end"><button type="button" class="btn btn-sm btn-link text-danger remove-row p-0">&#128465;</button></td>';
+                tableBody.appendChild(tr);
+                selectEl.value = '';
+            });
+
+            tableBody.addEventListener('click', function (e) {
+                if (e.target.closest('.remove-row')) {
+                    e.target.closest('tr').remove();
+                    reindex();
+                }
+            });
+        })();
+    </script>
+}

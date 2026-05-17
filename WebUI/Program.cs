@@ -1,15 +1,20 @@
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddHttpClient<ICreateWorkoutProxy, CreateWorkoutProxy>();
+builder.Services.AddHttpClient<IActiveWorkoutProxy, ActiveWorkoutProxy>();
+builder.Services.AddHttpClient<IWorkoutLogProxy, WorkoutLogProxy>();
+builder.Services.AddSingleton<IUserSession, UserSession>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -25,5 +30,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+UserSession.SetCurrentSession(2, UserSession.CLIENT_ROLE);
 
 app.Run();
