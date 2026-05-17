@@ -179,7 +179,7 @@ public class WorkoutController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Finalize(int templateId, int durationSeconds = 0)
+    public async Task<IActionResult> Finalize(int templateId, int durationSeconds = 0, string? completedSetsJson = null)
     {
         if (!userSession.IsClient)
         {
@@ -194,10 +194,38 @@ public class WorkoutController : Controller
         }
 
         var workoutLog = BuildWorkoutLog(clientId, template, durationSeconds);
+
+        if (!string.IsNullOrEmpty(completedSetsJson))
+        {
+            var sets = System.Text.Json.JsonSerializer.Deserialize<List<CompletedSetItem>>(completedSetsJson);
+            if (sets is not null)
+            {
+                foreach (var group in sets.GroupBy(s => s.exerciseName))
+                {
+                    var exercise = new LoggedExercise { ExerciseName = group.Key };
+                    foreach (var s in group.OrderBy(x => x.setNumber))
+                    {
+                        exercise.Sets.Add(new LoggedSet
+                        {
+                            ExerciseName = s.exerciseName,
+                            SetNumber = s.setNumber,
+                            SetIndex = s.setNumber,
+                            ActualReps = s.actualReps,
+                            ActualWeight = s.actualWeight,
+                            TargetReps = s.targetReps,
+                        });
+                    }
+                    workoutLog.Exercises.Add(exercise);
+                }
+            }
+        }
+
         await activeWorkoutProxy.FinalizeWorkoutAsync(workoutLog);
         TempData["WorkoutFinalized"] = template.Name;
         return RedirectToAction(nameof(Index));
     }
+
+    private sealed record CompletedSetItem(string exerciseName, int setNumber, int actualReps, double actualWeight, int targetReps);
 
     private static WorkoutLog BuildWorkoutLog(int clientId, WorkoutTemplate template, int durationSeconds = 0)
     {
