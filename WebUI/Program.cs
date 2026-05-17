@@ -3,7 +3,6 @@ using ClassLibrary.Proxies.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 
@@ -16,16 +15,17 @@ builder.Services.AddTransient<ClassLibrary.Proxies.Interfaces.ICalendarIntegrati
 builder.Services.AddTransient<ClassLibrary.Proxies.Interfaces.ICalendarWorkoutCatalogProxy, ClassLibrary.Proxies.CalendarWorkoutCatalogProxy>();
 builder.Services.AddTransient<ClassLibrary.Proxies.Interfaces.ICalendarExportProxy, ClassLibrary.Proxies.CalendarExportProxy>();
 builder.Services.AddSingleton<IUserSession, UserSession>();
+builder.Services.AddHttpClient<ICreateWorkoutProxy, CreateWorkoutProxy>();
+builder.Services.AddHttpClient<IActiveWorkoutProxy, ActiveWorkoutProxy>();
+builder.Services.AddHttpClient<IWorkoutLogProxy, WorkoutLogProxy>();
 builder.Services.AddHttpClient<IMealPlanProxy, MealPlanProxy>();
 builder.Services.AddHttpClient<IDailyLogProxy, DailyLogProxy>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -41,5 +41,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+UserSession.SetCurrentSession(2, UserSession.CLIENT_ROLE);
 
 app.Run();

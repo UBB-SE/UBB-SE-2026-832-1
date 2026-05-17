@@ -1,4 +1,4 @@
-﻿@using ClassLibrary.Proxies.Interfaces
+@using ClassLibrary.Proxies.Interfaces
 @inject IUserSession userSession
 <!DOCTYPE html>
 <html lang="en">
@@ -23,14 +23,21 @@
                 </li>
             }
             <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Products" ? "active" : "")" 
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Products" ? "active" : "")"
                    asp-area="" asp-controller="Products" asp-action="Index">Products</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "MealPlan" ? "active" : "")"
                    asp-area="" asp-controller="MealPlan" asp-action="Index">Meal Plan</a>
             </li>
-            </ul>
+            @if (UserSession.IsClient)
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Workout" ? "active" : "")"
+                       asp-area="" asp-controller="Workout" asp-action="Index">Workout History</a>
+                </li>
+            }
+        </ul>
     </header>
 
     <main class="container mt-3">
@@ -41,5 +48,6 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
