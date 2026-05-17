@@ -1,0 +1,150 @@
+@model WebUI.Models.ClientDashboard.ClientDashboardIndexViewModel
+@{
+    ViewData["Title"] = "Analytics Dashboard";
+}
+
+<div class="client-dashboard">
+    <h1 class="h3 mb-4">Analytics Dashboard</h1>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Total Workouts</p>
+                    <p class="display-6 mb-0">@Model.TotalWorkouts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Active Time (7 Days)</p>
+                    <p class="display-6 mb-0">@Model.ActiveTimeSevenDaysDisplay</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Preferred Workout</p>
+                    <p class="h4 mb-0 text-truncate">@Model.PreferredWorkoutDisplay</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.ShowEmptyState)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h5 mb-3">4-Week Consistency</h2>
+                @foreach (var bucket in Model.ConsistencyBuckets)
+                {
+                    <div class="d-flex justify-content-between border-bottom py-2">
+                        <span>@bucket.WeekStart</span>
+                        <strong>@bucket.WorkoutCount workouts</strong>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <section class="mb-4">
+        <h2 class="h5 mb-3">Workout History</h2>
+
+        @if (Model.ShowEmptyState)
+        {
+            <div class="text-center py-5 text-muted">
+                <p class="h4">No workouts recorded yet</p>
+                <p class="mb-0">Complete a workout to see your analytics and history here.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row small text-muted fw-semibold px-3 mb-2 d-none d-md-flex">
+                <div class="col-md-5">WORKOUT</div>
+                <div class="col-md-3">DATE</div>
+                <div class="col-md-2">DURATION</div>
+                <div class="col-md-2">INTENSITY</div>
+            </div>
+
+            <div class="accordion" id="workoutHistoryAccordion">
+                @foreach (var item in Model.HistoryItems)
+                {
+                    <div class="accordion-item mb-2 border rounded">
+                        <h3 class="accordion-header" id="heading-@item.WorkoutLogId">
+                            <button class="accordion-button collapsed py-3"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapse-@item.WorkoutLogId"
+                                    aria-expanded="false"
+                                    aria-controls="collapse-@item.WorkoutLogId">
+                                <div class="row w-100 align-items-center g-2">
+                                    <div class="col-md-5 fw-semibold">@item.Title</div>
+                                    <div class="col-md-3 text-muted">@item.DateLine</div>
+                                    <div class="col-md-2 text-muted">@item.DurationLine</div>
+                                    <div class="col-md-2 text-muted">@item.IntensityTag</div>
+                                </div>
+                            </button>
+                        </h3>
+                        <div id="collapse-@item.WorkoutLogId"
+                             class="accordion-collapse collapse"
+                             data-bs-parent="#workoutHistoryAccordion">
+                            <div class="accordion-body workout-detail-panel"
+                                 data-detail-url="@Url.Action("Detail", "ClientDashboard", new { workoutLogId = item.WorkoutLogId })">
+                                <div class="text-center py-3 text-muted">Loading details…</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                @if (Model.CanGoPrevious)
+                {
+                    <a asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" class="btn btn-outline-secondary btn-sm">Previous</a>
+                }
+                else
+                {
+                    <span class="btn btn-outline-secondary btn-sm disabled">Previous</span>
+                }
+
+                <span class="text-muted fw-semibold">@Model.PageDisplayText</span>
+
+                @if (Model.CanGoNext)
+                {
+                    <a asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" class="btn btn-outline-secondary btn-sm">Next</a>
+                }
+                else
+                {
+                    <span class="btn btn-outline-secondary btn-sm disabled">Next</span>
+                }
+            </div>
+        }
+    </section>
+
+    <section>
+        <h2 class="h5 mb-3">Recent Achievements</h2>
+        @if (Model.RecentAchievements.Count == 0)
+        {
+            <p class="text-muted">No achievements yet.</p>
+        }
+        else
+        {
+            @foreach (var achievement in Model.RecentAchievements)
+            {
+                <div class="card shadow-sm mb-2">
+                    <div class="card-body">
+                        <p class="fw-semibold mb-1">@achievement.Title</p>
+                        <p class="mb-1">@achievement.Description</p>
+                        <p class="small text-muted mb-0">@achievement.Criteria</p>
+                    </div>
+                </div>
+            }
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/client-dashboard.js" asp-append-version="true"></script>
+}
