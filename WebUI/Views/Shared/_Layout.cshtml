@@ -1,23 +1,33 @@
-﻿<!DOCTYPE html>
+﻿@using ClassLibrary.Proxies.Interfaces
+@inject IUserSession UserSession
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WebUI Management System</title>
+    <title>@ViewData["Title"] - WebUI Management System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
     <header class="container mt-4">
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")" 
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"
                    asp-area="" asp-controller="Home" asp-action="Index">Dashboard</a>
             </li>
+            @if (UserSession.IsClient && UserSession.CurrentClientId > 0)
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ClientDashboard" ? "active" : "")"
+                       asp-area="" asp-controller="ClientDashboard" asp-action="Index">Analytics Dashboard</a>
+                </li>
+            }
             <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Products" ? "active" : "")" 
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "active" : "")"
                    asp-area="" asp-controller="Products" asp-action="Index">Products</a>
             </li>
-            </ul>
+        </ul>
     </header>
 
     <main class="container mt-3">
@@ -28,5 +38,6 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

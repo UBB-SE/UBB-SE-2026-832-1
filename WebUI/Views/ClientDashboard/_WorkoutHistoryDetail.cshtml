@@ -1,0 +1,39 @@
+@model WebUI.Models.ClientDashboard.WorkoutSessionDetailViewModel
+
+<div class="alert alert-primary py-2">
+    <strong>Total Calories Burned:</strong> @Model.TotalCaloriesBurned kcal
+</div>
+
+@if (Model.ExerciseCalories.Count > 0)
+{
+    <p class="fw-semibold text-muted small mb-2">Calories by Exercise</p>
+    <ul class="list-unstyled mb-3">
+        @foreach (var calorie in Model.ExerciseCalories)
+        {
+            <li class="d-flex justify-content-between border-bottom py-1">
+                <span>@calorie.ExerciseName</span>
+                <strong>@calorie.CaloriesBurned kcal</strong>
+            </li>
+        }
+    </ul>
+}
+
+@foreach (var group in Model.ExerciseSetGroups)
+{
+    <div class="mb-3">
+        <p class="fw-semibold mb-1">@group.ExerciseName</p>
+        <div class="row small text-muted fw-semibold mb-1">
+            <div class="col-4">Set</div>
+            <div class="col-4">Reps</div>
+            <div class="col-4">Weight</div>
+        </div>
+        @foreach (var set in group.Sets)
+        {
+            <div class="row">
+                <div class="col-4">@set.SetNumber</div>
+                <div class="col-4">@set.RepsDisplay</div>
+                <div class="col-4">@set.WeightDisplay</div>
+            </div>
+        }
+    </div>
+}
