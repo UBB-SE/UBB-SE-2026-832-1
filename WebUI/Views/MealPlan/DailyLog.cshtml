@@ -1,0 +1,124 @@
+@model WebUI.Models.DailyLogPageViewModel
+@{
+    ViewData["Title"] = "Daily Log";
+}
+
+<h2 class="mb-3">Daily Nutrition Log</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-semibold">Today's Totals</div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Calories:</strong> @Model.TodayTotals.TotalCalories.ToString("F0") kcal
+                        @if (Model.NutritionTargets != null)
+                        {
+                            <span class="text-muted">/ @Model.NutritionTargets.CalorieNeeds kcal</span>
+                        }
+                    </li>
+                    <li><strong>Protein:</strong> @Model.TodayTotals.TotalProtein.ToString("F1") g
+                        @if (Model.NutritionTargets != null)
+                        {
+                            <span class="text-muted">/ @Model.NutritionTargets.ProteinNeeds g</span>
+                        }
+                    </li>
+                    <li><strong>Carbs:</strong> @Model.TodayTotals.TotalCarbohydrates.ToString("F1") g
+                        @if (Model.NutritionTargets != null)
+                        {
+                            <span class="text-muted">/ @Model.NutritionTargets.CarbohydrateNeeds g</span>
+                        }
+                    </li>
+                    <li><strong>Fat:</strong> @Model.TodayTotals.TotalFat.ToString("F1") g
+                        @if (Model.NutritionTargets != null)
+                        {
+                            <span class="text-muted">/ @Model.NutritionTargets.FatNeeds g</span>
+                        }
+                    </li>
+                    <li class="mt-2"><strong>Burned Calories:</strong> @Model.TodayBurnedCalories.ToString("F0") kcal</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-semibold">This Week's Totals</div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Calories:</strong> @Model.WeekTotals.TotalCalories.ToString("F0") kcal</li>
+                    <li><strong>Protein:</strong> @Model.WeekTotals.TotalProtein.ToString("F1") g</li>
+                    <li><strong>Carbs:</strong> @Model.WeekTotals.TotalCarbohydrates.ToString("F1") g</li>
+                    <li><strong>Fat:</strong> @Model.WeekTotals.TotalFat.ToString("F1") g</li>
+                    <li class="mt-2"><strong>Burned Calories:</strong> @Model.WeekBurnedCalories.ToString("F0") kcal</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header fw-semibold">Search &amp; Log Food</div>
+    <div class="card-body">
+        <form asp-action="DailyLog" method="get" class="d-flex gap-2 mb-3">
+            <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control" placeholder="Search food items..." />
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+        @if (Model.FoodItems.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Calories</th>
+                            <th>Protein</th>
+                            <th>Carbs</th>
+                            <th>Fat</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.FoodItems)
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>@item.Calories kcal</td>
+                                <td>@item.Protein g</td>
+                                <td>@item.Carbohydrates g</td>
+                                <td>@item.Fat g</td>
+                                <td>
+                                    <form asp-action="LogFood" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="foodItemId" value="@item.FoodItemId" />
+                                        <input type="hidden" name="calories" value="@item.Calories" />
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Log</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+        {
+            <p class="text-muted">No food items found for "<strong>@Model.SearchTerm</strong>".</p>
+        }
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-outline-primary">Back to Meal Plan</a>
