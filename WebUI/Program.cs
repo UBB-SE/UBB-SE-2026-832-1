@@ -1,7 +1,14 @@
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSingleton<IUserSession, UserSession>();
+builder.Services.AddHttpClient<IMealPlanProxy, MealPlanProxy>();
+builder.Services.AddHttpClient<IDailyLogProxy, DailyLogProxy>();
 
 var app = builder.Build();
 

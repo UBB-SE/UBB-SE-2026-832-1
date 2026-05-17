@@ -1,0 +1,105 @@
+@model WebUI.Models.MealPlanPageViewModel
+@{
+    ViewData["Title"] = "Meal Plan";
+}
+
+<h2 class="mb-3">Today's Meal Plan</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<p class="text-muted">@Model.StatusMessage</p>
+
+@if (!Model.HasMeals)
+{
+    <form asp-action="Generate" method="post">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-primary">Generate Today's Meal Plan</button>
+    </form>
+}
+else
+{
+    <div class="mb-3">
+        <span class="badge bg-secondary fs-6">@Model.GoalDescription</span>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-0 bg-white shadow-sm">
+                <div class="card-body">
+                    <div class="fs-4 fw-bold text-primary">@Model.TotalCalories</div>
+                    <div class="small text-muted">kcal</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-0 bg-white shadow-sm">
+                <div class="card-body">
+                    <div class="fs-4 fw-bold text-success">@Model.TotalProtein g</div>
+                    <div class="small text-muted">Protein</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-0 bg-white shadow-sm">
+                <div class="card-body">
+                    <div class="fs-4 fw-bold text-warning">@Model.TotalCarbohydrates g</div>
+                    <div class="small text-muted">Carbs</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-0 bg-white shadow-sm">
+                <div class="card-body">
+                    <div class="fs-4 fw-bold text-danger">@Model.TotalFat g</div>
+                    <div class="small text-muted">Fat</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        @foreach (var meal in Model.Meals)
+        {
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-primary text-white fw-semibold">
+                        @meal.MealType &mdash; @meal.Name
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text text-muted small">@meal.Description</p>
+                        <ul class="list-unstyled mb-2 small">
+                            <li><strong>Calories:</strong> @meal.Calories kcal</li>
+                            <li><strong>Protein:</strong> @meal.Protein g</li>
+                            <li><strong>Carbs:</strong> @meal.Carbohydrates g</li>
+                            <li><strong>Fat:</strong> @meal.Fat g</li>
+                        </ul>
+                        <div>
+                            @if (meal.IsVegan) { <span class="badge bg-success me-1">Vegan</span> }
+                            @if (meal.IsKeto) { <span class="badge bg-warning text-dark me-1">Keto</span> }
+                            @if (meal.IsGlutenFree) { <span class="badge bg-info text-dark me-1">Gluten Free</span> }
+                            @if (meal.IsLactoseFree) { <span class="badge bg-secondary me-1">Lactose Free</span> }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <form asp-action="SaveToLog" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="mealPlanId" value="@Model.CurrentMealPlanId" />
+        <button type="submit" class="btn btn-success">Save All Meals to Daily Log</button>
+        <a asp-action="DailyLog" class="btn btn-outline-secondary ms-2">View Daily Log</a>
+    </form>
+}
