@@ -5,6 +5,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+
+builder.Services.AddHttpClient<ClassLibrary.Proxies.CalendarIntegrationProxy>();
+builder.Services.AddHttpClient<ClassLibrary.Proxies.CalendarWorkoutCatalogProxy>();
+builder.Services.AddHttpClient<ClassLibrary.Proxies.CalendarExportProxy>();
+
+builder.Services.AddSingleton<ClassLibrary.Proxies.Interfaces.IUserSession, ClassLibrary.Proxies.UserSession>();
+builder.Services.AddTransient<ClassLibrary.Proxies.Interfaces.ICalendarIntegrationProxy, ClassLibrary.Proxies.CalendarIntegrationProxy>();
+builder.Services.AddTransient<ClassLibrary.Proxies.Interfaces.ICalendarWorkoutCatalogProxy, ClassLibrary.Proxies.CalendarWorkoutCatalogProxy>();
+builder.Services.AddTransient<ClassLibrary.Proxies.Interfaces.ICalendarExportProxy, ClassLibrary.Proxies.CalendarExportProxy>();
 builder.Services.AddSingleton<IUserSession, UserSession>();
 builder.Services.AddHttpClient<ICreateWorkoutProxy, CreateWorkoutProxy>();
 builder.Services.AddHttpClient<IActiveWorkoutProxy, ActiveWorkoutProxy>();

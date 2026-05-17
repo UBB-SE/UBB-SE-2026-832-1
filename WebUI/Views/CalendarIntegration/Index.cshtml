@@ -1,0 +1,83 @@
+@model WebUI.Models.CalendarIntegrationViewModel
+@{
+    ViewData["Title"] = "Calendar Integration";
+}
+
+<div class="container">
+    <h2 class="mb-4">Calendar Integration</h2>
+
+    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+    {
+        <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert">
+            @Model.StatusMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <form asp-action="GenerateCalendar" method="post">
+                <div class="mb-3">
+                    <label asp-for="SelectedWorkout" class="form-label">Select Workout</label>
+                    <select name="selectedWorkoutId" class="form-select">
+                        <option value="">-- Select a workout --</option>
+                        @foreach (var workout in Model.AvailableWorkouts)
+                        {
+                            @if (Model.SelectedWorkout?.WorkoutTemplateId == workout.WorkoutTemplateId)
+                            {
+                                <option value="@workout.WorkoutTemplateId" selected>@workout.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@workout.WorkoutTemplateId">@workout.Name</option>
+                            }
+                        }
+                    </select>
+                    <input type="hidden" asp-for="SelectedWorkout" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DurationWeeks" class="form-label">Duration (Weeks)</label>
+                    <input asp-for="DurationWeeks" type="number" class="form-control" min="1" max="52" value="@Model.DurationWeeks" />
+                    <span asp-validation-for="DurationWeeks" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Select Training Days</label>
+                    <div class="row">
+                        @for (int i = 0; i < Model.SelectedDays.Count; i++)
+                        {
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <input type="hidden" asp-for="@Model.SelectedDays[i].DayOfWeekIndex" />
+                                    <input type="hidden" asp-for="@Model.SelectedDays[i].DayName" />
+                                    <input asp-for="@Model.SelectedDays[i].IsSelected" class="form-check-input" type="checkbox" />
+                                    <label asp-for="@Model.SelectedDays[i].IsSelected" class="form-check-label">@Model.SelectedDays[i].DayName</label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Generate Calendar</button>
+            </form>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.GeneratedIcsContent))
+    {
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Generated Calendar</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-success">Calendar generated successfully!</p>
+                <form asp-action="DownloadCalendar" method="post">
+                    <input type="hidden" name="icsContent" value="@Model.GeneratedIcsContent" />
+                    <input type="hidden" name="workoutName" value="@(Model.SelectedWorkout?.Name ?? "Workout")" />
+                    <button type="submit" class="btn btn-success">Download .ics File</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>
