@@ -7,8 +7,7 @@ namespace ClassLibrary.Proxies;
 
 public sealed class RankShowcaseProxy : IRankShowcaseProxy
 {
-    private const string ApiBaseAddress = "https://localhost:7197/api";
-    private const string EvaluationRoute = "evaluation";
+    private const string ApiBaseAddress = "http://localhost:5000/api"; private const string EvaluationRoute = "evaluation";
     private readonly HttpClient httpClient;
 
     public RankShowcaseProxy(HttpClient httpClient)
