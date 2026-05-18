@@ -1,7 +1,9 @@
+﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 using WinUI.ViewModels.CalendarIntegration;
 using Windows.Storage.Pickers;
 
@@ -18,8 +20,8 @@ public sealed partial class CalendarIntegrationPage : Page
         this.InitializeComponent();
         this.userSession = new UserSession();
         this.viewModel = new CalendarIntegrationViewModel(
-            new CalendarWorkoutCatalogService(new HttpClient()),
-            new CalendarExportService(),
+            new CalendarWorkoutCatalogProxy(new HttpClient()),
+            new CalendarExportProxy(),
             this.userSession);
         this.DataContext = this.viewModel;
         this.GenerateCalendarButton.Click += this.GenerateCalendarButton_Click;
@@ -137,3 +139,4 @@ public sealed partial class CalendarIntegrationPage : Page
     [DllImport("user32.dll", ExactSpelling = true)]
     private static extern IntPtr GetActiveWindow();
 }
+

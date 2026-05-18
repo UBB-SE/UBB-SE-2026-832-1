@@ -1,0 +1,123 @@
+<Page
+    x:Class="WinUI.Views.DailyLogView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Padding="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Text="{Binding ErrorMessage}"
+            Foreground="Red"
+            TextWrapping="Wrap"
+            Margin="0,0,0,8"/>
+
+        <TextBlock
+            Grid.Row="1"
+            Text="{Binding StatusMessage}"
+            TextWrapping="Wrap"
+            Margin="0,0,0,8"/>
+
+        <StackPanel Grid.Row="2" Spacing="8" Margin="0,0,0,16">
+            <TextBlock Text="Log in your meal" Style="{ThemeResource BodyTextBlockStyle}" Margin="0,0,0,4"/>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <AutoSuggestBox x:Name="MealSearchBox" PlaceholderText="Search meal" MinWidth="400" TextChanged="OnMealSearchTextChanged" SuggestionChosen="OnMealSearchSuggestionChosen"/>
+                <Button Content="Log a meal" Click="OnLogMealButtonClick" IsEnabled="{Binding IsLoading, Converter={StaticResource BoolNegate}}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <Grid Grid.Row="3" ColumnSpacing="16" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Daily Log (Today)" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="SemiBold"/>
+                    
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Calories consumed" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Text="{Binding DailyCaloriesDisplay}" Style="{ThemeResource BodyTextBlockStyle}" FontWeight="SemiBold"/>
+                        <ProgressBar Value="{Binding DailyCaloriesPercentage}" Maximum="100" Height="8" Foreground="#0078D4" Background="{ThemeResource ControlFillColorDisabledBrush}" CornerRadius="4"/>
+                    </StackPanel>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Calories burned" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Grid.Row="1" Text="{Binding BurnedCalories}" Style="{ThemeResource BodyTextBlockStyle}"/>
+                    </Grid>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding DailyProteinDisplay}" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                        <ProgressBar Value="{Binding DailyProteinPercentage}" Maximum="100" Height="8" Foreground="#0078D4" Background="{ThemeResource ControlFillColorDisabledBrush}" CornerRadius="4"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding DailyCarbohydratesDisplay}" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                        <ProgressBar Value="{Binding DailyCarbohydratesPercentage}" Maximum="100" Height="8" Foreground="#0078D4" Background="{ThemeResource ControlFillColorDisabledBrush}" CornerRadius="4"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding DailyFatDisplay}" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                        <ProgressBar Value="{Binding DailyFatPercentage}" Maximum="100" Height="8" Foreground="#0078D4" Background="{ThemeResource ControlFillColorDisabledBrush}" CornerRadius="4"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Weekly Log (Monday to Current time)" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="SemiBold"/>
+                    
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Calories consumed" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Text="{Binding WeeklyCaloriesDisplay}" Style="{ThemeResource BodyTextBlockStyle}" FontWeight="SemiBold"/>
+                        <ProgressBar Value="{Binding WeeklyCaloriesPercentage}" Maximum="100" Height="8" Foreground="#0078D4" Background="{ThemeResource ControlFillColorDisabledBrush}" CornerRadius="4"/>
+                    </StackPanel>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Calories burned" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Grid.Row="1" Text="{Binding WeekBurnedCalories}" Style="{ThemeResource BodyTextBlockStyle}"/>
+                    </Grid>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding WeeklyProteinDisplay}" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                        <ProgressBar Value="{Binding WeeklyProteinPercentage}" Maximum="100" Height="8" Foreground="#0078D4" Background="{ThemeResource ControlFillColorDisabledBrush}" CornerRadius="4"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding WeeklyCarbohydratesDisplay}" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                        <ProgressBar Value="{Binding WeeklyCarbohydratesPercentage}" Maximum="100" Height="8" Foreground="#0078D4" Background="{ThemeResource ControlFillColorDisabledBrush}" CornerRadius="4"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding WeeklyFatDisplay}" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                        <ProgressBar Value="{Binding WeeklyFatPercentage}" Maximum="100" Height="8" Foreground="#0078D4" Background="{ThemeResource ControlFillColorDisabledBrush}" CornerRadius="4"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="4" Background="#80000000" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+            <ProgressRing IsActive="{Binding IsLoading}" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+    </Grid>
+</Page>

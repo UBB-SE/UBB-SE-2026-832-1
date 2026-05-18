@@ -1,7 +1,7 @@
 using System;
 using ClassLibrary.Models;
 
-namespace ClassLibrary.Services;
+namespace WebAPI.Services;
 
 public static class NutritionCalculator
 {

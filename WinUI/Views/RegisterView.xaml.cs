@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views;
@@ -11,7 +11,7 @@ public sealed partial class RegisterView : Page
 
     public RegisterView()
     {
-        this.ViewModel = new UserViewModel(new UserService());
+        this.ViewModel = new UserViewModel(new UserProxy());
         this.InitializeComponent();
 
         this.ViewModel.RegistrationValid += (s, e) =>
@@ -20,3 +20,4 @@ public sealed partial class RegisterView : Page
         this.ViewModel.NavigateToLogin += (s, e) => this.Frame.Navigate(typeof(LoginView));
     }
 }
+

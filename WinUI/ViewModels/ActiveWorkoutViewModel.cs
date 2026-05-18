@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using ClassLibrary.Models;
@@ -6,7 +6,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -16,7 +17,7 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
     private const int REST_TIMER_INTERVAL_MS = 1000;
     private const int HOUR_IN_SECONDS = 3600;
 
-    private readonly IActiveWorkoutService activeWorkoutService;
+    private readonly IActiveWorkoutProxy activeWorkoutService;
     private readonly WorkoutUiState workoutUiState;
 
     private int clientId;
@@ -28,7 +29,7 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
 
     public event Action? WorkoutFinished;
 
-    public ActiveWorkoutViewModel(IActiveWorkoutService activeWorkoutService, WorkoutUiState workoutUiState)
+    public ActiveWorkoutViewModel(IActiveWorkoutProxy activeWorkoutService, WorkoutUiState workoutUiState)
     {
         this.activeWorkoutService = activeWorkoutService;
         this.workoutUiState = workoutUiState;
@@ -297,15 +298,75 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
             WorkoutLog = this.activeLog,
         };
 
-        bool isSaved = await this.activeWorkoutService.SaveSetAsync(this.activeLog, set);
+        double multiplier =
+            GetExerciseIntensityMultiplier(
+                this.CurrentExercise?.MuscleGroup
+                ?? MuscleGroup.CHEST);
+
+        double setCalories =
+            ((set.ActualReps ?? 0)
+            * (set.ActualWeight ?? 0)
+            * multiplier) / 10.0;
+
+        var loggedExercise =
+            this.activeLog.Exercises
+                .FirstOrDefault(
+                    exercise =>
+                        exercise.ExerciseName ==
+                        set.ExerciseName);
+
+        if (loggedExercise == null)
+        {
+            loggedExercise = new LoggedExercise
+            {
+                ExerciseName = set.ExerciseName,
+
+                TargetMuscles =
+                    this.CurrentExercise?.MuscleGroup
+                    ?? MuscleGroup.CHEST,
+
+                Sets = new List<LoggedSet>(),
+
+                ExerciseCaloriesBurned = 0,
+            };
+
+            this.activeLog.Exercises.Add(loggedExercise);
+        }
+
+        loggedExercise.Sets.Add(set);
+
+        loggedExercise.ExerciseCaloriesBurned += (int)setCalories;
+
+        loggedExercise.MetabolicEquivalent =
+            (float)multiplier * 50;
+
+        this.activeLog.TotalCaloriesBurned =
+            this.activeLog.Exercises.Sum(
+                exercise =>
+                    exercise.ExerciseCaloriesBurned);
+
+        this.activeLog.AverageMetabolicEquivalent =
+            this.activeLog.Exercises.Average(
+                exercise =>
+                    exercise.MetabolicEquivalent);
+
+        bool isSaved =
+            await this.activeWorkoutService.SaveSetAsync(
+                this.activeLog,
+                set);
+
         if (!isSaved)
         {
-            this.ErrorMessage = "Failed to save set. Please try again.";
+            this.ErrorMessage =
+                "Failed to save set. Please try again.";
+
             return;
         }
 
         setViewModel.IsCompleted = true;
+
         FocusNextSet(setViewModel);
+
         UpdateCurrentSetDisplay();
     }
 
@@ -549,6 +610,21 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
         {
         }
     }
+    private static double GetExerciseIntensityMultiplier(
+    MuscleGroup muscleGroup)
+    {
+        return muscleGroup switch
+        {
+            MuscleGroup.CHEST => 0.11,
+            MuscleGroup.BACK => 0.12,
+            MuscleGroup.LEGS => 0.15,
+            MuscleGroup.SHOULDERS => 0.10,
+            MuscleGroup.ARMS => 0.08,
+            MuscleGroup.CORE => 0.07,
+            MuscleGroup.CARDIO => 0.18,
+            _ => 0.10
+        };
+    }
 
     private static string BuildIcsContent(WorkoutLog workoutLog)
     {
@@ -575,3 +651,4 @@ public sealed partial class ActiveWorkoutViewModel : ObservableObject
         return builder.ToString();
     }
 }
+

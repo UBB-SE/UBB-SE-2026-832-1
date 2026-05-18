@@ -1,6 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ClassLibrary.DTOs;
 using Microsoft.UI.Xaml;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -60,3 +61,4 @@ public class MealViewModel
         };
     }
 }
+

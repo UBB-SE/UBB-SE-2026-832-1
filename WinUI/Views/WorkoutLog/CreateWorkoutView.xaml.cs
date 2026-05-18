@@ -1,9 +1,9 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Net.Http;
 using ClassLibrary.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using WinUI.Services;
+using ClassLibrary.Proxies;
 using WinUI.ViewModels;
 
 namespace WinUI.Views.WorkoutLog;
@@ -16,7 +16,7 @@ public sealed partial class CreateWorkoutView : UserControl
 
     public CreateWorkoutView(int clientId)
     {
-        ViewModel = new CreateWorkoutViewModel(new CreateWorkoutService(new HttpClient()));
+        ViewModel = new CreateWorkoutViewModel(new CreateWorkoutProxy(new HttpClient()));
         ViewModel.ClientId = clientId;
         ViewModel.WorkoutSaved += () => WorkoutSaved?.Invoke();
         ViewModel.PropertyChanged += OnViewModelPropertyChanged;
@@ -51,3 +51,4 @@ public sealed partial class CreateWorkoutView : UserControl
         }
     }
 }
+

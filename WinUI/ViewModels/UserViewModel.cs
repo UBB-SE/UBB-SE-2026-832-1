@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
-using ClassLibrary.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -23,7 +23,7 @@ public partial class UserViewModel : ObservableObject
     private const string ERROR_SAVING_DATA_FORMAT = "Error: {0}";
     private const string ERROR_VALIDATION_LENGTH = "Username (min 3) and Password (min 6) required.";
 
-    private readonly IUserService? userService;
+    private readonly IUserProxy? userService;
 
     [ObservableProperty] private string userName = string.Empty;
     [ObservableProperty] private string password = string.Empty;
@@ -44,7 +44,9 @@ public partial class UserViewModel : ObservableObject
         set
         {
             if (SetProperty(ref isTrainer, value) && value)
+            {
                 IsNutritionist = false;
+            }
         }
     }
 
@@ -55,7 +57,9 @@ public partial class UserViewModel : ObservableObject
         set
         {
             if (SetProperty(ref isNutritionist, value) && value)
+            {
                 IsTrainer = false;
+            }
         }
     }
 
@@ -68,9 +72,11 @@ public partial class UserViewModel : ObservableObject
     public event EventHandler? NavigateToRegister;
     public event EventHandler? NavigateToLogin;
 
-    public UserViewModel() { }
+    public UserViewModel()
+    {
+    }
 
-    public UserViewModel(IUserService userService)
+    public UserViewModel(IUserProxy userService)
     {
         this.userService = userService;
     }
@@ -78,7 +84,11 @@ public partial class UserViewModel : ObservableObject
     [RelayCommand]
     private async Task LoginAsync()
     {
-        if (this.userService == null) return;
+        if (this.userService == null)
+        {
+            return;
+        }
+
         this.StatusMessage = string.Empty;
 
         if (string.IsNullOrWhiteSpace(this.UserName) || string.IsNullOrWhiteSpace(this.Password))
@@ -111,7 +121,11 @@ public partial class UserViewModel : ObservableObject
     [RelayCommand]
     private async Task RegisterAsync()
     {
-        if (this.userService == null) return;
+        if (this.userService == null)
+        {
+            return;
+        }
+
         this.StatusMessage = string.Empty;
 
         if (this.UserName.Length < 3 || this.Password.Length < 6)
@@ -165,7 +179,11 @@ public partial class UserViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveDataAsync()
     {
-        if (this.userService == null) return;
+        if (this.userService == null)
+        {
+            return;
+        }
+
         this.StatusMessage = string.Empty;
 
         try
@@ -208,8 +226,16 @@ public partial class UserViewModel : ObservableObject
     }
     private string GetSelectedRole()
     {
-        if (this.IsTrainer) return ROLE_TRAINER;
-        if (this.IsNutritionist) return ROLE_NUTRITIONIST;
+        if (this.IsTrainer)
+        {
+            return ROLE_TRAINER;
+        }
+
+        if (this.IsNutritionist)
+        {
+            return ROLE_NUTRITIONIST;
+        }
+
         return ROLE_USER;
     }
     public static int CalculateAge(DateTimeOffset? birthDate)
@@ -231,3 +257,4 @@ public partial class UserViewModel : ObservableObject
         return age;
     }
 }
+

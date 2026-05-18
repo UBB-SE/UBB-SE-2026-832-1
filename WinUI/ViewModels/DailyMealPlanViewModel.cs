@@ -1,5 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -14,3 +15,4 @@ public partial class DailyMealPlanViewModel : ObservableObject
         plannedMeals.Add("Almuerzo: Pollo con arroz");
     }
 }
+

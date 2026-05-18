@@ -1,17 +1,18 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using ClassLibrary.Filters;
 using ClassLibrary.Models;
-using WinUI.Services;
-using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels
 {
     public partial class MealSearchViewModel : ObservableObject
     {
-        private readonly IMealService _mealService;
+        private readonly IMealProxy mealService;
 
         public ObservableCollection<FoodItem> Meals { get; private set; } = new ObservableCollection<FoodItem>();
 
@@ -19,22 +20,22 @@ namespace WinUI.ViewModels
 
         public FoodItem? SelectedMeal { get; set; }
 
-        public MealSearchViewModel(IMealService mealService)
+        public MealSearchViewModel(IMealProxy mealService)
         {
-            _mealService = mealService;
+            this.mealService = mealService;
             _ = LoadMealsAsync();
         }
 
         public async Task LoadMealsAsync(string? filter = null)
         {
-            var list = await _mealService.SearchMealsAsync(new FoodItemFilter { SearchTerm = filter ?? "" });
+            var list = await mealService.SearchMealsAsync(new FoodItemFilter { SearchTerm = filter ?? string.Empty });
             Meals = new ObservableCollection<FoodItem>(list);
             OnPropertyChanged(nameof(Meals));
         }
 
         public async Task<List<FoodItem>> SearchMealsAsync(FoodItemFilter filter)
         {
-            var list = await _mealService.SearchMealsAsync(filter);
+            var list = await mealService.SearchMealsAsync(filter);
             Meals = new ObservableCollection<FoodItem>(list);
             OnPropertyChanged(nameof(Meals));
             return new List<FoodItem>(list);
@@ -42,7 +43,7 @@ namespace WinUI.ViewModels
 
         public async Task<string> GetMealIngredientsTextAsync(int mealId)
         {
-            var lines = await _mealService.GetMealIngredientsAsync(mealId);
+            var lines = await mealService.GetMealIngredientsAsync(mealId);
             return lines.Count > 0 ? string.Join("\n", lines) : "No ingredients found.";
         }
 
@@ -55,10 +56,14 @@ namespace WinUI.ViewModels
         [RelayCommand]
         public async Task ToggleFavoriteAsync(FoodItem meal)
         {
-            if (meal == null) return;
-            
+            if (meal == null)
+            {
+                return;
+            }
+
             int userId = UserSession.UserId ?? 1;
-            await _mealService.ToggleFavoriteAsync(userId, meal.FoodItemId);
+            await mealService.ToggleFavoriteAsync(userId, meal.FoodItemId);
         }
     }
 }
+

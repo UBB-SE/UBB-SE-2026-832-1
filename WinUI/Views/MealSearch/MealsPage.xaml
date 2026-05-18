@@ -5,151 +5,267 @@
     xmlns:converters="using:WinUI.Converters">
 
     <Page.Resources>
-        <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
+        <converters:BoolToVisibilityConverter
+            x:Key="BooleanToVisibilityConverter" />
     </Page.Resources>
 
     <Grid Padding="20">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
+        <StackPanel
+            Orientation="Horizontal"
+            Spacing="10"
+            Margin="0,0,0,10">
 
-            <TextBox x:Name="txtSearch"
-                     PlaceholderText="Search meal..."
-                     Width="250"
-                     KeyDown="txtSearch_KeyDown"/>
+            <TextBox
+                x:Name="searchTextBox"
+                Width="250"
+                PlaceholderText="Search meal..."
+                KeyDown="SearchTextBox_KeyDown" />
 
-            <Button Content="Search"
-                    Click="btnSearch_Click"/>
+            <Button
+                Content="Search"
+                Click="SearchButton_Click" />
 
             <Button Content="Filters">
+
                 <Button.Flyout>
+
                     <Flyout>
-                        <StackPanel Padding="10" Spacing="5">
-                            <CheckBox x:Name="chkVegan" Content="Vegan"/>
-                            <CheckBox x:Name="chkKeto" Content="Keto"/>
-                            <CheckBox x:Name="chkGlutenFree" Content="Gluten Free"/>
-                            <CheckBox x:Name="chkLactoseFree" Content="Lactose Free"/>
-                            <CheckBox x:Name="chkNutFree" Content="No Nuts"/>
-                            <CheckBox x:Name="chkFavorites" Content="Favorites Only"/>
+
+                        <StackPanel
+                            Padding="10"
+                            Spacing="5">
+
+                            <CheckBox
+                                x:Name="veganCheckBox"
+                                Content="Vegan" />
+
+                            <CheckBox
+                                x:Name="ketoCheckBox"
+                                Content="Keto" />
+
+                            <CheckBox
+                                x:Name="glutenFreeCheckBox"
+                                Content="Gluten Free" />
+
+                            <CheckBox
+                                x:Name="lactoseFreeCheckBox"
+                                Content="Lactose Free" />
+
+                            <CheckBox
+                                x:Name="nutFreeCheckBox"
+                                Content="Nut Free" />
+
+                            <CheckBox
+                                x:Name="favoritesOnlyCheckBox"
+                                Content="Favorites Only" />
+
                         </StackPanel>
+
                     </Flyout>
+
                 </Button.Flyout>
+
             </Button>
 
         </StackPanel>
 
-        <ListView x:Name="listMeals"
-                  Grid.Row="1"
-                  IsItemClickEnabled="True"
-                  ItemClick="listMeals_ItemClick">
+        <ListView
+            x:Name="mealsListView"
+            Grid.Row="1"
+            IsItemClickEnabled="True"
+            ItemClick="MealsListView_ItemClick">
 
             <ListView.ItemTemplate>
+
                 <DataTemplate>
 
-                    <Grid Padding="10" Margin="5"
-                          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                          BorderThickness="1"
-                          CornerRadius="10">
+                    <Grid
+                        Padding="10"
+                        Margin="5"
+                        CornerRadius="10"
+                        BorderThickness="1"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
 
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <StackPanel>
 
-                            <TextBlock Text="{Binding Name}"
-                                       FontSize="17"
-                                       FontWeight="SemiBold"/>
+                            <TextBlock
+                                Text="{Binding Name}"
+                                FontSize="17"
+                                FontWeight="SemiBold" />
 
                             <TextBlock Opacity="0.75">
+
                                 <Run Text="{Binding Calories}" />
                                 <Run Text=" kcal" />
-                            </TextBlock>
-
-                            <TextBlock Opacity="0.7" FontSize="12">
-
-                                <Run Text="P " Foreground="Green"/>
-                                <Run Text="{Binding Protein}" Foreground="Green"/>
-                                <Run Text="g  •  "/>
-
-                                <Run Text="C " Foreground="Orange"/>
-                                <Run Text="{Binding Carbohydrates}" Foreground="Orange"/>
-                                <Run Text="g  •  "/>
-
-                                <Run Text="F " Foreground="Crimson"/>
-                                <Run Text="{Binding Fat}" Foreground="Crimson"/>
-                                <Run Text="g"/>
 
                             </TextBlock>
 
-                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
-                                <Border Background="#2E7D32" CornerRadius="12" Padding="8,2"
-                                        Visibility="{Binding IsVegan, Converter={StaticResource BoolToVis}}">
-                                    <TextBlock Text="Vegan" Foreground="White" FontSize="11"/>
+                            <TextBlock
+                                FontSize="12"
+                                Opacity="0.7">
+
+                                <Run
+                                    Text="Protein "
+                                    Foreground="Green" />
+
+                                <Run
+                                    Text="{Binding Protein}"
+                                    Foreground="Green" />
+
+                                <Run Text="g  •  " />
+
+                                <Run
+                                    Text="Carbohydrates "
+                                    Foreground="Orange" />
+
+                                <Run
+                                    Text="{Binding Carbohydrates}"
+                                    Foreground="Orange" />
+
+                                <Run Text="g  •  " />
+
+                                <Run
+                                    Text="Fat "
+                                    Foreground="Crimson" />
+
+                                <Run
+                                    Text="{Binding Fat}"
+                                    Foreground="Crimson" />
+
+                                <Run Text="g" />
+
+                            </TextBlock>
+
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="6"
+                                Margin="0,8,0,0">
+
+                                <Border
+                                    Padding="8,2"
+                                    CornerRadius="12"
+                                    Background="#2E7D32"
+                                    Visibility="{Binding IsVegan, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                                    <TextBlock
+                                        Text="Vegan"
+                                        FontSize="11"
+                                        Foreground="White" />
+
                                 </Border>
 
-                                <Border Background="#8E24AA" CornerRadius="12" Padding="8,2"
-                                        Visibility="{Binding IsKeto, Converter={StaticResource BoolToVis}}">
-                                    <TextBlock Text="Keto" Foreground="White" FontSize="11"/>
+                                <Border
+                                    Padding="8,2"
+                                    CornerRadius="12"
+                                    Background="#8E24AA"
+                                    Visibility="{Binding IsKeto, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                                    <TextBlock
+                                        Text="Keto"
+                                        FontSize="11"
+                                        Foreground="White" />
+
                                 </Border>
 
-                                <Border Background="#EF6C00" CornerRadius="12" Padding="8,2"
-                                        Visibility="{Binding IsGlutenFree, Converter={StaticResource BoolToVis}}">
-                                    <TextBlock Text="Gluten Free" Foreground="White" FontSize="11"/>
+                                <Border
+                                    Padding="8,2"
+                                    CornerRadius="12"
+                                    Background="#EF6C00"
+                                    Visibility="{Binding IsGlutenFree, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                                    <TextBlock
+                                        Text="Gluten Free"
+                                        FontSize="11"
+                                        Foreground="White" />
+
                                 </Border>
 
-                                <Border Background="#00838F" CornerRadius="12" Padding="8,2"
-                                        Visibility="{Binding IsLactoseFree, Converter={StaticResource BoolToVis}}">
-                                    <TextBlock Text="Lactose Free" Foreground="White" FontSize="11"/>
+                                <Border
+                                    Padding="8,2"
+                                    CornerRadius="12"
+                                    Background="#00838F"
+                                    Visibility="{Binding IsLactoseFree, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                                    <TextBlock
+                                        Text="Lactose Free"
+                                        FontSize="11"
+                                        Foreground="White" />
+
                                 </Border>
 
-                                <Border Background="#5D4037" CornerRadius="12" Padding="8,2"
-                                        Visibility="{Binding IsNutFree, Converter={StaticResource BoolToVis}}">
-                                    <TextBlock Text="Nut Free" Foreground="White" FontSize="11"/>
+                                <Border
+                                    Padding="8,2"
+                                    CornerRadius="12"
+                                    Background="#5D4037"
+                                    Visibility="{Binding IsNutFree, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                                    <TextBlock
+                                        Text="Nut Free"
+                                        FontSize="11"
+                                        Foreground="White" />
+
                                 </Border>
+
                             </StackPanel>
 
                         </StackPanel>
 
-                        <Button Grid.Column="1"
-                            Click="Favorite_Click"
+                        <Button
+                            Grid.Column="1"
                             FontSize="22"
+                            Content="☆"
+                            Foreground="Gold"
                             Background="Transparent"
                             BorderThickness="0"
-                            Foreground="Gold"
-                            Content="☆"
-                            Loaded="Favorite_Loaded"/>
+                            Click="FavoriteButton_Click"
+                            Loaded="FavoriteButton_Loaded" />
 
                     </Grid>
 
                 </DataTemplate>
+
             </ListView.ItemTemplate>
 
         </ListView>
 
-        <StackPanel Grid.Row="2"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Spacing="10"
-                    Margin="0,10,0,0">
+        <StackPanel
+            Grid.Row="2"
+            Margin="0,10,0,0"
+            Orientation="Horizontal"
+            HorizontalAlignment="Center"
+            Spacing="10">
 
-            <Button x:Name="btnPrev" Content="Prev" Click="Prev_Click"/>
+            <Button
+                x:Name="previousPageButton"
+                Content="Previous"
+                Click="PreviousPageButton_Click" />
 
-            <TextBlock x:Name="txtPage"
-                       VerticalAlignment="Center"
-                       FontSize="14"
-                       FontWeight="SemiBold"/>
+            <TextBlock
+                x:Name="pageInformationTextBlock"
+                FontSize="14"
+                FontWeight="SemiBold"
+                VerticalAlignment="Center" />
 
-            <Button x:Name="btnNext" Content="Next" Click="Next_Click"/>
+            <Button
+                x:Name="nextPageButton"
+                Content="Next"
+                Click="NextPageButton_Click" />
 
         </StackPanel>
 
     </Grid>
+
 </Page>

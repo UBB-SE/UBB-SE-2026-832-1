@@ -1,5 +1,6 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using ClassLibrary.Models;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -17,11 +18,11 @@ public sealed class WorkoutLogExerciseSummary
 
     public string RepsDisplay => this.Sets.Count > 0
         ? string.Join(" / ", this.Sets.Select(s => s.RepsDisplay))
-        : "—";
+        : "â€”";
 
     public string WeightDisplay => this.Sets.Count > 0
         ? string.Join(" / ", this.Sets.Select(s => s.WeightDisplay))
-        : "—";
+        : "â€”";
 
     public WorkoutLogExerciseSummary(LoggedExercise exercise)
     {
@@ -37,3 +38,4 @@ public sealed class WorkoutLogExerciseSummary
         }
     }
 }
+

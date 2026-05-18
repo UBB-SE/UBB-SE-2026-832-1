@@ -1,8 +1,8 @@
-﻿using Microsoft.UI.Text;
+﻿using System;
+using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
-using System;
 using Windows.UI;
 using Windows.UI.Text;
 
@@ -108,7 +108,10 @@ namespace WinUI.Converters
         {
             bool inverse = parameter?.ToString() == ConverterConstants.ParamInverse;
 
-            if (value == null) return Visibility.Visible;
+            if (value == null)
+            {
+                return Visibility.Visible;
+            }
 
             if (int.TryParse(value.ToString(), out int intVal))
             {

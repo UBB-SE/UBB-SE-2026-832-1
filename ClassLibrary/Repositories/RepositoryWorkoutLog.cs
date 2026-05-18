@@ -44,7 +44,9 @@ public class RepositoryWorkoutLog : IRepositoryWorkoutLog
             .FirstOrDefaultAsync(logEntity => logEntity.WorkoutLogId == workoutLogId);
 
         if (workoutLog == null)
+        {
             return false;
+        }
 
         workoutLog.Rating = rating;
         workoutLog.TrainerNotes = notes;

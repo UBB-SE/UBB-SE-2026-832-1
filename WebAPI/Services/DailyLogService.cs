@@ -12,23 +12,25 @@ public sealed class DailyLogService : IDailyLogService
     private const int DAYS_IN_WEEK = 7;
     private const int ONE_DAY = 1;
     private const DayOfWeek START_OF_WEEK = DayOfWeek.Monday;
-    private const double DEFAULT_BURNED_CALORIES = 500d;
 
     private readonly IDailyLogRepository dailyLogRepository;
     private readonly IUserRepository userRepository;
     private readonly IFoodItemRepository foodItemRepository;
     private readonly IFoodItemService foodItemService;
+    private readonly IWorkoutLogRepository workoutLogRepository;
 
     public DailyLogService(
         IDailyLogRepository dailyLogRepository,
         IUserRepository userRepository,
         IFoodItemService foodItemService,
-        IFoodItemRepository foodItemRepository)
+        IFoodItemRepository foodItemRepository,
+        IWorkoutLogRepository workoutLogRepository)
     {
         this.dailyLogRepository = dailyLogRepository;
         this.userRepository = userRepository;
         this.foodItemService = foodItemService;
         this.foodItemRepository = foodItemRepository;
+        this.workoutLogRepository = workoutLogRepository;
     }
 
     private static DailyLogTotalsDto MapToDailyLogTotalsDto(DailyLog? log)
@@ -47,12 +49,12 @@ public sealed class DailyLogService : IDailyLogService
         };
     }
 
-    private static UserDataDto MapToUserDataDto(UserData userData)
+    private static UserDataDto MapToUserDataDto(UserData userData, int userId)
     {
         return new UserDataDto
         {
             UserDataId = userData.UserDataId,
-            UserId = userData.User.UserId,
+            UserId = userId,
             Weight = userData.Weight,
             Height = userData.Height,
             Age = userData.Age,
@@ -78,7 +80,7 @@ public sealed class DailyLogService : IDailyLogService
 
     public async Task<DailyLogTotalsDto> GetTodayTotalsAsync(int userId)
     {
-        var start = DateTime.Today;
+        var start = DateTime.Now.Date;
         var end = start.AddDays(ONE_DAY);
 
         var log = await this.dailyLogRepository.GetNutritionTotalsForRangeAsync(userId, start, end);
@@ -88,7 +90,7 @@ public sealed class DailyLogService : IDailyLogService
 
     public async Task<DailyLogTotalsDto> GetCurrentWeekTotalsAsync(int userId)
     {
-        var today = DateTime.Today;
+        var today = DateTime.Now.Date;
         int diff = (DAYS_IN_WEEK + (today.DayOfWeek - START_OF_WEEK)) % DAYS_IN_WEEK;
 
         var startOfWeek = today.AddDays(-diff);
@@ -108,12 +110,26 @@ public sealed class DailyLogService : IDailyLogService
             return null;
         }
 
-        return MapToUserDataDto(userData);
+        return MapToUserDataDto(userData, userId);
     }
 
-    public Task<double> GetTodayBurnedCaloriesAsync(int userId)
+    public async Task<double> GetTodayBurnedCaloriesAsync(int userId)
     {
-        return Task.FromResult(DEFAULT_BURNED_CALORIES);
+        var start = DateTime.Now.Date;
+        var end = start.AddDays(ONE_DAY);
+
+        return await this.workoutLogRepository.GetTotalCaloriesBurnedForRangeAsync(userId, start, end);
+    }
+
+    public async Task<double> GetWeekBurnedCaloriesAsync(int userId)
+    {
+        var today = DateTime.Now.Date;
+        int diff = (DAYS_IN_WEEK + (today.DayOfWeek - START_OF_WEEK)) % DAYS_IN_WEEK;
+
+        var startOfWeek = today.AddDays(-diff);
+        var endOfWeek = startOfWeek.AddDays(DAYS_IN_WEEK);
+
+        return await this.workoutLogRepository.GetTotalCaloriesBurnedForRangeAsync(userId, startOfWeek, endOfWeek);
     }
 
     public async Task<IReadOnlyList<FoodItemDto>> SearchFoodItemsAsync(string? searchTerm)
@@ -159,7 +175,7 @@ public sealed class DailyLogService : IDailyLogService
             Protein = foodItem.Protein,
             Carbohydrates = foodItem.Carbohydrates,
             Fats = foodItem.Fat,
-            LoggedAt = DateTime.UtcNow
+            LoggedAt = DateTime.Now
         };
 
         await this.dailyLogRepository.AddAsync(dailyLog);

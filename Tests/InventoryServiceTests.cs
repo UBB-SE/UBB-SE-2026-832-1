@@ -1,4 +1,4 @@
-using ClassLibrary.DTOs;
+﻿using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 using Moq;
@@ -6,13 +6,13 @@ using WebAPI.Services;
 
 namespace Tests;
 
-public sealed class InventoryServiceTests
+public sealed class InventoryProxyTests
 {
     private readonly Mock<IIngredientRepository> ingredientRepo = new();
     private readonly Mock<IInventoryRepository> inventoryRepo = new();
     private readonly Mock<IMealPlanRepository> mealPlanRepo = new();
 
-    private InventoryService CreateService() => new(
+    private InventoryProxy CreateService() => new(
         this.ingredientRepo.Object,
         this.inventoryRepo.Object,
         this.mealPlanRepo.Object);

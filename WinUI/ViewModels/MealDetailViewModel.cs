@@ -1,16 +1,17 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using ClassLibrary.Filters;
 using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
 public partial class MealDetailViewModel : ObservableObject
 {
     private const int PAGE_SIZE = 8;
-    private readonly IMealService mealService;
+    private readonly IMealProxy mealService;
     private readonly UserSession userSession;
     private readonly List<FoodItem> allMeals = [];
 
@@ -74,7 +75,7 @@ public partial class MealDetailViewModel : ObservableObject
     [ObservableProperty]
     private bool isSelectedMealNutFree;
 
-    public MealDetailViewModel(IMealService mealService, UserSession userSession)
+    public MealDetailViewModel(IMealProxy mealService, UserSession userSession)
     {
         this.mealService = mealService;
         this.userSession = userSession;
@@ -186,3 +187,4 @@ public partial class MealDetailViewModel : ObservableObject
         this.SelectedMeal = this.Meals.FirstOrDefault();
     }
 }
+

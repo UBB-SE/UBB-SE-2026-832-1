@@ -8,6 +8,8 @@ public interface IUserRepository
 
     Task<User?> GetByIdAsync(int id);
 
+    Task<User?> GetByUsernameAsync(string username);
+
     Task<User?> GetByUsernameAndPasswordAsync(string username, string password);
 
     Task AddAsync(User entity);

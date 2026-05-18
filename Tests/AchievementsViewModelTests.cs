@@ -1,4 +1,4 @@
-using ClassLibrary.Models;
+﻿using ClassLibrary.Models;
 using Moq;
 using WinUI.Services;
 using WinUI.ViewModels;
@@ -7,13 +7,13 @@ namespace Tests;
 
 public class AchievementsViewModelTests
 {
-    private readonly Mock<IAchievementsService> mockAchievementsService;
+    private readonly Mock<IAchievementsProxy> mockAchievementsProxy;
     private readonly AchievementsViewModel viewModel;
 
     public AchievementsViewModelTests()
     {
-        this.mockAchievementsService = new Mock<IAchievementsService>();
-        this.viewModel = new AchievementsViewModel(this.mockAchievementsService.Object);
+        this.mockAchievementsProxy = new Mock<IAchievementsProxy>();
+        this.viewModel = new AchievementsViewModel(this.mockAchievementsProxy.Object);
     }
 
     [Fact]
@@ -24,7 +24,7 @@ public class AchievementsViewModelTests
             new Achievement { AchievementId = 1, Name = "First Workout" },
             new Achievement { AchievementId = 2, Name = "Week Streak" },
         };
-        this.mockAchievementsService
+        this.mockAchievementsProxy
             .Setup(service => service.GetAchievementsAsync(1))
             .ReturnsAsync(expectedAchievements);
 
@@ -38,7 +38,7 @@ public class AchievementsViewModelTests
     [Fact]
     public async Task LoadAchievements_ShouldResultInEmptyCollection_WhenServiceReturnsEmpty()
     {
-        this.mockAchievementsService
+        this.mockAchievementsProxy
             .Setup(service => service.GetAchievementsAsync(1))
             .ReturnsAsync(new List<Achievement>());
 
@@ -50,7 +50,7 @@ public class AchievementsViewModelTests
     [Fact]
     public async Task LoadAchievements_ShouldSetIsLoadingFalse_AfterCompletion()
     {
-        this.mockAchievementsService
+        this.mockAchievementsProxy
             .Setup(service => service.GetAchievementsAsync(1))
             .ReturnsAsync(new List<Achievement>());
 
@@ -71,7 +71,7 @@ public class AchievementsViewModelTests
             new Achievement { AchievementId = 2, Name = "New" },
         };
 
-        this.mockAchievementsService
+        this.mockAchievementsProxy
             .SetupSequence(service => service.GetAchievementsAsync(1))
             .ReturnsAsync(firstBatch)
             .ReturnsAsync(secondBatch);
@@ -86,7 +86,7 @@ public class AchievementsViewModelTests
     [Fact]
     public async Task LoadAchievements_ShouldSetIsLoadingFalse_WhenServiceThrows()
     {
-        this.mockAchievementsService
+        this.mockAchievementsProxy
             .Setup(service => service.GetAchievementsAsync(1))
             .ThrowsAsync(new HttpRequestException("Network error"));
 

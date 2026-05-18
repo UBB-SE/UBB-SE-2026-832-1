@@ -1,3 +1,4 @@
+﻿using ClassLibrary.Proxies.Interfaces;
 namespace WinUI.ViewModels;
 
 public sealed class TabItemModel
@@ -11,3 +12,4 @@ public sealed class TabItemModel
         PageType = pageType;
     }
 }
+

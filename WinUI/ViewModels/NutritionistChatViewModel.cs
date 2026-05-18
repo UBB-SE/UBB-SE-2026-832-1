@@ -1,8 +1,6 @@
-﻿namespace WinUI.ViewModels
+﻿using ClassLibrary.Proxies.Interfaces;
+namespace WinUI.ViewModels
 {
-    using ClassLibrary.Models;
-    using CommunityToolkit.Mvvm.ComponentModel;
-    using CommunityToolkit.Mvvm.Input;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -10,11 +8,14 @@
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
-    using WinUI.Services;
+    using ClassLibrary.Models;
+    using CommunityToolkit.Mvvm.ComponentModel;
+    using CommunityToolkit.Mvvm.Input;
+    using ClassLibrary.Proxies;
 
     public partial class NutritionistChatViewModel : ObservableObject
     {
-        private readonly IChatService chatService;
+        private readonly IChatProxy chatService;
         private CancellationTokenSource? autoRefreshCancellationTokenSource;
         private int? currentConversationId;
         private readonly IUserSession userSession;
@@ -61,7 +62,7 @@
 
         public bool IsEmptyPlaceholderVisible => !IsNutritionistUser && !HasMessages;
 
-        public NutritionistChatViewModel(IChatService chatService, IUserSession userSession)
+        public NutritionistChatViewModel(IChatProxy chatService, IUserSession userSession)
         {
             Conversations = new ObservableCollection<ConversationViewModel>();
             Messages = new ObservableCollection<MessageViewModel>();
@@ -214,7 +215,10 @@
         [RelayCommand]
         public async Task SendMessageAsync()
         {
-            if (string.IsNullOrWhiteSpace(InputText)) return;
+            if (string.IsNullOrWhiteSpace(InputText))
+            {
+                return;
+            }
 
             if (InputText.Length > MaxMessageLength)
             {
@@ -237,7 +241,10 @@
                 }
 
                 var conversation = await chatService.GetOrCreateConversationForUserAsync(this.userSession.CurrentClientId);
-                if (conversation == null) return;
+                if (conversation == null)
+                {
+                    return;
+                }
 
                 currentConversationId = conversation.Id;
             }
@@ -257,3 +264,4 @@
         }
     }
 }
+

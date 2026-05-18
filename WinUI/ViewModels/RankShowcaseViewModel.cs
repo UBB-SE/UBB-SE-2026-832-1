@@ -1,9 +1,10 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using ClassLibrary.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -14,8 +15,7 @@ public partial class RankShowcaseViewModel : ObservableObject
     private const string DEFAULT_NEXT_RANK_INFO = "Complete more achievements to unlock your next rank.";
     private const string RANK_SHOWCASE_LOAD_ERROR_FORMAT = "Failed to load rank showcase: {0}";
 
-
-    private readonly IRankShowcaseService rankShowcaseService;
+    private readonly IRankShowcaseProxy rankShowcaseService;
     private readonly UserSession userSession;
 
     [ObservableProperty]
@@ -39,7 +39,7 @@ public partial class RankShowcaseViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<AchievementShowcaseItem> showcaseAchievements = [];
 
-    public RankShowcaseViewModel(IRankShowcaseService rankShowcaseService, UserSession userSession)
+    public RankShowcaseViewModel(IRankShowcaseProxy rankShowcaseService, UserSession userSession)
     {
         this.rankShowcaseService = rankShowcaseService;
         this.userSession = userSession;
@@ -82,3 +82,4 @@ public partial class RankShowcaseViewModel : ObservableObject
         }
     }
 }
+

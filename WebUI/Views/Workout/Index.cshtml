@@ -1,0 +1,86 @@
+@model WebUI.Models.Workout.WorkoutHistoryViewModel
+@{
+    ViewData["Title"] = "Workout Tracker";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Workout Tracker</h4>
+    <a asp-action="Dashboard" class="btn btn-info text-white">
+        Start Workout
+    </a>
+</div>
+
+@if (Model.Logs.Count == 0)
+{
+    <div class="text-center py-5">
+        <div class="mb-3" style="font-size: 3rem; color: #adb5bd;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z"/>
+                <path d="M11 7.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z"/>
+            </svg>
+        </div>
+        <h5 class="fw-bold">No workouts logged yet</h5>
+        <p class="text-muted">Start a workout to see your logs here.</p>
+        <a asp-action="Dashboard" class="btn btn-info text-white">
+            Start Your First Workout
+        </a>
+    </div>
+}
+else
+{
+    <div class="list-group list-group-flush">
+        @foreach (var (log, i) in Model.Logs.Select((l, i) => (l, i)))
+        {
+            var collapseId = "log-details-" + i;
+            <div class="list-group-item p-0">
+                <div class="d-flex justify-content-between align-items-center px-3 py-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-semibold">@log.WorkoutName</span>
+                        <span class="badge bg-secondary text-uppercase" style="font-size: 0.65rem;">@log.Type</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 text-muted small">
+                        <span>@log.Date.ToString("yyyy-MM-dd")</span>
+                        <span>@($"{(int)log.Duration.TotalMinutes:00}:{log.Duration.Seconds:00}")</span>
+                        @if (log.Exercises.Count > 0)
+                        {
+                            <button class="btn btn-sm btn-link text-muted p-0"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#@collapseId"
+                                    aria-expanded="false">
+                                +
+                            </button>
+                        }
+                    </div>
+                </div>
+                @if (log.Exercises.Count > 0)
+                {
+                    <div class="collapse" id="@collapseId">
+                        <div class="px-3 pb-3">
+                            <table class="table table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Exercise</th>
+                                        <th class="text-center">Sets</th>
+                                        <th class="text-center">Reps</th>
+                                        <th class="text-center">Weight (kg)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ex in log.Exercises)
+                                    {
+                                        <tr>
+                                            <td>@ex.ExerciseName</td>
+                                            <td class="text-center">@ex.Sets.Count</td>
+                                            <td class="text-center">@string.Join(" / ", ex.Sets.OrderBy(s => s.SetNumber).Select(s => s.ActualReps))</td>
+                                            <td class="text-center">@string.Join(" / ", ex.Sets.OrderBy(s => s.SetNumber).Select(s => s.ActualWeight + " kg"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}

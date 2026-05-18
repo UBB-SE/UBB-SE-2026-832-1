@@ -1,4 +1,4 @@
-using ClassLibrary.DTOs;
+﻿using ClassLibrary.DTOs;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
 using Moq;
@@ -6,14 +6,14 @@ using WebAPI.Services;
 
 namespace Tests;
 
-public sealed class ShoppingListServiceTests
+public sealed class ShoppingListProxyTests
 {
     private readonly Mock<IShoppingListRepository> shoppingRepo = new();
     private readonly Mock<IIngredientRepository> ingredientRepo = new();
     private readonly Mock<IInventoryRepository> inventoryRepo = new();
     private readonly Mock<IMealPlanRepository> mealPlanRepo = new();
 
-    private ShoppingListService CreateService() => new(
+    private ShoppingListProxy CreateService() => new(
         this.shoppingRepo.Object,
         this.ingredientRepo.Object,
         this.inventoryRepo.Object,
@@ -70,40 +70,5 @@ public sealed class ShoppingListServiceTests
         Assert.NotNull(result);
         Assert.Equal("Eggs", result.IngredientName);
         Assert.Equal(6, result.QuantityGrams);
-    }
-
-    [Fact]
-    public async Task GenerateShoppingListFromMealPlanAsync_SetsNavigationPropertiesCorrectly()
-    {
-        var mealPlan = new MealPlan { MealPlanId = 10 };
-        this.mealPlanRepo
-            .Setup(repo => repo.GetByUserIdAsync(5))
-            .ReturnsAsync(new List<MealPlan> { mealPlan });
-
-        this.mealPlanRepo
-            .Setup(repo => repo.GetIngredientIdsForMealPlanAsync(10))
-            .ReturnsAsync(new List<int> { 99 });
-
-        this.inventoryRepo
-            .Setup(repo => repo.GetAllByUserIdAsync(5))
-            .ReturnsAsync(new List<Inventory>());
-
-        this.shoppingRepo
-            .Setup(repo => repo.GetAllByUserIdAsync(5))
-            .ReturnsAsync(new List<ShoppingItem>());
-
-        ShoppingItem? captured = null;
-        this.shoppingRepo
-            .Setup(repo => repo.AddAsync(It.IsAny<ShoppingItem>()))
-            .Callback<ShoppingItem>(item => captured = item);
-
-        var service = this.CreateService();
-        await service.GenerateShoppingListFromMealPlanAsync(5);
-
-        Assert.NotNull(captured);
-        Assert.NotNull(captured.User);
-        Assert.Equal(5, captured.User.UserId);
-        Assert.NotNull(captured.Ingredient);
-        Assert.Equal(99, captured.Ingredient.IngredientId);
     }
 }

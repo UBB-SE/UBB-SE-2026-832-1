@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassLibrary.Repositories;
 
-
 public sealed class NutritionRepository : INutritionRepository
 {
     private readonly AppDbContext databaseContext;

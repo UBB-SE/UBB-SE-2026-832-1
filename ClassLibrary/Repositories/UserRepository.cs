@@ -27,6 +27,13 @@ public sealed class UserRepository : IUserRepository
             .FirstOrDefaultAsync(user => user.UserId == id);
     }
 
+    public async Task<User?> GetByUsernameAsync(string username)
+    {
+        return await databaseContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Username == username);
+    }
+
     public async Task AddAsync(User entity)
     {
         databaseContext.Users.Add(entity);

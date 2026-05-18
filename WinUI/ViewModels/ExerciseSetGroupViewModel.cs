@@ -1,4 +1,5 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -8,3 +9,4 @@ public sealed class ExerciseSetGroupViewModel
 
     public ObservableCollection<SetDetailRowViewModel> Sets { get; } = new();
 }
+

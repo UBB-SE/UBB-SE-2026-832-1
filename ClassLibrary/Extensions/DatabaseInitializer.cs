@@ -3,6 +3,7 @@ using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 namespace ClassLibrary.Extensions;
+
 using ClassLibrary.Extensions.Seeders;
 public static class DatabaseInitializer
 {
@@ -10,7 +11,6 @@ public static class DatabaseInitializer
     {
         using var scope = serviceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
         dbContext.Database.EnsureDeleted();
         dbContext.Database.EnsureCreated();
 
@@ -80,7 +80,6 @@ public static class DatabaseInitializer
 
             dbContext.SaveChanges();
         }
-
 
         // CLIENTS
         if (!dbContext.Clients.Any())
@@ -955,8 +954,7 @@ public static class DatabaseInitializer
                     Sender = testUser!,
                     TextContent = "Thanks!",
                     SentAt = DateTime.UtcNow.AddMinutes(-5)
-                }
-            );
+                });
 
             var saraUser = new User
             {
@@ -989,8 +987,7 @@ public static class DatabaseInitializer
                     Sender = nutritionist,
                     TextContent = "Yes!yesyes",
                     SentAt = DateTime.UtcNow.AddDays(-1).AddHours(2)
-                }
-            );
+                });
 
             dbContext.SaveChanges();
 
@@ -1021,5 +1018,4 @@ public static class DatabaseInitializer
 
         dbContext.SaveChanges();
     }
-    
 }

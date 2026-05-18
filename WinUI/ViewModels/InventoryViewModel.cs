@@ -1,15 +1,16 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using ClassLibrary.DTOs;
 using CommunityToolkit.Mvvm.ComponentModel;
-using WinUI.Services;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
 public partial class InventoryViewModel : ObservableObject
 {
-    private readonly IInventoryService inventoryService;
+    private readonly IInventoryProxy inventoryService;
 
     [ObservableProperty]
     private ObservableCollection<InventoryDataTransferObject> inventoryItems = new();
@@ -38,7 +39,7 @@ public partial class InventoryViewModel : ObservableObject
     [ObservableProperty]
     private string statusMessage = string.Empty;
 
-    public InventoryViewModel(IInventoryService inventoryService)
+    public InventoryViewModel(IInventoryProxy inventoryService)
     {
         this.inventoryService = inventoryService ?? throw new ArgumentNullException(nameof(inventoryService));
     }
@@ -224,3 +225,5 @@ public partial class InventoryViewModel : ObservableObject
         }
     }
 }
+
+

@@ -180,7 +180,7 @@ public sealed class CalendarExportService : ICalendarExportService
         {
             for (int day = 0; day < DAYS_IN_WEEK; day++)
             {
-                var currentDate = startDate.AddDays(week * DAYS_IN_WEEK + day);
+                var currentDate = startDate.AddDays((week * DAYS_IN_WEEK) + day);
 
                 if (selectedDays.Contains(currentDate.DayOfWeek))
                 {

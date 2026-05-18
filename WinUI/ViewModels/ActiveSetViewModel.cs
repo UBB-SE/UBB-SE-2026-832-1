@@ -1,4 +1,5 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
@@ -65,3 +66,4 @@ public sealed partial class ActiveSetViewModel : ObservableObject
         this.AutoSaveHandler?.Invoke(this);
     }
 }
+

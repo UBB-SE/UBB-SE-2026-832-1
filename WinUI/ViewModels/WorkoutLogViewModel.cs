@@ -1,14 +1,14 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinUI.Services;
-using WinUI.Services.Interfaces;
+using ClassLibrary.Proxies;
+using ClassLibrary.Proxies.Interfaces;
 
 namespace WinUI.ViewModels;
 
 public sealed partial class WorkoutLogViewModel : ObservableObject
 {
-    private readonly IWorkoutLogService workoutLogService;
+    private readonly IWorkoutLogProxy workoutLogService;
 
     public ObservableCollection<WorkoutLogItemViewModel> Logs { get; } = new();
 
@@ -23,7 +23,7 @@ public sealed partial class WorkoutLogViewModel : ObservableObject
 
     public event Action<int>? StartWorkoutRequested;
 
-    public WorkoutLogViewModel(IWorkoutLogService workoutLogService)
+    public WorkoutLogViewModel(IWorkoutLogProxy workoutLogService)
     {
         this.workoutLogService = workoutLogService;
     }
@@ -66,3 +66,4 @@ public sealed partial class WorkoutLogViewModel : ObservableObject
         StartWorkoutRequested?.Invoke(clientId);
     }
 }
+

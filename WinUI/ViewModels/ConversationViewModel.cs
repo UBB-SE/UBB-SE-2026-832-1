@@ -1,7 +1,8 @@
-﻿namespace WinUI.ViewModels
+﻿using ClassLibrary.Proxies.Interfaces;
+namespace WinUI.ViewModels
 {
     using ClassLibrary.Models;
-    using WinUI.Services;
+    using ClassLibrary.Proxies;
 
     public class ConversationViewModel
     {
@@ -21,3 +22,4 @@
         public bool ShouldHighlight => conversation.HasUnanswered && userSession.CurrentRole == "Nutritionist";
     }
 }
+

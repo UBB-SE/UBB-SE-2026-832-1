@@ -1,7 +1,6 @@
 using ClassLibrary.DTOs.Analytics;
 using ClassLibrary.IRepositories;
 using ClassLibrary.Models;
-using ClassLibrary.Services;
 using WebAPI.IServices;
 
 namespace WebAPI.Services;
